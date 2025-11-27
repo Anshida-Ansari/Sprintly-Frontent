@@ -1,6 +1,9 @@
 import { Code2, GitBranch, Calendar, Users, CheckCircle, ArrowRight, Zap, Shield, BarChart3 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function SprintlyLanding() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Navigation */}
@@ -16,7 +19,11 @@ export default function SprintlyLanding() {
             <a href="#features" className="text-gray-600 hover:text-indigo-600 transition">Features</a>
             <a href="#teams" className="text-gray-600 hover:text-indigo-600 transition">For Teams</a>
             <a href="#about" className="text-gray-600 hover:text-indigo-600 transition">About</a>
-            <button className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-sm">
+            {/* UPDATED: Navigate to /register */}
+            <button 
+              onClick={() => navigate('/register')}
+              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-sm"
+            >
               Join Sprintly
             </button>
           </div>
@@ -41,7 +48,11 @@ export default function SprintlyLanding() {
               The all-in-one platform where developers and leads manage projects, collaborate seamlessly, and integrate tools—without the chaos.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="px-8 py-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg font-semibold">
+              {/* UPDATED: Navigate to /register */}
+              <button 
+                onClick={() => navigate('/register')}
+                className="px-8 py-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg font-semibold"
+              >
                 Get Started <ArrowRight className="w-5 h-5" />
               </button>
               <button className="px-8 py-4 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition shadow-md border border-gray-200 text-lg font-semibold">
@@ -254,7 +265,11 @@ export default function SprintlyLanding() {
               Join thousands of development teams already using Sprintly to ship faster and collaborate better.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-8 py-4 bg-white text-indigo-600 rounded-xl hover:bg-gray-50 transition shadow-lg text-lg font-semibold">
+              {/* UPDATED: Navigate to /register */}
+              <button 
+                onClick={() => navigate('/register')}
+                className="px-8 py-4 bg-white text-indigo-600 rounded-xl hover:bg-gray-50 transition shadow-lg text-lg font-semibold"
+              >
                 Join the Waitlist
               </button>
               <button className="px-8 py-4 bg-indigo-700 text-white rounded-xl hover:bg-indigo-800 transition border-2 border-indigo-400 text-lg font-semibold">
