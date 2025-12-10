@@ -115,7 +115,6 @@ export default function SprintlyLogin() {
               {isLoading ? 'Signing in...' : 'Login'}
             </button>
           </div>
-
           {/* Footer */}
           <div className="mt-6 text-center text-sm text-gray-500">
             Need help? <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">Contact Support</a>
