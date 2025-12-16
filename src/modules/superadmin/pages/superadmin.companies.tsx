@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { useDebounce } from "../../../shared/hooks/useDebounce";
 import { useCompanies } from "../hooks/useCompanies";
-import { Table } from "../../../shared/components/table"
+import { Table } from "../../../shared/components/Table"
 import { Pagination } from "../../../shared/components/pagination";
 import { type Company } from "../types/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

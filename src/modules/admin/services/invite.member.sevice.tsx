@@ -13,5 +13,15 @@ export const inviteMemberService = {
     async setpassword(payload:SetPasswordPayload):Promise<SetPasswordResponse>{
         const res = await api.post('auth/set-password',payload)
         return res.data
-    }
+    },
+    async getMembers({ page, limit, search }: { page: number; limit: number; search?: string }) {
+        console.log("GET /admin/members HIT!");
+    const params = new URLSearchParams();
+    params.append("page", page.toString());
+    params.append("limit", limit.toString());
+    if (search) params.append("search", search);
+
+    const res = await api.get(`/admin/members?${params.toString()}`);
+    return res.data;
+  },
 }

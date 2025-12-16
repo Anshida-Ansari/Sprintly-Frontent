@@ -1,14 +1,12 @@
-import { createBrowserRouter, Outlet,  } from "react-router-dom";
+import { createBrowserRouter,  } from "react-router-dom";
 import ProtectedRoutes from "./protected.route";
 import Login from "../modules/auth/pages/login"
 import Register from "../modules/auth/pages/register";
 import OTP from "../modules/auth/pages/otp";
-import DashboardLayout from "../shared/layouts/dashboard.layout";
 import LandingPage from "../modules/landing/pages/Landing";
 import App from "../App";
 import AdminDashboard from "../modules/admin/pages/admin.dashboard";
 import SuperAdminDashboard from "../modules/superadmin/pages/superadmin.dashboard";
-import DevelopersDashboard from "../modules/developers/pages/developers.dashboard";
 import ForgotPassword from "../modules/auth/pages/forgotPassword";
 import AdminLayout from "../shared/layouts/admin.layout";
 import SuperAdminLayout from "../shared/layouts/superadmin.layout";
@@ -17,6 +15,7 @@ import SuperAdminCompanyDetail from "../modules/superadmin/pages/superadmin.comp
 import MemberAccept from "../modules/auth/pages/setPassword";
 import DeveloperLayout from "../shared/layouts/developer.layout";
 import DashboardPage from "../modules/developers/pages/developers.dashboard";
+import Members from "../modules/admin/pages/list.users";
 //public routes
 export const router = createBrowserRouter([
   // PUBLIC
@@ -44,7 +43,7 @@ export const router = createBrowserRouter([
         children: [
           { path: "dashboard", element: <AdminDashboard /> },
           { path: "projects", element: <div>Projects</div> },
-          { path: "members", element: <div>Members</div> },
+          { path: "members", element: <Members/> },
           { path: "sprints", element: <div>Sprints</div> },
           { path: "user-stories", element: <div>User Stories</div> },
           { path: "team", element: <div>Team</div> },
