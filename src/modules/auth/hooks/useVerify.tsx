@@ -17,7 +17,9 @@ export function useVerifyOtp(){
 
             login(res.user,res.accessToken)
 
-            navigate("/dashboard")
+            localStorage.removeItem("otp_token") 
+
+            navigate("/dashboard",{replace:true})
 
 
         },

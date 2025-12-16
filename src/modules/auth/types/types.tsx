@@ -33,3 +33,8 @@ export type ForgotPasswordRequest = {
 export type LogoutRequest = {
     refreshToken: string
 }
+
+export type ForgotRequest = {
+    email: string
+}
+

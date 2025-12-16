@@ -11,12 +11,16 @@ export function useRegister(){
         mutationFn:(data:RegisterRequest)=>authService.Register(data),
 
         onSuccess:(res)=>{
-            toast.success("Registered successfully")
+            toast.success("OTP sent successfully")
+
+            localStorage.setItem("otp_token",res.data.token)
+
+            navigate('/otp',{replace:true})
 
     
-        if(res.otpRequired){
-            navigate("/otp",{state:{email:res.user.email}})
-        }
+        // if(res.otpRequired){
+        //     navigate("/otp",{state:{email:res.user.email}})
+        // }
     },
     onError:(err:any)=>{
         toast.error(err.response?.data?.message || "Registration failed")
@@ -24,4 +28,5 @@ export function useRegister(){
 
        
     })
+
 }

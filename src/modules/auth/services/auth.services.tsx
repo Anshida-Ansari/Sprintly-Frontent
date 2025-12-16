@@ -4,7 +4,7 @@ import type { ForgotPasswordRequest, LoginRequest, RegisterRequest, ResendOtpReq
 
 export const authService = {
     async Register(data:RegisterRequest){
-        const res = await api.post("/auth/admin/register",data)
+        const res = await api.post("auth/admin/register",data)
         return res.data
     },
 
@@ -38,7 +38,10 @@ export const authService = {
     async getMe(){
         const res = await api.get("/auth/me")
         return res.data
-    }
-
+    },
+    async forgotPassword(){
+        const res = await api.get("/forgot-password")
+        return res.data
+    },
     
 }

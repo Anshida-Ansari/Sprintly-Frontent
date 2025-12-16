@@ -1,7 +1,8 @@
 import axios from "axios";
+import { UserAuth } from "../modules/auth/store/store";
 
 const api = axios.create({
-    baseURL: import.meta.env.APP_API_URL,
+    baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true,
     headers: {
         "Content-Type": "application/json",
@@ -12,7 +13,9 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem("access_token")
+        // const token = localStorage.getItem("access_token")
+        const token = UserAuth.getState().token
+
         if (token) {
             config.headers.Authorization = `Bearer ${token}`
         }
@@ -23,6 +26,11 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 )
 
+
+const refreshApi = axios.create({
+    baseURL: import.meta.env.VITE_API_URL,
+    withCredentials: true,
+})
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
@@ -31,11 +39,14 @@ api.interceptors.response.use(
             originalRequest._retry = true
 
             try {
-                const res = await api.post("/auth/refresh")
 
-                const newToken = res.data.token
-                localStorage.setItem("access_token", newToken)
+                const res = await refreshApi.post("/auth/refresh")
 
+
+                const newToken = res.data.acessToken
+                const user = UserAuth.getState().user
+                UserAuth.getState().login(user!, newToken)
+                originalRequest.headers.Authorization = `Bearer ${newToken}`
                 return api(originalRequest)
             } catch (error) {
                 localStorage.removeItem("access_token")
@@ -47,4 +58,4 @@ api.interceptors.response.use(
 
 )
 
-export default api
+export default api  
