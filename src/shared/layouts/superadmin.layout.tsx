@@ -1,85 +1,60 @@
 import { NavLink, Outlet } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Building2,
-  Activity,
-  CreditCard,
-  Settings,
-  LogOut,
-} from "lucide-react";
+import { LayoutDashboard, Building2, Activity, CreditCard, Settings, LogOut, Bell } from "lucide-react";
 
 const sidebarLinks = [
-  {
-    name: "Dashboard",
-    path: "/superadmin/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    name: "Companies",
-    path: "/superadmin/companies",
-    icon: Building2,
-  },
-  {
-    name: "Active Logs",
-    path: "/superadmin/logs",
-    icon: Activity,
-  },
-  {
-    name: "Subscription Plans",
-    path: "/superadmin/subscriptions",
-    icon: CreditCard,
-  },
-  {
-    name: "Settings",
-    path: "/superadmin/settings",
-    icon: Settings,
-  },
+  { name: "Dashboard", path: "/superadmin/dashboard", icon: LayoutDashboard },
+  { name: "Companies", path: "/superadmin/companies", icon: Building2 },
+  { name: "Logs", path: "/superadmin/logs", icon: Activity },
+  { name: "Plans", path: "/superadmin/subscriptions", icon: CreditCard },
+  { name: "Settings", path: "/superadmin/settings", icon: Settings },
 ];
 
 export default function SuperAdminLayout() {
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-gray-900 text-gray-100 flex flex-col p-6">
-        <h2 className="text-2xl font-bold mb-8 text-white">
-          Sprintly <span className="text-indigo-400"></span>
-        </h2>
+    <div className="min-h-screen bg-[#F8FAFC]">
+      {/* Top Navbar */}
+      <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+          <div className="flex items-center gap-8">
+            <h2 className="text-xl font-bold tracking-tight text-gray-900">
+              Sprintly<span className="text-indigo-600">.</span>
+            </h2>
+            <nav className="hidden md:flex items-center gap-1">
+              {sidebarLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <NavLink
+                    key={link.path}
+                    to={link.path}
+                    className={({ isActive }) =>
+                      `flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                        isActive 
+                          ? "bg-indigo-50 text-indigo-700" 
+                          : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+                      }`
+                    }
+                  >
+                    <Icon size={16} />
+                    {link.name}
+                  </NavLink>
+                );
+              })}
+            </nav>
+          </div>
 
-        <nav className="flex flex-col gap-2 flex-1">
-          {sidebarLinks.map((link) => {
-            const Icon = link.icon;
-            return (
-              <NavLink
-                key={link.path}
-                to={link.path}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-lg transition-all
-                  ${
-                    isActive
-                      ? "bg-indigo-600 text-white"
-                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
-                  }`
-                }
-              >
-                <Icon size={20} />
-                <span className="font-medium">{link.name}</span>
-              </NavLink>
-            );
-          })}
-        </nav>
+          <div className="flex items-center gap-4">
+            <button className="p-2 text-gray-400 hover:text-gray-600"><Bell size={20} /></button>
+            <div className="h-8 w-px bg-gray-200 mx-2" />
+            <NavLink to="/login" className="flex items-center gap-2 text-sm font-medium text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition">
+              <LogOut size={18} />
+              <span className="hidden sm:inline">Logout</span>
+            </NavLink>
+          </div>
+        </div>
+      </header>
 
-        {/* Logout */}
-        <NavLink
-          to="/logout"
-          className="mt-6 flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-grey-700 text-white font-medium transition"
-        >
-          <LogOut size={20} />
-          Logout
-        </NavLink>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-8">
+      {/* Main Content Area */}
+      <main className="mx-auto max-w-7xl p-6 lg:p-10">
         <Outlet />
       </main>
     </div>

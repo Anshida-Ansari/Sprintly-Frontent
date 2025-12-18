@@ -1,54 +1,79 @@
 import { NavLink, Outlet } from "react-router-dom";
+import { 
+  LayoutDashboard, FolderKanban, Users, Zap, ScrollText, 
+  UserPlus, Video, BarChart3, Settings, LogOut 
+} from "lucide-react";
 
 const sidebarLinks = [
-    { name: "Dashboard", path: "/admin/dashboard" },
-    { name: "Projects", path: "/admin/projects" },
-    { name: "Members", path: "/admin/members" },
-    { name: "Sprints", path: "/admin/sprints" },
-    { name: "User Stories", path: "/admin/user-stories" },
-    { name: "Team", path: "/admin/team" },
-    { name: "Meetings", path: "/admin/meetings" },
-    { name: "Reports", path: "/admin/reports" },
-    { name: "Settings", path: "/admin/settings" },
+  { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
+  { name: "Projects", path: "/admin/projects", icon: FolderKanban },
+  { name: "Members", path: "/admin/members", icon: Users },
+  { name: "Sprints", path: "/admin/sprints", icon: Zap },
+  { name: "User Stories", path: "/admin/user-stories", icon: ScrollText },
+  { name: "Team", path: "/admin/team", icon: UserPlus },
+  { name: "Meetings", path: "/admin/meetings", icon: Video },
+  { name: "Reports", path: "/admin/reports", icon: BarChart3 },
 ];
 
 export default function AdminLayout() {
-    return (
-        <div className="flex min-h-screen">
-            {/* Sidebar */}
-            <aside className="w-64 bg-indigo-600 text-white p-6 flex flex-col">
-                <h2 className="text-2xl font-bold mb-8">Sprintly Admin</h2>
-
-                <nav className="flex flex-col gap-3 flex-1">
-                    {sidebarLinks.map((link) => (
-                        <NavLink
-                            key={link.path}
-                            to={link.path}
-                            className={({ isActive }) =>
-                                `px-4 py-2 rounded-md transition-all ${isActive
-                                    ? "bg-white text-indigo-600 font-semibold"
-                                    : "hover:bg-indigo-500"
-                                }`
-                            }
-                        >
-                            {link.name}
-                        </NavLink>
-                    ))}
-                </nav>
-
-                {/* Logout */}
-                <NavLink
-                    to="/admin/logout"
-                    className="mt-6 px-4 py-2 rounded-md bg-red-500 hover:bg-red-600 text-center font-medium"
-                >
-                    Logout
-                </NavLink>
-            </aside>
-
-            {/* Main Content */}
-            <main className="flex-1 p-6 bg-gray-100">
-                <Outlet />
-            </main>
+  return (
+    <div className="flex min-h-screen bg-[#FDFDFF]">
+      {/* Sidebar */}
+      <aside className="w-72 bg-white border-r border-gray-100 p-6 flex flex-col sticky top-0 h-screen">
+        <div className="flex items-center gap-3 mb-10 px-2">
+          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
+            <Zap className="text-white" size={20} fill="white" />
+          </div>
+          <h2 className="text-xl font-bold tracking-tight text-gray-900">Sprintly<span className="text-indigo-600">.</span></h2>
         </div>
-    );
+
+        <nav className="flex flex-col gap-1 flex-1">
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-4 mb-2">Main Menu</p>
+          {sidebarLinks.map((link) => {
+            const Icon = link.icon;
+            return (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${
+                    isActive
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
+                      : "text-gray-500 hover:bg-indigo-50 hover:text-indigo-600"
+                  }`
+                }
+              >
+                {/* Fixed the Icon className here */}
+                {({ isActive }) => (
+                  <>
+                    <Icon 
+                      size={20} 
+                      className={isActive ? "text-white" : "text-gray-500 group-hover:text-indigo-600"} 
+                    />
+                    <span className="font-semibold text-sm">{link.name}</span>
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
+        </nav>
+
+        <div className="mt-auto space-y-2 pt-6 border-t border-gray-100">
+          <NavLink to="/admin/settings" className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 rounded-xl transition-all">
+            <Settings size={20} />
+            <span className="font-semibold text-sm">Settings</span>
+          </NavLink>
+          <NavLink to="/login" className="flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-all group">
+            <LogOut size={20} />
+            <span className="font-semibold text-sm">Logout</span>
+          </NavLink>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 p-8 lg:p-12 overflow-y-auto">
+        <Outlet />
+      </main>
+    </div>
+  );
 }
