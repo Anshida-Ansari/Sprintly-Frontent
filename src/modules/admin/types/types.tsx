@@ -28,6 +28,30 @@ export interface SetPasswordResponse {
     message: string;
 }
 
+export type ProjectStatus = 'Active' | 'Completed';
+
+export interface IProject {
+    id: string;
+    name: string;
+    description: string;
+    status: ProjectStatus;
+    startDate: string;
+    endDate: string;
+    gitRepoUrl?: string;
+    members: string[]; 
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface GetProjectsResponse {
+    success: boolean;
+    data: IProject[];
+    total: number;
+    page: number;
+    limit: number;
+}
+
+
 export interface CreateProjectPayload {
     name: string;
     description: string;
@@ -39,5 +63,5 @@ export interface CreateProjectPayload {
 export interface CreateProjectResponse {
     success: boolean;
     message: string;
-    data: any; // Using any for now, can be specific Project type later
+    data: any; 
 }
