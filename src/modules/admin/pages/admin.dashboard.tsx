@@ -3,8 +3,10 @@ import { FolderOpen, Play, Clock, Trophy, ChevronRight, Plus, RefreshCw, Search,
 import InviteMemberBtn from '../components/invite.member.btn';
 import { useInviteMember } from '../hooks/useInviteMember';
 import InviteMemberModal from '../components/invite.modal';
+import { UserAuth } from '../../auth/store/store';
 
 export default function AdminDashboard() {
+  const user = UserAuth((state)=>state.user)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { mutate: inviteMember, isPending } = useInviteMember();
 
@@ -50,7 +52,7 @@ export default function AdminDashboard() {
       <div className="relative overflow-hidden bg-indigo-600 rounded-[2rem] p-8 text-white shadow-xl shadow-indigo-100">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="max-w-xl">
-            <h2 className="text-2xl lg:text-3xl font-bold mb-2">Welcome back, John 👋</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold mb-2">Welcome back, {user?.name || "User"} 👋</h2>
             <p className="text-indigo-100 text-lg opacity-90 font-medium">
               You have <span className="text-white font-bold underline decoration-indigo-400 underline-offset-4">12 reviews</span> pending for the current sprint. Your team is waiting for your feedback!
             </p>

@@ -1,14 +1,11 @@
 import { useState } from "react"
 import { useLogin } from "../hooks/useLogin"
 import { Link } from "react-router-dom"
+import { ArrowRight, Loader2, Fingerprint } from "lucide-react"
 
 export default function Login() {
     const { mutate: login, isPending } = useLogin()
-
-    const [form, setForm] = useState({
-        email: "",
-        password: "",
-    })
+    const [form, setForm] = useState({ email: "", password: "" })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value })
@@ -20,298 +17,91 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen w-full flex bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 relative overflow-hidden">
-            {/* Decorative Background Blobs */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <svg className="absolute top-10 left-10 w-96 h-96 opacity-40" viewBox="0 0 400 400">
-                    <path fill="#93C5FD" d="M150,50 Q250,80 300,150 T280,280 Q200,320 120,260 T150,50Z" />
-                </svg>
-                <svg className="absolute top-1/4 right-20 w-64 h-64 opacity-30" viewBox="0 0 200 200">
-                    <path fill="#BFDBFE" d="M100,30 Q150,50 160,100 T120,170 Q70,180 50,130 T100,30Z" />
-                </svg>
-                <div className="absolute top-20 right-32 w-4 h-4 bg-indigo-400 rounded-full opacity-60"></div>
-                <div className="absolute bottom-40 right-1/4 w-3 h-3 bg-blue-400 rounded-full opacity-50"></div>
-            </div>
-
-            {/* Left Side - Form */}
-            <div className="w-full lg:w-5/12 flex items-center justify-center p-8 relative z-10">
-                <div className="w-full max-w-md">
-                    {/* Logo */}
-                    <div className="mb-8">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="flex items-center justify-center w-10 h-10 bg-indigo-600 rounded-lg">
-                                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                                </svg>
-                            </div>
-                            <span className="text-2xl font-bold text-gray-800">Sprintly</span>
-                        </div>
-                    </div>
-
-                    {/* Form Card */}
-                    <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-                        <div className="mb-6">
-                            <h1 className="text-2xl font-bold text-gray-800 mb-1">
-                                Welcome back
-                            </h1>
-                            <p className="text-gray-500 text-sm">
-                                Sign in to your account to continue
-                            </p>
-                        </div>
-
-                        {/* THIS IS THE KEY PART - Wrap inputs in form element */}
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            {/* Email */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Email
-                                </label>
-                                <input
-                                    name="email"
-                                    type="email"
-                                    placeholder="name@company.com"
-                                    value={form.email}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white outline-none transition-all duration-200 placeholder:text-gray-400 text-sm"
-                                />
-                            </div>
-
-                            {/* Password */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Password
-                                </label>
-                                <input
-                                    name="password"
-                                    type="password"
-                                    placeholder="Enter your password"
-                                    value={form.password}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white outline-none transition-all duration-200 placeholder:text-gray-400 text-sm"
-                                />
-                            </div>
-
-                            {/* Remember Me & Forgot Password */}
-                            <div className="flex items-center justify-between text-sm">
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                    />
-                                    <span className="text-gray-600">Remember me</span>
-                                </label>
-                                <Link
-                                    to="/forgot-password"
-                                    className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
-                                >
-                                    Forgot password?
-                                </Link>
-
-                            </div>
-
-                            {/* Submit Button */}
-                            <button
-                                type="submit"
-                                disabled={isPending}
-                                className="w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition-all duration-200 shadow-md disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-indigo-600 mt-6"
-                            >
-                                {isPending ? (
-                                    <span className="flex items-center justify-center gap-2">
-                                        <svg
-                                            className="animate-spin h-5 w-5"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <circle
-                                                className="opacity-25"
-                                                cx="12"
-                                                cy="12"
-                                                r="10"
-                                                stroke="currentColor"
-                                                strokeWidth="4"
-                                            ></circle>
-                                            <path
-                                                className="opacity-75"
-                                                fill="currentColor"
-                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                            ></path>
-                                        </svg>
-                                        Logging in...
-                                    </span>
-                                ) : (
-                                    "LOGIN"
-                                )}
-                            </button>
-                        </form>
-                        {/* End of form element */}
-
-                        {/* Footer Link */}
-                        <div className="mt-6 text-center">
-                            <p className="text-sm text-gray-600">
-                                Don't have an account?{" "}
-                                <Link
-                                    to="/register"
-                                    className="text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
-                                >
-                                    register?
-                                </Link>
-                            </p>
-                        </div>
-                    </div>
+        <div className="min-h-screen w-full bg-white flex flex-col font-sans antialiased text-slate-900">
+            {/* Top Navigation Bar */}
+            <nav className="p-8 flex justify-between items-center w-full max-w-7xl mx-auto">
+                <div className="flex items-center gap-2">
+               
+                    <span className="font-black text-2xl tracking-tighter text-slate-900">
+                        Sprintly<span className="text-blue-600">.</span>
+                    </span>
                 </div>
-            </div>
+                <Link to="/register" className="text-sm font-bold border-b-2 border-blue-600 pb-1 hover:text-blue-600 transition-colors">
+                    CREATE ACCOUNT
+                </Link>
+            </nav>
 
-            {/* Right Side - Illustration (copy from artifact) */}
-            <div className="hidden lg:flex lg:w-7/12 items-center justify-center p-12 relative z-10">
-                <div className="relative w-full max-w-4xl">
-                    {/* Background Wave Blob */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <svg viewBox="0 0 800 600" className="w-full h-auto">
-                            <defs>
-                                <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="#93C5FD" stopOpacity="0.3" />
-                                    <stop offset="100%" stopColor="#BFDBFE" stopOpacity="0.4" />
-                                </linearGradient>
-                            </defs>
-                            <path
-                                fill="url(#waveGradient)"
-                                d="M200,100 Q400,50 500,150 Q600,250 550,350 Q500,450 350,480 Q200,510 100,400 Q0,290 100,200 Q150,150 200,100Z"
+            <main className="flex-1 flex items-center justify-center p-6">
+                <div className="w-full max-w-[480px]">
+                    {/* Bold Heading Section */}
+                    <div className="mb-12 space-y-4">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full">
+                            <Fingerprint size={14} className="text-blue-600" />
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Secure Access v2</span>
+                        </div>
+                        <h1 className="text-5xl font-black tracking-tight leading-[0.9]">
+                            WORK <span className="text-blue-600">FASTER.</span><br />
+                            CODE BETTER.
+                        </h1>
+                        <p className="text-slate-500 font-medium text-lg max-w-[320px]">
+                            The command center for your next big release.
+                        </p>
+                    </div>
+
+                    {/* Standard but Modern Form */}
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="group relative border-2 border-slate-100 rounded-2xl p-4 focus-within:border-blue-600 transition-all duration-300">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-focus-within:text-blue-600 mb-1">Identity</p>
+                            <input
+                                name="email"
+                                type="email"
+                                placeholder="name@company.com"
+                                value={form.email}
+                                onChange={handleChange}
+                                required
+                                className="w-full bg-transparent outline-none font-bold text-lg placeholder:text-slate-200"
                             />
-                        </svg>
-                    </div>
-
-                    {/* Main Dashboard Card - Centered */}
-                    <div className="relative z-20 bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-gray-200/50 mx-auto max-w-2xl">
-                        {/* Dashboard Header */}
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="space-y-1">
-                                <div className="h-4 w-32 bg-indigo-500 rounded"></div>
-                                <div className="h-3 w-24 bg-indigo-300 rounded"></div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-indigo-400"></div>
-                                <div className="h-3 w-20 bg-indigo-200 rounded"></div>
-                            </div>
                         </div>
 
-                        {/* Content Grid */}
-                        <div className="grid grid-cols-3 gap-6">
-                            {/* Left Sidebar - Navigation */}
-                            <div className="col-span-1 space-y-2">
-                                <div className="h-10 bg-indigo-500 rounded-lg"></div>
-                                <div className="h-8 bg-indigo-200 rounded-lg"></div>
-                                <div className="h-8 bg-indigo-200 rounded-lg"></div>
-                                <div className="h-8 bg-indigo-200 rounded-lg"></div>
-                                <div className="h-8 bg-indigo-200 rounded-lg"></div>
+                        <div className="group relative border-2 border-slate-100 rounded-2xl p-4 focus-within:border-blue-600 transition-all duration-300">
+                            <div className="flex justify-between items-center mb-1">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-focus-within:text-blue-600">Access Key</p>
+                                <Link to="/forgot" className="text-[10px] font-bold text-slate-300 hover:text-blue-600">FORGOT?</Link>
                             </div>
-
-                            {/* Main Content */}
-                            <div className="col-span-2 space-y-4">
-                                {/* Chart Area */}
-                                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-indigo-100">
-                                    <div className="relative w-full h-48 flex items-center justify-center">
-                                        {/* Pie Chart */}
-                                        <svg className="w-40 h-40 transform -rotate-90">
-                                            <circle cx="80" cy="80" r="70" fill="none" stroke="#BFDBFE" strokeWidth="20" />
-                                            <circle
-                                                cx="80"
-                                                cy="80"
-                                                r="70"
-                                                fill="none"
-                                                stroke="#6366F1"
-                                                strokeWidth="20"
-                                                strokeDasharray="439.6"
-                                                strokeDashoffset="109.9"
-                                            />
-                                            <circle
-                                                cx="80"
-                                                cy="80"
-                                                r="70"
-                                                fill="none"
-                                                stroke="#818CF8"
-                                                strokeWidth="20"
-                                                strokeDasharray="439.6"
-                                                strokeDashoffset="219.8"
-                                            />
-                                        </svg>
-                                    </div>
-                                </div>
-
-                                {/* List Items */}
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2 bg-blue-50 p-2 rounded-lg">
-                                        <div className="w-3 h-3 rounded bg-indigo-500"></div>
-                                        <div className="h-2 flex-1 bg-indigo-300 rounded"></div>
-                                    </div>
-                                    <div className="flex items-center gap-2 bg-blue-50 p-2 rounded-lg">
-                                        <div className="w-3 h-3 rounded bg-indigo-400"></div>
-                                        <div className="h-2 flex-1 bg-indigo-200 rounded"></div>
-                                    </div>
-                                    <div className="flex items-center gap-2 bg-blue-50 p-2 rounded-lg">
-                                        <div className="w-3 h-3 rounded bg-indigo-300"></div>
-                                        <div className="h-2 flex-1 bg-indigo-200 rounded"></div>
-                                    </div>
-                                </div>
-                            </div>
+                            <input
+                                name="password"
+                                type="password"
+                                placeholder="••••••••"
+                                value={form.password}
+                                onChange={handleChange}
+                                required
+                                className="w-full bg-transparent outline-none font-bold text-lg placeholder:text-slate-200"
+                            />
                         </div>
-                    </div>
 
-                    {/* Person Left - with Chart Board */}
-                    <div className="absolute left-8 bottom-8 z-30">
-                        <div className="relative">
-                            {/* Person */}
-                            <div className="w-20 h-32 relative">
-                                {/* Head */}
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10 bg-gradient-to-br from-indigo-400 to-indigo-500 rounded-full"></div>
-                                {/* Body */}
-                                <div className="absolute top-10 left-1/2 -translate-x-1/2 w-12 h-16 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-t-xl"></div>
-                                {/* Legs */}
-                                <div className="absolute top-26 left-1/2 -translate-x-1/2 flex gap-1">
-                                    <div className="w-5 h-8 bg-indigo-700 rounded-b-lg"></div>
-                                    <div className="w-5 h-8 bg-indigo-700 rounded-b-lg"></div>
-                                </div>
-                            </div>
-                            {/* Chart Board */}
-                            <div className="absolute -right-16 top-4 w-16 h-20 bg-white rounded-lg shadow-lg border border-gray-200 p-2">
-                                <div className="h-full flex items-end justify-around gap-1">
-                                    <div className="w-2 bg-indigo-400 rounded-t" style={{ height: '40%' }}></div>
-                                    <div className="w-2 bg-indigo-500 rounded-t" style={{ height: '70%' }}></div>
-                                    <div className="w-2 bg-indigo-600 rounded-t" style={{ height: '55%' }}></div>
-                                    <div className="w-2 bg-indigo-700 rounded-t" style={{ height: '85%' }}></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        <button
+                            type="submit"
+                            disabled={isPending}
+                            className="w-full h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-between px-8 hover:bg-blue-600 transition-all duration-300 group shadow-2xl shadow-slate-200 active:scale-95 disabled:opacity-50"
+                        >
+                            <span className="font-black text-xl tracking-tight">LOG IN</span>
+                            {isPending ? (
+                                <Loader2 className="animate-spin" size={24} />
+                            ) : (
+                                <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
+                            )}
+                        </button>
+                    </form>
 
-                    {/* Person Right */}
-                    <div className="absolute right-12 bottom-8 z-30">
-                        <div className="w-20 h-32 relative">
-                            {/* Head */}
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10 bg-gradient-to-br from-indigo-400 to-indigo-500 rounded-full"></div>
-                            {/* Body */}
-                            <div className="absolute top-10 left-1/2 -translate-x-1/2 w-12 h-16 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-t-xl"></div>
-                            {/* Legs */}
-                            <div className="absolute top-26 left-1/2 -translate-x-1/2 flex gap-1">
-                                <div className="w-5 h-8 bg-indigo-700 rounded-b-lg"></div>
-                                <div className="w-5 h-8 bg-indigo-700 rounded-b-lg"></div>
-                            </div>
-                        </div>
+                    {/* Minimal Footer Info */}
+                    <div className="mt-12 pt-8 border-t border-slate-50 flex items-center gap-8 text-[11px] font-bold text-slate-300 uppercase tracking-widest">
+                        <span>EST. 2024</span>
+                        <span>Open Source</span>
+                        <div className="ml-auto w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span className="text-emerald-500">System Live</span>
                     </div>
-
-                    {/* 3D Cylinders/Boxes at Bottom */}
-                    <div className="absolute left-1/2 -translate-x-1/2 bottom-4 flex gap-3 z-20">
-                        <div className="w-12 h-16 bg-gradient-to-br from-indigo-300 to-indigo-400 rounded-lg transform perspective-1000 rotate-y-12"></div>
-                        <div className="w-12 h-20 bg-gradient-to-br from-indigo-400 to-indigo-500 rounded-lg transform perspective-1000 rotate-y-12"></div>
-                        <div className="w-12 h-14 bg-gradient-to-br from-indigo-300 to-indigo-400 rounded-lg transform perspective-1000 rotate-y-12"></div>
-                    </div>
-
-                    {/* Decorative Elements */}
-                    <div className="absolute top-12 left-16 w-8 h-8 bg-blue-200 rounded-full opacity-60 animate-bounce"></div>
-                    <div className="absolute top-32 right-20 w-6 h-6 bg-indigo-300 rounded-full opacity-50"></div>
                 </div>
-            </div>
+            </main>
         </div>
     )
 }

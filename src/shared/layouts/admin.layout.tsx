@@ -1,8 +1,9 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { 
-  LayoutDashboard, FolderKanban, Users, Zap, ScrollText, 
-  UserPlus, Video, BarChart3, Settings, LogOut 
+import {
+  LayoutDashboard, FolderKanban, Users, Zap, ScrollText,
+  UserPlus, Video, BarChart3, Settings, LogOut
 } from "lucide-react";
+import { useLogout } from "../hooks/useLogout";
 
 const sidebarLinks = [
   { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
@@ -16,6 +17,7 @@ const sidebarLinks = [
 ];
 
 export default function AdminLayout() {
+  const logout = useLogout()
   return (
     <div className="flex min-h-screen bg-[#FDFDFF]">
       {/* Sidebar */}
@@ -36,19 +38,18 @@ export default function AdminLayout() {
                 key={link.path}
                 to={link.path}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${
-                    isActive
-                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
-                      : "text-gray-500 hover:bg-indigo-50 hover:text-indigo-600"
+                  `flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${isActive
+                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
+                    : "text-gray-500 hover:bg-indigo-50 hover:text-indigo-600"
                   }`
                 }
               >
                 {/* Fixed the Icon className here */}
                 {({ isActive }) => (
                   <>
-                    <Icon 
-                      size={20} 
-                      className={isActive ? "text-white" : "text-gray-500 group-hover:text-indigo-600"} 
+                    <Icon
+                      size={20}
+                      className={isActive ? "text-white" : "text-gray-500 group-hover:text-indigo-600"}
                     />
                     <span className="font-semibold text-sm">{link.name}</span>
                   </>
@@ -63,10 +64,15 @@ export default function AdminLayout() {
             <Settings size={20} />
             <span className="font-semibold text-sm">Settings</span>
           </NavLink>
-          <NavLink to="/login" className="flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-all group">
+          <button
+            type="button"
+            onClick={logout} // your existing logout hook
+            className="flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-all group"
+          >
             <LogOut size={20} />
             <span className="font-semibold text-sm">Logout</span>
-          </NavLink>
+          </button>
+
         </div>
       </aside>
 

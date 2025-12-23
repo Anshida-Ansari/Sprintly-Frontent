@@ -1,13 +1,16 @@
 import { Play, CheckCircle2, Github, Timer, ArrowUpRight, Target } from "lucide-react";
+import { UserAuth } from "../../auth/store/store";
 
 export default function DashboardPage() {
+
+  const user = UserAuth((state)=>state.user)
   return (
     <div className="max-w-6xl mx-auto space-y-12">
       {/* 1. Header with System Stats */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="text-4xl font-bold text-white tracking-tight">Main Console</h1>
-          <p className="text-gray-500 mt-2 font-mono text-sm uppercase tracking-widest">User: John_Doe // Rank: Senior_L4</p>
+          <p className="text-gray-500 mt-2 font-mono text-sm uppercase tracking-widest">User: {user?.name || "User!"} // Rank: Senior_L4</p>
         </div>
         <div className="flex gap-4">
           <div className="text-right">

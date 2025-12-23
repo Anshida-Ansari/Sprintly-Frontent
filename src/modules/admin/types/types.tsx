@@ -27,3 +27,17 @@ export interface SetPasswordPayload {
 export interface SetPasswordResponse {
     message: string;
 }
+
+export interface CreateProjectPayload {
+    name: string;
+    description: string;
+    startDate: string | Date;
+    endDate: string | Date;
+    gitRepoUrl?: string;
+}
+
+export interface CreateProjectResponse {
+    success: boolean;
+    message: string;
+    data: any; // Using any for now, can be specific Project type later
+}

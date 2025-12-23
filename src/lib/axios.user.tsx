@@ -33,7 +33,14 @@ const refreshApi = axios.create({
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
+
+        
         const originalRequest = error.config
+        const authState = UserAuth.getState()
+
+        if(!authState.isAuthenticated){
+            return Promise.reject(error)
+        }
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true
 

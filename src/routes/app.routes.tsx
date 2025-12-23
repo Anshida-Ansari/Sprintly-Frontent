@@ -1,4 +1,4 @@
-import { createBrowserRouter,  } from "react-router-dom";
+import { createBrowserRouter, } from "react-router-dom";
 import ProtectedRoutes from "./protected.route";
 import Login from "../modules/auth/pages/login"
 import Register from "../modules/auth/pages/register";
@@ -16,6 +16,7 @@ import MemberAccept from "../modules/auth/pages/setPassword";
 import DeveloperLayout from "../shared/layouts/developer.layout";
 import DashboardPage from "../modules/developers/pages/developers.dashboard";
 import Members from "../modules/admin/pages/list.users";
+import Projects from "../modules/admin/pages/projects";
 //public routes
 export const router = createBrowserRouter([
   // PUBLIC
@@ -42,8 +43,8 @@ export const router = createBrowserRouter([
         element: <AdminLayout />,
         children: [
           { path: "dashboard", element: <AdminDashboard /> },
-          { path: "projects", element: <div>Projects</div> },
-          { path: "members", element: <Members/> },
+          { path: "projects", element: <Projects /> },
+          { path: "members", element: <Members /> },
           { path: "sprints", element: <div>Sprints</div> },
           { path: "user-stories", element: <div>User Stories</div> },
           { path: "team", element: <div>Team</div> },
@@ -59,8 +60,8 @@ export const router = createBrowserRouter([
         element: <SuperAdminLayout />,
         children: [
           { path: "dashboard", element: <SuperAdminDashboard /> },
-          { path: "companies", element: <SuperAdminCompanyPage/> },
-          {path:"companies/:companyId",element:<SuperAdminCompanyDetail/>},
+          { path: "companies", element: <SuperAdminCompanyPage /> },
+          { path: "companies/:companyId", element: <SuperAdminCompanyDetail /> },
           { path: "logs", element: <div>Active Logs</div> },
           { path: "subscriptions", element: <div>Subscription Plans</div> },
           { path: "settings", element: <div>Settings</div> },
@@ -69,18 +70,18 @@ export const router = createBrowserRouter([
 
       // DEVELOPERS
       {
-  path: "/developers",
-  element: <DeveloperLayout />,  
-  children: [
-    { path: "dashboard", element: <DashboardPage /> },
-    { path: "tasks", element: <div>My Tasks Page</div> },
-    { path: "projects", element: <div>Projects Page</div> },
-    { path: "sprints", element: <div>Sprints Page</div> },
-    { path: "standups", element: <div>Issues Page</div> },
-    { path: "Performance", element: <div>Settings Page</div> },
-    { path: "Profile", element: <div>Settings Page</div> },
-  ],
-},
+        path: "/developers",
+        element: <DeveloperLayout />,
+        children: [
+          { path: "dashboard", element: <DashboardPage /> },
+          { path: "tasks", element: <div>My Tasks Page</div> },
+          { path: "projects", element: <div>Projects Page</div> },
+          { path: "sprints", element: <div>Sprints Page</div> },
+          { path: "standups", element: <div>Issues Page</div> },
+          { path: "Performance", element: <div>Settings Page</div> },
+          { path: "Profile", element: <div>Settings Page</div> },
+        ],
+      },
     ],
   },
 ]);

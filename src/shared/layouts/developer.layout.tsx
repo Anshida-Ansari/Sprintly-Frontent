@@ -1,16 +1,17 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  CheckSquare, 
-  Box, 
-  Zap, 
-  MessagesSquare, 
-  BarChart3, 
-  UserCircle, 
-  LogOut, 
-  Cpu, 
+import {
+  LayoutDashboard,
+  CheckSquare,
+  Box,
+  Zap,
+  MessagesSquare,
+  BarChart3,
+  UserCircle,
+  LogOut,
+  Cpu,
   Terminal
 } from "lucide-react";
+import { useLogout } from "../hooks/useLogout";
 
 const sidebarLinks = [
   { name: "Dashboard", path: "/developers/dashboard", icon: LayoutDashboard },
@@ -24,12 +25,13 @@ const sidebarLinks = [
 ];
 
 export default function DeveloperLayout() {
+  const logout = useLogout()
   return (
     <div className="flex min-h-screen bg-[#050507] text-gray-400 font-sans selection:bg-indigo-500/30">
-      
+
       {/* Sidebar */}
       <aside className="w-20 lg:w-64 border-r border-white/[0.05] flex flex-col sticky top-0 h-screen bg-[#08080A]">
-        
+
         {/* Logo Area */}
         <div className="p-6 mb-4">
           <div className="flex items-center gap-3">
@@ -52,19 +54,18 @@ export default function DeveloperLayout() {
                 key={link.path}
                 to={link.path}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative ${
-                    isActive
-                      ? "bg-white/[0.03] text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]"
-                      : "hover:bg-white/[0.02] hover:text-gray-200"
+                  `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative ${isActive
+                    ? "bg-white/[0.03] text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]"
+                    : "hover:bg-white/[0.02] hover:text-gray-200"
                   }`
                 }
               >
                 <Icon size={20} className="group-hover:scale-110 transition-transform duration-300" />
                 <span className="hidden lg:block font-semibold text-sm tracking-tight">{link.name}</span>
-                
+
                 {/* Neon Active Pill */}
                 <div className="hidden lg:group-[.active]:block ml-auto">
-                   <div className="w-1 h-5 bg-indigo-500 rounded-full shadow-[0_0_12px_#6366f1]" />
+                  <div className="w-1 h-5 bg-indigo-500 rounded-full shadow-[0_0_12px_#6366f1]" />
                 </div>
               </NavLink>
             );
@@ -72,15 +73,20 @@ export default function DeveloperLayout() {
         </nav>
 
         {/* Footer / Logout */}
-        <div className="p-4 border-t border-white/[0.05] bg-black/20">
-          <NavLink
-            to="/login"
-            className="w-full flex items-center gap-3 px-4 py-3 text-rose-500/80 hover:text-rose-400 hover:bg-rose-500/5 rounded-xl transition-all group"
-          >
-            <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
-            <span className="hidden lg:block font-bold text-sm">Terminate</span>
-          </NavLink>
-        </div>
+        <button
+          type="button"
+          onClick={logout}
+          className="w-full flex items-center gap-3 px-4 py-3 text-rose-500/80 hover:text-rose-400 hover:bg-rose-500/5 rounded-xl transition-all group text-left"
+        >
+          <LogOut
+            size={20}
+            className="group-hover:-translate-x-1 transition-transform"
+          />
+          <span className="hidden lg:block font-bold text-sm">
+            Terminate
+          </span>
+        </button>
+
       </aside>
 
       {/* Main Stage */}
@@ -88,7 +94,7 @@ export default function DeveloperLayout() {
         {/* Subtle Background Glows */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-violet-500/5 blur-[100px] rounded-full pointer-events-none" />
-        
+
         <div className="p-8 lg:p-12 relative z-10">
           <Outlet />
         </div>

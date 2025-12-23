@@ -1,5 +1,6 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet,  } from "react-router-dom";
 import { LayoutDashboard, Building2, Activity, CreditCard, Settings, LogOut, Bell } from "lucide-react";
+import { useLogout } from "../hooks/useLogout";
 
 const sidebarLinks = [
   { name: "Dashboard", path: "/superadmin/dashboard", icon: LayoutDashboard },
@@ -10,6 +11,8 @@ const sidebarLinks = [
 ];
 
 export default function SuperAdminLayout() {
+
+  const logout = useLogout()
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* Top Navbar */}
@@ -27,10 +30,9 @@ export default function SuperAdminLayout() {
                     key={link.path}
                     to={link.path}
                     className={({ isActive }) =>
-                      `flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                        isActive 
-                          ? "bg-indigo-50 text-indigo-700" 
-                          : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+                      `flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${isActive
+                        ? "bg-indigo-50 text-indigo-700"
+                        : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
                       }`
                     }
                   >
@@ -45,10 +47,13 @@ export default function SuperAdminLayout() {
           <div className="flex items-center gap-4">
             <button className="p-2 text-gray-400 hover:text-gray-600"><Bell size={20} /></button>
             <div className="h-8 w-px bg-gray-200 mx-2" />
-            <NavLink to="/login" className="flex items-center gap-2 text-sm font-medium text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition">
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 text-sm font-medium text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition"
+            >
               <LogOut size={18} />
               <span className="hidden sm:inline">Logout</span>
-            </NavLink>
+            </button>
           </div>
         </div>
       </header>
