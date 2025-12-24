@@ -3,7 +3,7 @@ import { useGetMembers } from "../hooks/useGetmembers";
 import { Pagination } from "../../../shared/components/pagination";
 import InviteMemberModal from '../components/invite.modal';
 import { useInviteMember } from "../hooks/useInviteMember";
-import { Search, Filter, MoreVertical, Plus, User, Mail, Shield, Calendar, ArrowUpRight } from "lucide-react";
+import { Search, Filter, MoreVertical, Plus, User, Shield, Calendar } from "lucide-react";
 
 interface Member {
   _id: string;

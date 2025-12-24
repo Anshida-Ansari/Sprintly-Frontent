@@ -34,11 +34,11 @@ api.interceptors.response.use(
     (response) => response,
     async (error) => {
 
-        
+
         const originalRequest = error.config
         const authState = UserAuth.getState()
 
-        if(!authState.isAuthenticated){
+        if (!authState.isAuthenticated) {
             return Promise.reject(error)
         }
         if (error.response?.status === 401 && !originalRequest._retry) {
@@ -49,7 +49,7 @@ api.interceptors.response.use(
                 const res = await refreshApi.post("/auth/refresh")
 
 
-                const newToken = res.data.acessToken
+                const newToken = res.data.data.accessToken
                 const user = UserAuth.getState().user
                 UserAuth.getState().login(user!, newToken)
                 originalRequest.headers.Authorization = `Bearer ${newToken}`
