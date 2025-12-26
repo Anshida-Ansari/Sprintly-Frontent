@@ -1,19 +1,25 @@
 import { useState } from 'react';
 import { Plus, LayoutGrid } from 'lucide-react';
 import CreateProjectModal from '../components/create.project.modal';
+import EditProjectModal from '../components/edit.project.modal';
 import { useCreateProject } from '../hooks/useCreateProject';
+import { useEditProject } from '../hooks/useEditProject';
 import { useProjects } from '../hooks/useProjects';
 import ProjectCard from '../components/project.card';
-import type { CreateProjectPayload, IProject } from '../types/types';
+import type { CreateProjectPayload, EditProjectPayload, IProject } from '../types/types';
 
 export default function Projects() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingProject, setEditingProject] = useState<IProject | null>(null);
+
     const { mutate: createProject, isPending: isCreating } = useCreateProject();
+    const { mutate: updateProject, isPending: isUpdating } = useEditProject();
 
     const [page, setPage] = useState(1);
     const limit = 6;
 
-    
+
     const { data: projectData, isLoading, isPlaceholderData } = useProjects({ page, limit });
 
     const handleCreateProject = (data: CreateProjectPayload) => {
@@ -22,7 +28,21 @@ export default function Projects() {
         });
     };
 
-   
+    const handleEditProject = (data: EditProjectPayload) => {
+        updateProject(data, {
+            onSuccess: () => {
+                setIsEditModalOpen(false);
+                setEditingProject(null);
+            }
+        });
+    };
+
+    const openEditModal = (project: IProject) => {
+        setEditingProject(project);
+        setIsEditModalOpen(true);
+    };
+
+
     const projectsByStatus = {
         active: projectData?.data.filter((p) => p.status === 'Active') || [],
         completed: projectData?.data.filter((p) => p.status === 'Completed') || [],
@@ -38,7 +58,7 @@ export default function Projects() {
             </div>
             <div className="space-y-4">
                 {projects.map(project => (
-                    <ProjectCard key={project.id} project={project} />
+                    <ProjectCard key={project.id} project={project} onEdit={openEditModal} />
                 ))}
                 {projects.length === 0 && (
                     <div className="h-24 rounded-2xl border border-dashed border-gray-200 flex items-center justify-center text-gray-400 text-sm font-medium">
@@ -127,6 +147,14 @@ export default function Projects() {
                 onClose={() => setIsModalOpen(false)}
                 onSubmit={handleCreateProject}
                 isLoading={isCreating}
+            />
+
+            <EditProjectModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                onSubmit={handleEditProject}
+                project={editingProject}
+                isLoading={isUpdating}
             />
         </div>
     );

@@ -38,7 +38,7 @@ export interface IProject {
     startDate: string;
     endDate: string;
     gitRepoUrl?: string;
-    members: string[]; 
+    members: string[];
     createdAt: string;
     updatedAt: string;
 }
@@ -60,8 +60,18 @@ export interface CreateProjectPayload {
     gitRepoUrl?: string;
 }
 
+export interface EditProjectPayload {
+    projectId: string;
+    name?: string;
+    description?: string;
+    startDate?: string | Date;
+    endDate?: string | Date;
+    gitRepoUrl?: string;
+    status?: ProjectStatus;
+}
+
 export interface CreateProjectResponse {
     success: boolean;
     message: string;
-    data: any; 
+    data: any;
 }

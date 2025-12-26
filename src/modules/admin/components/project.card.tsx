@@ -1,11 +1,12 @@
-import { Calendar, GitBranch, MoreVertical, Users } from 'lucide-react';
+import { Calendar, GitBranch, Pencil, Users } from 'lucide-react';
 import type { IProject } from '../types/types';
 
 interface ProjectCardProps {
     project: IProject;
+    onEdit: (project: IProject) => void;
 }
 
-export default function ProjectCard({ project }: ProjectCardProps) {
+export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
     const statusColors = {
         Active: 'bg-emerald-100 text-emerald-700 border-emerald-200',
         Completed: 'bg-blue-100 text-blue-700 border-blue-200',
@@ -19,8 +20,12 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wide border ${statusColors[project.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-700'}`}>
                     {statusLabel}
                 </span>
-                <button className="p-1.5 hover:bg-gray-50 rounded-lg text-gray-400 hover:text-gray-600 transition">
-                    <MoreVertical size={16} />
+                <button
+                    onClick={() => onEdit(project)}
+                    className="p-1.5 hover:bg-blue-50 rounded-lg text-gray-400 hover:text-blue-600 transition"
+                    title="Edit Project"
+                >
+                    <Pencil size={16} />
                 </button>
             </div>
 
