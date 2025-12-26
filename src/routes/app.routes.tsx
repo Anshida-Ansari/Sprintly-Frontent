@@ -17,6 +17,7 @@ import DeveloperLayout from "../shared/layouts/developer.layout";
 import DashboardPage from "../modules/developers/pages/developers.dashboard";
 import Members from "../modules/admin/pages/list.users";
 import Projects from "../modules/admin/pages/projects";
+import ProjectDetail from "../modules/admin/pages/project.detail";
 //public routes
 export const router = createBrowserRouter([
   // PUBLIC
@@ -44,6 +45,7 @@ export const router = createBrowserRouter([
         children: [
           { path: "dashboard", element: <AdminDashboard /> },
           { path: "projects", element: <Projects /> },
+          { path: "projects/:projectId", element: <ProjectDetail /> },
           { path: "members", element: <Members /> },
           { path: "sprints", element: <div>Sprints</div> },
           { path: "user-stories", element: <div>User Stories</div> },

@@ -1,5 +1,6 @@
 import { Calendar, GitBranch, Pencil, Users } from 'lucide-react';
 import type { IProject } from '../types/types';
+import { useNavigate } from 'react-router-dom';
 
 interface ProjectCardProps {
     project: IProject;
@@ -7,6 +8,7 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
+    const navigate = useNavigate();
     const statusColors = {
         Active: 'bg-emerald-100 text-emerald-700 border-emerald-200',
         Completed: 'bg-blue-100 text-blue-700 border-blue-200',
@@ -15,13 +17,19 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
     const statusLabel = project.status.replace('_', ' ');
 
     return (
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+        <div
+            onClick={() => navigate(`/admin/projects/${project.id}`)}
+            className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group cursor-pointer"
+        >
             <div className="flex justify-between items-start mb-4">
                 <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wide border ${statusColors[project.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-700'}`}>
                     {statusLabel}
                 </span>
                 <button
-                    onClick={() => onEdit(project)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(project);
+                    }}
                     className="p-1.5 hover:bg-blue-50 rounded-lg text-gray-400 hover:text-blue-600 transition"
                     title="Edit Project"
                 >
@@ -50,7 +58,13 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
                         {new Date(project.endDate).toLocaleDateString()}
                     </div>
                     {project.gitRepoUrl && (
-                        <a href={project.gitRepoUrl} target="_blank" rel="noopener noreferrer" className="hover:text-gray-900 transition">
+                        <a
+                            href={project.gitRepoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-gray-900 transition"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <GitBranch size={14} />
                         </a>
                     )}

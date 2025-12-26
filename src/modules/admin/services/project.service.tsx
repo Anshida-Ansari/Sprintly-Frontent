@@ -38,5 +38,26 @@ export const projectService = {
         }
 
         return res.data;
+    },
+
+    async getProjectById(projectId: string): Promise<any> {
+        const res = await api.get(`project/get-projects/${projectId}`);
+        if (res.data && res.data.data) {
+            const p = res.data.data;
+            res.data.data = {
+                ...p,
+                id: p._id || p.id,
+                name: p._name || p.name,
+                description: p._description || p.description,
+                status: p._status || p.status,
+                startDate: p._startDate || p.startDate,
+                endDate: p._endDate || p.endDate,
+                gitRepoUrl: p._gitRepoUrl || p.gitRepoUrl,
+                members: p._members || p.members,
+                createdAt: p._createdAt || p.createdAt,
+                updatedAt: p._updatedAt || p.updatedAt,
+            };
+        }
+        return res.data;
     }
 }
