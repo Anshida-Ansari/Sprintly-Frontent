@@ -75,3 +75,58 @@ export interface CreateProjectResponse {
     message: string;
     data: any;
 }
+
+// User Story Types
+
+export const UserStoryStatus = {
+    IN_REVIEW: "In review",
+    IN_PROGRESS: "In progress",
+    IN_PENDING: "In pending",
+    DONE: "Done"
+} as const;
+
+export type UserStoryStatus = typeof UserStoryStatus[keyof typeof UserStoryStatus];
+
+export const PriorityStatus = {
+    LOW: "Low",
+    MEDIUM: "Medium",
+    HIGH: "High"
+} as const;
+
+export type PriorityStatus = typeof PriorityStatus[keyof typeof PriorityStatus];
+
+export interface IUserStory {
+    id: string;
+    projectId: string;
+    companyId: string;
+    title: string;
+    description: string;
+    status: UserStoryStatus;
+    priority: PriorityStatus;
+    sprintId?: string;
+    createdAt: string;
+    updatedAt?: string;
+}
+
+export interface CreateUserStoryPayload {
+    title: string;
+    description?: string;
+    priority?: PriorityStatus;
+    sprintId?: string;
+}
+
+export interface EditUserStoryPayload {
+    title?: string;
+    description?: string;
+    status?: UserStoryStatus;
+    priority?: PriorityStatus;
+    sprintId?: string;
+}
+
+export interface GetUserStoriesResponse {
+    success: boolean;
+    data: IUserStory[];
+    total: number;
+    page: number;
+    limit: number;
+}

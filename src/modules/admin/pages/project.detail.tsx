@@ -6,6 +6,8 @@ import EditProjectModal from "../components/edit.project.modal";
 import { useEditProject } from "../hooks/useEditProject";
 import type { EditProjectPayload } from "../types/types";
 
+import UserStoryList from "../components/user-story-list";
+
 export default function ProjectDetail() {
     const { projectId } = useParams<{ projectId: string }>();
     const navigate = useNavigate();
@@ -14,7 +16,7 @@ export default function ProjectDetail() {
     const { mutate: updateProject, isPending: isUpdating } = useEditProject();
 
     const project = projectResponse?.data;
- 
+
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full min-h-[400px]">
@@ -41,7 +43,7 @@ export default function ProjectDetail() {
         updateProject(data, {
             onSuccess: () => {
                 setIsEditModalOpen(false);
-                
+
             }
         });
     };
@@ -52,7 +54,7 @@ export default function ProjectDetail() {
     };
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
+        <div className="max-w-5xl mx-auto space-y-12 pb-12 animate-in fade-in duration-500">
             {/* Header Section */}
             <div className="flex flex-col gap-6">
                 <button
@@ -167,6 +169,11 @@ export default function ProjectDetail() {
                 </div>
             </div>
 
+            {/* User Stories Section */}
+            <div className="pt-8">
+                <UserStoryList projectId={projectId || ""} />
+            </div>
+
             <EditProjectModal
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
@@ -177,3 +184,4 @@ export default function ProjectDetail() {
         </div>
     );
 }
+
