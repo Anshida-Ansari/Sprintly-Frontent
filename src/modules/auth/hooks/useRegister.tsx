@@ -17,10 +17,6 @@ export function useRegister(){
 
             navigate('/otp',{replace:true})
 
-    
-        // if(res.otpRequired){
-        //     navigate("/otp",{state:{email:res.user.email}})
-        // }
     },
     onError:(err:any)=>{
         toast.error(err.response?.data?.message || "Registration failed")

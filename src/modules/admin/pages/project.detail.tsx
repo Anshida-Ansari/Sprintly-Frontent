@@ -1,11 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetProject } from "../hooks/useGetProject";
-import { ArrowLeft, Calendar, GitBranch, Users, Clock, Edit } from "lucide-react";
+import { ArrowLeft, Calendar, GitBranch, Users, Clock, Edit, Layout, ScrollText } from "lucide-react";
 import { useState } from "react";
 import EditProjectModal from "../components/edit.project.modal";
 import { useEditProject } from "../hooks/useEditProject";
 import type { EditProjectPayload } from "../types/types";
-
 import UserStoryList from "../components/user-story-list";
 
 export default function ProjectDetail() {
@@ -14,6 +13,7 @@ export default function ProjectDetail() {
     const { data: projectResponse, isLoading } = useGetProject(projectId || "");
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { mutate: updateProject, isPending: isUpdating } = useEditProject();
+    const [activeTab, setActiveTab] = useState<'overview' | 'stories'>('overview');
 
     const project = projectResponse?.data;
 
@@ -54,7 +54,7 @@ export default function ProjectDetail() {
     };
 
     return (
-        <div className="max-w-5xl mx-auto space-y-12 pb-12 animate-in fade-in duration-500">
+        <div className="max-w-6xl mx-auto space-y-8 pb-12 animate-in fade-in duration-500">
             {/* Header Section */}
             <div className="flex flex-col gap-6">
                 <button
@@ -65,113 +65,142 @@ export default function ProjectDetail() {
                     <span className="font-bold">Back to Projects</span>
                 </button>
 
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                     <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <h1 className="text-4xl font-black text-gray-900 tracking-tight">{project.name}</h1>
-                            <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${statusColors[project.status as keyof typeof statusColors] || 'bg-gray-500 text-gray-600'} bg-opacity-10 text-opacity-100 uppercase tracking-wide`}>
+                        <div className="flex items-center gap-4 mb-3">
+                            <h1 className="text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">{project.name}</h1>
+                            <span className={`px-3 py-1.5 rounded-xl text-xs font-black ${statusColors[project.status as keyof typeof statusColors] || 'bg-gray-500 text-gray-600'} bg-opacity-10 text-opacity-100 uppercase tracking-widest`}>
                                 {project.status}
                             </span>
                         </div>
-                        <p className="text-gray-500 text-lg font-medium max-w-2xl leading-relaxed">
+                        <p className="text-gray-500 text-lg font-medium max-w-3xl leading-relaxed">
                             {project.description}
                         </p>
                     </div>
 
                     <button
                         onClick={() => setIsEditModalOpen(true)}
-                        className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 hover:border-gray-300 transition shadow-sm flex items-center gap-2"
+                        className="px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-2xl font-black hover:bg-gray-50 hover:border-gray-300 transition shadow-sm flex items-center gap-2 whitespace-nowrap"
                     >
-                        <Edit size={18} />
-                        Edit Project
+                        <Edit size={20} />
+                        Update Project
                     </button>
                 </div>
             </div>
 
-            {/* Content Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                {/* Main Info Card */}
-                <div className="md:col-span-2 space-y-6">
-                    {/* Timeline */}
-                    <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                        <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                            <Clock size={20} className="text-indigo-500" />
-                            Timeline
-                        </h3>
-                        <div className="grid grid-cols-2 gap-8">
-                            <div>
-                                <p className="text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Start Date</p>
-                                <div className="flex items-center gap-2 text-gray-700 font-bold text-lg">
-                                    <Calendar size={20} className="text-emerald-500" />
-                                    {new Date(project.startDate).toLocaleDateString(undefined, { dateStyle: 'long' })}
-                                </div>
-                            </div>
-                            <div>
-                                <p className="text-sm font-bold text-gray-400 mb-1 uppercase tracking-wider">Due Date</p>
-                                <div className="flex items-center gap-2 text-gray-700 font-bold text-lg">
-                                    <Calendar size={20} className="text-rose-500" />
-                                    {new Date(project.endDate).toLocaleDateString(undefined, { dateStyle: 'long' })}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Git Repo */}
-                    {project.gitRepoUrl && (
-                        <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                <GitBranch size={20} className="text-black" />
-                                Repository
-                            </h3>
-                            <a
-                                href={project.gitRepoUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-bold hover:underline"
-                            >
-                                {project.gitRepoUrl}
-                            </a>
-                        </div>
-                    )}
-                </div>
-
-                {/* Sidebar */}
-                <div className="space-y-6">
-                    {/* Team Members */}
-                    <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 h-full">
-                        <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                            <Users size={20} className="text-orange-500" />
-                            Team Members
-                        </h3>
-
-                        {project.members && project.members.length > 0 ? (
-                            <div className="space-y-3">
-                                {project.members.map((memberId: string, index: number) => (
-                                    <div key={index} className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition border border-transparent hover:border-gray-100">
-                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-indigo-600 font-bold text-sm">
-                                            {/* Ideally verify if member is object or string, assuming string ID for now based on types */}
-                                            {memberId.slice(0, 2).toUpperCase()}
-                                        </div>
-                                        <div className="overflow-hidden">
-                                            <p className="font-bold text-gray-900 truncate">Member ID</p>
-                                            <p className="text-xs text-gray-400 truncate">{memberId}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-8 text-gray-400 font-medium bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                                No members assigned
-                            </div>
-                        )}
-                    </div>
-                </div>
+            {/* Tabs Navigation */}
+            <div className="flex items-center gap-2 p-1.5 bg-gray-100/50 rounded-2xl w-fit">
+                <button
+                    onClick={() => setActiveTab('overview')}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-black transition-all ${activeTab === 'overview'
+                            ? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
+                            : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                        }`}
+                >
+                    <Layout size={18} />
+                    Overview
+                </button>
+                <button
+                    onClick={() => setActiveTab('stories')}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-black transition-all ${activeTab === 'stories'
+                            ? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
+                            : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                        }`}
+                >
+                    <ScrollText size={18} />
+                    User Stories
+                </button>
             </div>
 
-            {/* User Stories Section */}
-            <div className="pt-8">
-                <UserStoryList projectId={projectId || ""} />
+            <div className="transition-all duration-300">
+                {activeTab === 'overview' ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in slide-in-from-bottom-4 duration-500">
+                        {/* Main Info Card */}
+                        <div className="lg:col-span-2 space-y-8">
+                            {/* Timeline */}
+                            <div className="bg-white rounded-[40px] p-10 shadow-sm border border-gray-100">
+                                <h3 className="text-xl font-black text-gray-900 mb-8 flex items-center gap-3">
+                                    <Clock size={24} className="text-indigo-500" />
+                                    Project Timeline
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                    <div className="space-y-2">
+                                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Start Date</p>
+                                        <div className="flex items-center gap-3 text-gray-700 font-black text-xl">
+                                            <div className="w-10 h-10 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center">
+                                                <Calendar size={20} />
+                                            </div>
+                                            {new Date(project.startDate).toLocaleDateString(undefined, { dateStyle: 'long' })}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Target Deadline</p>
+                                        <div className="flex items-center gap-3 text-gray-700 font-black text-xl">
+                                            <div className="w-10 h-10 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center">
+                                                <Calendar size={20} />
+                                            </div>
+                                            {new Date(project.endDate).toLocaleDateString(undefined, { dateStyle: 'long' })}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Git Repo */}
+                            {project.gitRepoUrl && (
+                                <div className="bg-white rounded-[40px] p-10 shadow-sm border border-gray-100 overflow-hidden relative group">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/50 rounded-full -mr-16 -mt-16 group-hover:bg-indigo-50 transition-colors"></div>
+                                    <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-3 relative z-10">
+                                        <GitBranch size={24} className="text-black" />
+                                        Version Control
+                                    </h3>
+                                    <a
+                                        href={project.gitRepoUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-3 text-indigo-600 hover:text-indigo-700 font-black text-lg hover:underline transition-all relative z-10"
+                                    >
+                                        {project.gitRepoUrl}
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Sidebar */}
+                        <div className="space-y-8">
+                            {/* Team Members */}
+                            <div className="bg-white rounded-[40px] p-10 shadow-sm border border-gray-100 flex flex-col">
+                                <h3 className="text-xl font-black text-gray-900 mb-8 flex items-center gap-3">
+                                    <Users size={24} className="text-orange-500" />
+                                    Core Team
+                                </h3>
+
+                                {project.members && project.members.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {project.members.map((memberId: string, index: number) => (
+                                            <div key={index} className="flex items-center gap-4 p-4 rounded-3xl hover:bg-gray-50 transition border border-transparent hover:border-gray-100 group">
+                                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-indigo-600 font-black text-sm group-hover:scale-110 transition-transform">
+                                                    {memberId.slice(0, 2).toUpperCase()}
+                                                </div>
+                                                <div className="overflow-hidden">
+                                                    <p className="font-black text-gray-900 truncate">Project Member</p>
+                                                    <p className="text-xs text-gray-400 font-bold truncate">{memberId}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-12 text-gray-400 font-bold bg-gray-50/50 rounded-[32px] border border-dashed border-gray-200">
+                                        No members assigned
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="animate-in slide-in-from-right-4 duration-500 bg-white p-10 rounded-[40px] border border-gray-100 shadow-sm">
+                        <UserStoryList projectId={projectId || ""} showHeader={false} />
+                    </div>
+                )}
             </div>
 
             <EditProjectModal
@@ -184,4 +213,3 @@ export default function ProjectDetail() {
         </div>
     );
 }
-

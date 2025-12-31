@@ -1,23 +1,27 @@
 import { createBrowserRouter, } from "react-router-dom";
+import { lazy } from "react";
 import ProtectedRoutes from "./protected.route";
-import Login from "../modules/auth/pages/login"
-import Register from "../modules/auth/pages/register";
-import OTP from "../modules/auth/pages/otp";
-import LandingPage from "../modules/landing/pages/Landing";
 import App from "../App";
-import AdminDashboard from "../modules/admin/pages/admin.dashboard";
-import SuperAdminDashboard from "../modules/superadmin/pages/superadmin.dashboard";
-import ForgotPassword from "../modules/auth/pages/forgotPassword";
-import AdminLayout from "../shared/layouts/admin.layout";
-import SuperAdminLayout from "../shared/layouts/superadmin.layout";
-import SuperAdminCompanyPage from "../modules/superadmin/pages/superadmin.companies";
-import SuperAdminCompanyDetail from "../modules/superadmin/pages/superadmin.companies.detail";
-import MemberAccept from "../modules/auth/pages/setPassword";
-import DeveloperLayout from "../shared/layouts/developer.layout";
-import DashboardPage from "../modules/developers/pages/developers.dashboard";
-import Members from "../modules/admin/pages/list.users";
-import Projects from "../modules/admin/pages/projects";
-import ProjectDetail from "../modules/admin/pages/project.detail";
+
+const Login = lazy(() => import("../modules/auth/pages/login"));
+const Register = lazy(() => import("../modules/auth/pages/register"));
+const OTP = lazy(() => import("../modules/auth/pages/otp"));
+const LandingPage = lazy(() => import("../modules/landing/pages/Landing"));
+const AdminDashboard = lazy(() => import("../modules/admin/pages/admin.dashboard"));
+const SuperAdminDashboard = lazy(() => import("../modules/superadmin/pages/superadmin.dashboard"));
+const ForgotPassword = lazy(() => import("../modules/auth/pages/forgotPassword"));
+const AdminLayout = lazy(() => import("../shared/layouts/admin.layout"));
+const SuperAdminLayout = lazy(() => import("../shared/layouts/superadmin.layout"));
+const SuperAdminCompanyPage = lazy(() => import("../modules/superadmin/pages/superadmin.companies"));
+const SuperAdminCompanyDetail = lazy(() => import("../modules/superadmin/pages/superadmin.companies.detail"));
+const MemberAccept = lazy(() => import("../modules/auth/pages/setPassword"));
+const DeveloperLayout = lazy(() => import("../shared/layouts/developer.layout"));
+const DashboardPage = lazy(() => import("../modules/developers/pages/developers.dashboard"));
+const Members = lazy(() => import("../modules/admin/pages/list.users"));
+const Projects = lazy(() => import("../modules/admin/pages/projects"));
+const ProjectDetail = lazy(() => import("../modules/admin/pages/project.detail"));
+const UserStoriesPage = lazy(() => import("../modules/admin/pages/user-stories"));
+
 //public routes
 export const router = createBrowserRouter([
   // PUBLIC
@@ -48,7 +52,7 @@ export const router = createBrowserRouter([
           { path: "projects/:projectId", element: <ProjectDetail /> },
           { path: "members", element: <Members /> },
           { path: "sprints", element: <div>Sprints</div> },
-          { path: "user-stories", element: <div>User Stories</div> },
+          { path: "user-stories", element: <UserStoriesPage /> },
           { path: "team", element: <div>Team</div> },
           { path: "meetings", element: <div>Meetings</div> },
           { path: "reports", element: <div>Reports</div> },
@@ -87,4 +91,3 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
-
