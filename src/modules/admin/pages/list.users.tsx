@@ -4,6 +4,7 @@ import { Pagination } from "../../../shared/components/pagination";
 import InviteMemberModal from '../components/invite.modal';
 import { useInviteMember } from "../hooks/useInviteMember";
 import { useBlockUser } from "../hooks/useBlockUser";
+import { useDebounce } from "../../../shared/hooks/useDebounce";
 import { Search, Filter, MoreVertical, Plus, User, Shield, Calendar, Ban, CheckCircle } from "lucide-react";
 
 interface Member {
@@ -18,9 +19,10 @@ interface Member {
 export default function Members() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data, isLoading } = useGetMembers({ page, limit: 10, search });
+  const { data, isLoading } = useGetMembers({ page, limit: 10, search: debouncedSearch });
   const { mutate: inviteMember, isPending: inviting } = useInviteMember();
   const { mutate: blockUser, isPending: blocking } = useBlockUser();
 
@@ -124,8 +126,8 @@ export default function Members() {
                 {/* Status */}
                 <div className="col-span-2 hidden md:block">
                   <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight ${member.status === 'active'
-                      ? 'bg-emerald-50 text-emerald-600'
-                      : 'bg-rose-50 text-rose-600'
+                    ? 'bg-emerald-50 text-emerald-600'
+                    : 'bg-rose-50 text-rose-600'
                     }`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${member.status === 'active' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                     {member.status === 'active' ? 'Active' : 'Blocked'}

@@ -130,3 +130,44 @@ export interface GetUserStoriesResponse {
     page: number;
     limit: number;
 }
+
+// Sprint Types
+
+export type SprintStatus = 'Planned' | 'Active' | 'Completed';
+
+export interface ISprint {
+    _id: string;
+    projectId: string;
+    name: string;
+    goal?: string;
+    startDate: string;
+    endDate: string;
+    status: SprintStatus;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface CreateSprintPayload {
+    name: string;
+    description?: string;
+    goal?: string;
+    startDate: string | Date;
+    endDate: string | Date;
+}
+
+export interface EditSprintPayload {
+    name?: string;
+    goal?: string;
+    startDate?: string | Date;
+    endDate?: string | Date;
+    status?: SprintStatus;
+}
+
+export interface GetSprintsResponse {
+    success: boolean;
+    data: ISprint[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}

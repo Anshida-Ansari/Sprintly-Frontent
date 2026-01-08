@@ -1,11 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetProject } from "../hooks/useGetProject";
-import { ArrowLeft, Calendar, GitBranch, Users, Clock, Edit, Layout, ScrollText } from "lucide-react";
+import { ArrowLeft, Calendar, GitBranch, Users, Clock, Edit, Layout, ScrollText, PlayCircle } from "lucide-react";
 import { useState } from "react";
 import EditProjectModal from "../components/edit.project.modal";
 import { useEditProject } from "../hooks/useEditProject";
 import type { EditProjectPayload } from "../types/types";
 import UserStoryList from "../components/user-story-list";
+import SprintList from "../components/sprint.list.tsx";
 
 export default function ProjectDetail() {
     const { projectId } = useParams<{ projectId: string }>();
@@ -13,7 +14,7 @@ export default function ProjectDetail() {
     const { data: projectResponse, isLoading } = useGetProject(projectId || "");
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { mutate: updateProject, isPending: isUpdating } = useEditProject();
-    const [activeTab, setActiveTab] = useState<'overview' | 'stories'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'stories' | 'sprints'>('overview');
 
     const project = projectResponse?.data;
 
@@ -93,8 +94,8 @@ export default function ProjectDetail() {
                 <button
                     onClick={() => setActiveTab('overview')}
                     className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-black transition-all ${activeTab === 'overview'
-                            ? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
-                            : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                        ? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
+                        : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                         }`}
                 >
                     <Layout size={18} />
@@ -103,17 +104,27 @@ export default function ProjectDetail() {
                 <button
                     onClick={() => setActiveTab('stories')}
                     className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-black transition-all ${activeTab === 'stories'
-                            ? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
-                            : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                        ? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
+                        : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                         }`}
                 >
                     <ScrollText size={18} />
                     User Stories
                 </button>
+                <button
+                    onClick={() => setActiveTab('sprints')}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-black transition-all ${activeTab === 'sprints'
+                        ? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
+                        : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                        }`}
+                >
+                    <PlayCircle size={18} />
+                    Sprints
+                </button>
             </div>
 
             <div className="transition-all duration-300">
-                {activeTab === 'overview' ? (
+                {activeTab === 'overview' && (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in slide-in-from-bottom-4 duration-500">
                         {/* Main Info Card */}
                         <div className="lg:col-span-2 space-y-8">
@@ -196,9 +207,17 @@ export default function ProjectDetail() {
                             </div>
                         </div>
                     </div>
-                ) : (
+                )}
+
+                {activeTab === 'stories' && (
                     <div className="animate-in slide-in-from-right-4 duration-500 bg-white p-10 rounded-[40px] border border-gray-100 shadow-sm">
                         <UserStoryList projectId={projectId || ""} showHeader={false} />
+                    </div>
+                )}
+
+                {activeTab === 'sprints' && (
+                    <div className="animate-in slide-in-from-right-4 duration-500 bg-white p-10 rounded-[40px] border border-gray-100 shadow-sm">
+                        <SprintList projectId={projectId || ""} />
                     </div>
                 )}
             </div>

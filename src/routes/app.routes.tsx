@@ -23,6 +23,7 @@ const Members = lazy(() => import("../modules/admin/pages/list.users"));
 const Projects = lazy(() => import("../modules/admin/pages/projects"));
 const ProjectDetail = lazy(() => import("../modules/admin/pages/project.detail"));
 const UserStoriesPage = lazy(() => import("../modules/admin/pages/user-stories"));
+const SprintsPage = lazy(() => import("../modules/admin/pages/sprints"));
 
 //public routes
 export const router = createBrowserRouter([
@@ -55,7 +56,7 @@ export const router = createBrowserRouter([
           { path: "projects", element: <Projects /> },
           { path: "projects/:projectId", element: <ProjectDetail /> },
           { path: "members", element: <Members /> },
-          { path: "sprints", element: <div>Sprints</div> },
+          { path: "sprints", element: <SprintsPage /> },
           { path: "user-stories", element: <UserStoriesPage /> },
           { path: "team", element: <div>Team</div> },
           { path: "meetings", element: <div>Meetings</div> },
