@@ -3,14 +3,15 @@ import { useGetMembers } from "../hooks/useGetmembers";
 import { Pagination } from "../../../shared/components/pagination";
 import InviteMemberModal from '../components/invite.modal';
 import { useInviteMember } from "../hooks/useInviteMember";
-import { Search, Filter, MoreVertical, Plus, User, Shield, Calendar } from "lucide-react";
+import { useBlockUser } from "../hooks/useBlockUser";
+import { Search, Filter, MoreVertical, Plus, User, Shield, Calendar, Ban, CheckCircle } from "lucide-react";
 
 interface Member {
   _id: string;
   name: string;
   email: string;
   role: string;
-  status: "active" | "blocked";
+  status: "active" | "block";
   createdAt: string;
 }
 
@@ -21,6 +22,7 @@ export default function Members() {
 
   const { data, isLoading } = useGetMembers({ page, limit: 10, search });
   const { mutate: inviteMember, isPending: inviting } = useInviteMember();
+  const { mutate: blockUser, isPending: blocking } = useBlockUser();
 
   const members = data?.data || [];
   const totalPages = data?.totalPages || 1;
@@ -121,13 +123,12 @@ export default function Members() {
 
                 {/* Status */}
                 <div className="col-span-2 hidden md:block">
-                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight ${
-                    member.status === 'active' 
-                    ? 'bg-emerald-50 text-emerald-600' 
-                    : 'bg-rose-50 text-rose-600'
-                  }`}>
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight ${member.status === 'active'
+                      ? 'bg-emerald-50 text-emerald-600'
+                      : 'bg-rose-50 text-rose-600'
+                    }`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${member.status === 'active' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                    {member.status}
+                    {member.status === 'active' ? 'Active' : 'Blocked'}
                   </span>
                 </div>
 
@@ -141,8 +142,26 @@ export default function Members() {
                   })}
                 </div>
 
-                {/* Actions */}
-                <div className="col-span-1 text-right flex justify-end">
+                <div className="col-span-1 text-right flex justify-end gap-2">
+                  {member.status === "active" ? (
+                    <button
+                      onClick={() => blockUser({ userId: member._id, status: "block" })}
+                      disabled={blocking}
+                      className="p-2 hover:bg-rose-50 rounded-xl text-slate-400 hover:text-rose-600 transition-colors"
+                      title="Block User"
+                    >
+                      <Ban size={18} />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => blockUser({ userId: member._id, status: "active" })}
+                      disabled={blocking}
+                      className="p-2 hover:bg-emerald-50 rounded-xl text-slate-400 hover:text-emerald-600 transition-colors"
+                      title="Unblock User"
+                    >
+                      <CheckCircle size={18} />
+                    </button>
+                  )}
                   <button className="p-2 hover:bg-slate-50 rounded-xl text-slate-400 hover:text-indigo-600 transition-colors">
                     <MoreVertical size={18} />
                   </button>

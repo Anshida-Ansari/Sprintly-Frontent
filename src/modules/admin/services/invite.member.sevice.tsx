@@ -6,21 +6,25 @@ export const inviteMemberService = {
         const res = await api.post('admin/invite-member', payload)
         return res.data
     },
-    async verifyToken(token: string):Promise<VerifyInvitationResponse>{
-        const res = await api.post('admin/verify-invitation',{token})
+    async verifyToken(token: string): Promise<VerifyInvitationResponse> {
+        const res = await api.post('admin/verify-invitation', { token })
         return res.data
     },
-    async setpassword(payload:SetPasswordPayload):Promise<SetPasswordResponse>{
-        const res = await api.post('auth/set-password',payload)
+    async setpassword(payload: SetPasswordPayload): Promise<SetPasswordResponse> {
+        const res = await api.post('auth/set-password', payload)
         return res.data
     },
     async getMembers({ page, limit, search }: { page: number; limit: number; search?: string }) {
-    const params = new URLSearchParams();
-    params.append("page", page.toString());
-    params.append("limit", limit.toString());
-    if (search) params.append("search", search);
+        const params = new URLSearchParams();
+        params.append("page", page.toString());
+        params.append("limit", limit.toString());
+        if (search) params.append("search", search);
 
-    const res = await api.get(`/admin/members?${params.toString()}`);
-    return res.data;
-  },
+        const res = await api.get(`/admin/members?${params.toString()}`);
+        return res.data;
+    },
+    async blockUser(userId: string, status: "active" | "block") {
+        const res = await api.patch(`admin/block-user/${userId}`, { status });
+        return res.data;
+    },
 }
