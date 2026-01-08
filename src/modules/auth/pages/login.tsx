@@ -21,7 +21,7 @@ export default function Login() {
             {/* Top Navigation Bar */}
             <nav className="p-8 flex justify-between items-center w-full max-w-7xl mx-auto">
                 <div className="flex items-center gap-2">
-               
+
                     <span className="font-black text-2xl tracking-tighter text-slate-900">
                         Sprintly<span className="text-blue-600">.</span>
                     </span>
@@ -66,7 +66,7 @@ export default function Login() {
                         <div className="group relative border-2 border-slate-100 rounded-2xl p-4 focus-within:border-blue-600 transition-all duration-300">
                             <div className="flex justify-between items-center mb-1">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-focus-within:text-blue-600">Access Key</p>
-                                <Link to="/forgot" className="text-[10px] font-bold text-slate-300 hover:text-blue-600">FORGOT?</Link>
+                                <Link to="/forgot-password" className="text-[10px] font-bold text-slate-300 hover:text-blue-600">FORGOT?</Link>
                             </div>
                             <input
                                 name="password"

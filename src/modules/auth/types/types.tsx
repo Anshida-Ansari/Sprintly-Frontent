@@ -16,7 +16,8 @@ export type VerifyOtpRequest = {
 }
 
 export type ResendOtpRequest = {
-    token: string
+    token?: string,
+    email?: string
 }
 
 export type ResetPasswordRequest = {
@@ -37,4 +38,3 @@ export type LogoutRequest = {
 export type ForgotRequest = {
     email: string
 }
-

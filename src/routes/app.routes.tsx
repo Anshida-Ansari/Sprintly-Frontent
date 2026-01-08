@@ -10,6 +10,8 @@ const LandingPage = lazy(() => import("../modules/landing/pages/Landing"));
 const AdminDashboard = lazy(() => import("../modules/admin/pages/admin.dashboard"));
 const SuperAdminDashboard = lazy(() => import("../modules/superadmin/pages/superadmin.dashboard"));
 const ForgotPassword = lazy(() => import("../modules/auth/pages/forgotPassword"));
+const ForgotPasswordOtp = lazy(() => import("../modules/auth/pages/forgotOtp"));
+const ResetPassword = lazy(() => import("../modules/auth/pages/resetPassword"));
 const AdminLayout = lazy(() => import("../shared/layouts/admin.layout"));
 const SuperAdminLayout = lazy(() => import("../shared/layouts/superadmin.layout"));
 const SuperAdminCompanyPage = lazy(() => import("../modules/superadmin/pages/superadmin.companies"));
@@ -34,6 +36,8 @@ export const router = createBrowserRouter([
       { path: "login", element: <Login /> },
       { path: "otp", element: <OTP /> },
       { path: "forgot-password", element: <ForgotPassword /> },
+      { path: "forgot-otp", element: <ForgotPasswordOtp /> },
+      { path: "reset-password", element: <ResetPassword /> },
       { path: "member/accept", element: <MemberAccept /> },
     ],
   },

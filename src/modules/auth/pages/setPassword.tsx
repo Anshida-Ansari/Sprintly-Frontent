@@ -1,9 +1,9 @@
-// modules/auth/pages/MemberAccept.tsx
 import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useVerifyInvitation } from "../../admin/hooks/useVerifyInvitation";
 import { useSetPassword } from "../../admin/hooks/usesetPassword";
 import SetPasswordForm from "../../auth/components/Password/set.password";
+import { Loader2, UserPlus, AlertCircle, ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function MemberAccept() {
@@ -14,7 +14,7 @@ export default function MemberAccept() {
   const { mutate: verifyToken, data: responseData, isPending: verifying, isError: verifyError } = useVerifyInvitation();
   const { mutate: setPassword, isPending: setting } = useSetPassword();
   const inviteData = responseData?.data;
-console.log("Invite data from verify:", inviteData);
+
   useEffect(() => {
     if (!token) {
       toast.error("Invalid invitation link");
@@ -29,92 +29,119 @@ console.log("Invite data from verify:", inviteData);
       { token: token!, password, confirmPassword },
       {
         onSuccess: () => {
-          toast.success("Account created successfully! Please log in.");
+          toast.success("Account created! Welcome to the team.");
           navigate("/login");
         },
       }
     );
   };
 
-  // Loading
+  // --- LOADING STATE ---
   if (verifying) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-          <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Verifying your invitation...</p>
-        </div>
+      <div className="min-h-screen w-full bg-white flex flex-col items-center justify-center font-sans antialiased">
+        <Loader2 className="animate-spin text-blue-600 mb-4" size={40} />
+        <p className="font-black text-sm uppercase tracking-[0.2em] text-slate-400">Authenticating Ticket...</p>
       </div>
     );
   }
 
-  // Error
+  // --- ERROR STATE ---
   if (verifyError || !inviteData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md text-center">
-          <div className="text-red-500 text-5xl mb-4">⚠️</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Invalid or Expired Link</h1>
-          <p className="text-gray-600 mb-6">
-            This invitation link is no longer valid. Please contact your team admin to send a new invitation.
-          </p>
-          <button
-            onClick={() => navigate("/login")}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition"
-          >
-            Go to Login
-          </button>
-        </div>
+      <div className="min-h-screen w-full bg-white flex flex-col font-sans antialiased text-slate-900">
+        <main className="flex-1 flex items-center justify-center p-6">
+          <div className="w-full max-w-[480px] text-center space-y-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-red-50 rounded-full text-red-500">
+              <AlertCircle size={40} />
+            </div>
+            <div className="space-y-4">
+              <h1 className="text-5xl font-black tracking-tight leading-[0.9]">
+                LINK <span className="text-red-500">EXPIRED.</span><br />
+                ACCESS DENIED.
+              </h1>
+              <p className="text-slate-500 font-medium text-lg mx-auto max-w-[320px]">
+                This invitation is no longer valid or has already been used.
+              </p>
+            </div>
+            <button
+              onClick={() => navigate("/login")}
+              className="w-full h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center gap-3 hover:bg-slate-800 transition-all active:scale-95 font-black text-xl tracking-tight"
+            >
+              <ArrowLeft size={20} /> RETURN TO LOGIN
+            </button>
+          </div>
+        </main>
       </div>
     );
   }
 
-  // Valid token → show form
+  // --- SUCCESS/FORM STATE ---
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
-      {/* Logo */}
-      <div className="absolute top-6 left-6">
+    <div className="min-h-screen w-full bg-white flex flex-col font-sans antialiased text-slate-900">
+      {/* Top Navigation Bar */}
+      <nav className="p-8 flex justify-between items-center w-full max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
-          <div className="text-indigo-600 text-2xl font-bold">&lt;/&gt;</div>
-          <span className="text-2xl font-bold text-gray-800">Sprintly</span>
+          <span className="font-black text-2xl tracking-tighter text-slate-900">
+            Sprintly<span className="text-blue-600">.</span>
+          </span>
         </div>
-      </div>
+      </nav>
 
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to Sprintly!</h1>
-            <p className="text-gray-600">
-              You've been invited to join your team. Set your password to get started.
+      <main className="flex-1 flex items-center justify-center p-6">
+        <div className="w-full max-w-[480px]">
+          {/* Bold Heading Section */}
+          <div className="mb-12 space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 rounded-full">
+              <UserPlus size={14} className="text-blue-600" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Team Invitation</span>
+            </div>
+            <h1 className="text-5xl font-black tracking-tight leading-[0.9]">
+              WELCOME <span className="text-blue-600">ABOARD.</span><br />
+              SETUP ACCOUNT.
+            </h1>
+            <p className="text-slate-500 font-medium text-lg">
+              Finish setting up your profile to join the workspace.
             </p>
           </div>
 
-          {/* Read-only info */}
-          <div className="space-y-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+          <div className="space-y-4">
+            {/* Read-only Identity info using the same style as login inputs */}
+            <div className="group relative border-2 border-slate-50 bg-slate-50/50 rounded-2xl p-4 transition-all duration-300">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Assigned Name</p>
               <input
                 type="text"
                 value={inviteData?.name || ""}
                 readOnly
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-700"
+                className="w-full bg-transparent outline-none font-bold text-lg text-slate-500 cursor-not-allowed"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+
+            <div className="group relative border-2 border-slate-50 bg-slate-50/50 rounded-2xl p-4 transition-all duration-300">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Corporate Email</p>
               <input
                 type="email"
                 value={inviteData?.email || ""}
                 readOnly
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-700"
+                className="w-full bg-transparent outline-none font-bold text-lg text-slate-500 cursor-not-allowed"
               />
+            </div>
+
+            {/* Password Form - Ensure this component uses the same Button style internally */}
+            <div className="pt-4">
+               <SetPasswordForm onSubmit={handleSetPassword} isLoading={setting} />
             </div>
           </div>
 
-          {/* Reusable Form */}
-          <SetPasswordForm onSubmit={handleSetPassword} isLoading={setting} />
+          {/* Minimal Footer Info */}
+          <div className="mt-12 pt-8 border-t border-slate-50 flex items-center gap-8 text-[11px] font-bold text-slate-300 uppercase tracking-widest">
+            <span>SECURE JOIN</span>
+            <span>v2.0.4</span>
+            <div className="ml-auto w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            <span className="text-emerald-500">Server Active</span>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

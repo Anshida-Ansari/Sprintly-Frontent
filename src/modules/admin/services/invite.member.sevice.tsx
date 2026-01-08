@@ -3,11 +3,11 @@ import type { InviteMemberPayload, InviteMemberResponse, SetPasswordPayload, Set
 
 export const inviteMemberService = {
     async inviteMember(payload: InviteMemberPayload): Promise<InviteMemberResponse> {
-        const res = await api.post('admin/members/invite', payload)
+        const res = await api.post('admin/invite-member', payload)
         return res.data
     },
     async verifyToken(token: string):Promise<VerifyInvitationResponse>{
-        const res = await api.post('admin/verify-members',{token})
+        const res = await api.post('admin/verify-invitation',{token})
         return res.data
     },
     async setpassword(payload:SetPasswordPayload):Promise<SetPasswordResponse>{
@@ -15,7 +15,6 @@ export const inviteMemberService = {
         return res.data
     },
     async getMembers({ page, limit, search }: { page: number; limit: number; search?: string }) {
-        console.log("GET /admin/members HIT!");
     const params = new URLSearchParams();
     params.append("page", page.toString());
     params.append("limit", limit.toString());
