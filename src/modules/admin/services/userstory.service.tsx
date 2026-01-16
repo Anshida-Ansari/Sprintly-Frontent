@@ -52,4 +52,12 @@ export const userStoryService = {
 
         return res.data;
     },
+
+    async assignUserStoryToSprint(projectId: string, userStoryId: string, sprintId: string | null) {
+        const res = await api.post(`projects/${projectId}/assign-sprint`, {
+            userStoryId,
+            sprintId
+        });
+        return res.data;
+    }
 };

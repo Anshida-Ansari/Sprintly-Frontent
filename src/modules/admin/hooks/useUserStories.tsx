@@ -40,3 +40,19 @@ export const useUpdateUserStory = () => {
         },
     });
 };
+
+export const useAssignUserStoryToSprint = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ projectId, userStoryId, sprintId }: { projectId: string; userStoryId: string; sprintId: string | null }) =>
+            userStoryService.assignUserStoryToSprint(projectId, userStoryId, sprintId),
+        onSuccess: (res: any) => {
+            queryClient.invalidateQueries({ queryKey: ["user-stories"] });
+            queryClient.invalidateQueries({ queryKey: ["sprints"] });
+            toast.success(res.message || "User story assigned successfully");
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || "Failed to assign user story");
+        },
+    });
+};

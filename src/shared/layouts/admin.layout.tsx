@@ -10,6 +10,7 @@ const sidebarLinks = [
   { name: "Projects", path: "/admin/projects", icon: FolderKanban },
   { name: "Members", path: "/admin/members", icon: Users },
   { name: "Sprints", path: "/admin/sprints", icon: Zap },
+  { name: "Planning", path: "/admin/sprint-planning", icon: Zap },
   { name: "User Stories", path: "/admin/user-stories", icon: ScrollText },
   { name: "Team", path: "/admin/team", icon: UserPlus },
   { name: "Meetings", path: "/admin/meetings", icon: Video },

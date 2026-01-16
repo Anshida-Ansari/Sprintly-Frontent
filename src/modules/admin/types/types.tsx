@@ -136,6 +136,7 @@ export interface GetUserStoriesResponse {
 export type SprintStatus = 'Planned' | 'Active' | 'Completed';
 
 export interface ISprint {
+    id: string;
     _id: string;
     projectId: string;
     name: string;
@@ -170,4 +171,37 @@ export interface GetSprintsResponse {
     page: number;
     limit: number;
     totalPages: number;
+}
+
+// Subtask Types
+
+export type SubtaskStatus = 'pending' | 'completed';
+
+export interface ISubtask {
+    id: string;
+    _id: string;
+    userStoryId: string;
+    companyId: string;
+    title: string;
+    status: SubtaskStatus;
+    assignedTo?: string;
+    createdAt: string;
+    updatedAt?: string;
+}
+
+export interface CreateSubtaskPayload {
+    title: string;
+}
+
+export interface UpdateSubtaskStatusPayload {
+    status: SubtaskStatus;
+}
+
+export interface AssignSubtaskPayload {
+    assignedTo: string;
+}
+
+export interface GetSubtasksResponse {
+    success: boolean;
+    data: ISubtask[];
 }

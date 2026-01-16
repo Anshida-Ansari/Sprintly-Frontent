@@ -9,12 +9,14 @@ import {
   UserCircle,
   LogOut,
   Cpu,
-  Terminal
+  Terminal,
+  Kanban
 } from "lucide-react";
 import { useLogout } from "../hooks/useLogout";
 
 const sidebarLinks = [
   { name: "Dashboard", path: "/developers/dashboard", icon: LayoutDashboard },
+  { name: "Kanban Board", path: "/developers/kanban", icon: Kanban },
   { name: "My Tasks", path: "/developers/tasks", icon: CheckSquare },
   { name: "Projects", path: "/developers/projects", icon: Box },
   { name: "Sprints", path: "/developers/sprints", icon: Zap },

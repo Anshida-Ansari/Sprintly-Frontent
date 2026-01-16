@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Plus, Calendar, Edit, MoreVertical, Search, Filter, Rocket, CheckCircle2, Clock } from "lucide-react";
-import { useGetSprints, useCreateSprint, useEditSprint } from "../hooks/useSprints.tsx";
+import { Plus, Calendar, Edit, MoreVertical, Search, Filter, Rocket, CheckCircle2, Clock, Trash2, Play } from "lucide-react";
+import { useGetSprints, useCreateSprint, useEditSprint, useStartSprint, useCompleteSprint, useDeleteSprint } from "../hooks/useSprints.tsx";
 import SprintModal from "./sprint.modal.tsx";
 import { Pagination } from "../../../shared/components/pagination";
 import type { ISprint, SprintStatus } from "../types/types.tsx";
@@ -25,6 +25,9 @@ export default function SprintList({ projectId }: SprintListProps) {
 
     const createMutation = useCreateSprint(projectId);
     const editMutation = useEditSprint(projectId);
+    const startMutation = useStartSprint(projectId);
+    const completeMutation = useCompleteSprint(projectId);
+    const deleteMutation = useDeleteSprint(projectId);
 
     const sprints = sprintsResponse?.data || [];
     const totalPages = sprintsResponse?.totalPages || 1;
@@ -140,12 +143,43 @@ export default function SprintList({ projectId }: SprintListProps) {
                                 </div>
 
                                 <div className="flex items-center gap-3 self-end md:self-center">
+                                    {sprint.status === 'Planned' && (
+                                        <button
+                                            onClick={() => startMutation.mutate(sprint._id)}
+                                            disabled={startMutation.isPending}
+                                            className="p-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-2xl transition-all border border-indigo-100 hover:shadow-md disabled:opacity-50"
+                                            title="Start Sprint"
+                                        >
+                                            <Play size={18} />
+                                        </button>
+                                    )}
+                                    {sprint.status === 'Active' && (
+                                        <button
+                                            onClick={() => completeMutation.mutate(sprint._id)}
+                                            disabled={completeMutation.isPending}
+                                            className="p-3 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-2xl transition-all border border-emerald-100 hover:shadow-md disabled:opacity-50"
+                                            title="Complete Sprint"
+                                        >
+                                            <CheckCircle2 size={18} />
+                                        </button>
+                                    )}
                                     <button
                                         onClick={() => handleOpenEdit(sprint)}
                                         className="p-3 bg-gray-50 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all border border-transparent hover:border-indigo-100"
+                                        title="Edit Sprint"
                                     >
                                         <Edit size={18} />
                                     </button>
+                                    {(sprint.status === 'Planned' || sprint.status === 'Completed') && (
+                                        <button
+                                            onClick={() => deleteMutation.mutate(sprint._id)}
+                                            disabled={deleteMutation.isPending}
+                                            className="p-3 bg-rose-50 text-rose-400 hover:text-rose-600 hover:bg-rose-100 rounded-2xl transition-all border border-transparent hover:border-rose-100 disabled:opacity-50"
+                                            title="Delete Sprint"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>

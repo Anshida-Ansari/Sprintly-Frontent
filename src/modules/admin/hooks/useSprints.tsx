@@ -41,3 +41,48 @@ export function useEditSprint(projectId: string) {
         },
     });
 }
+
+export function useStartSprint(projectId: string) {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (sprintId: string) => sprintService.startSprint(sprintId),
+        onSuccess: () => {
+            toast.success("Sprint started successfully");
+            queryClient.invalidateQueries({ queryKey: ["sprints", projectId] });
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || "Failed to start sprint");
+        },
+    });
+}
+
+export function useCompleteSprint(projectId: string) {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (sprintId: string) => sprintService.completeSprint(sprintId),
+        onSuccess: () => {
+            toast.success("Sprint completed successfully");
+            queryClient.invalidateQueries({ queryKey: ["sprints", projectId] });
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || "Failed to complete sprint");
+        },
+    });
+}
+
+export function useDeleteSprint(projectId: string) {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (sprintId: string) => sprintService.deleteSprint(sprintId),
+        onSuccess: () => {
+            toast.success("Sprint deleted successfully");
+            queryClient.invalidateQueries({ queryKey: ["sprints", projectId] });
+        },
+        onError: (error: any) => {
+            toast.error(error?.response?.data?.message || "Failed to delete sprint");
+        },
+    });
+}

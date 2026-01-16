@@ -19,11 +19,13 @@ const SuperAdminCompanyDetail = lazy(() => import("../modules/superadmin/pages/s
 const MemberAccept = lazy(() => import("../modules/auth/pages/setPassword"));
 const DeveloperLayout = lazy(() => import("../shared/layouts/developer.layout"));
 const DashboardPage = lazy(() => import("../modules/developers/pages/developers.dashboard"));
+const KanbanBoard = lazy(() => import("../modules/developers/pages/kanban-board"));
 const Members = lazy(() => import("../modules/admin/pages/list.users"));
 const Projects = lazy(() => import("../modules/admin/pages/projects"));
 const ProjectDetail = lazy(() => import("../modules/admin/pages/project.detail"));
 const UserStoriesPage = lazy(() => import("../modules/admin/pages/user-stories"));
 const SprintsPage = lazy(() => import("../modules/admin/pages/sprints"));
+const SprintPlanning = lazy(() => import("../modules/admin/pages/sprint-planning"));
 
 //public routes
 export const router = createBrowserRouter([
@@ -57,6 +59,7 @@ export const router = createBrowserRouter([
           { path: "projects/:projectId", element: <ProjectDetail /> },
           { path: "members", element: <Members /> },
           { path: "sprints", element: <SprintsPage /> },
+          { path: "sprint-planning", element: <SprintPlanning /> },
           { path: "user-stories", element: <UserStoriesPage /> },
           { path: "team", element: <div>Team</div> },
           { path: "meetings", element: <div>Meetings</div> },
@@ -85,6 +88,7 @@ export const router = createBrowserRouter([
         element: <DeveloperLayout />,
         children: [
           { path: "dashboard", element: <DashboardPage /> },
+          { path: "kanban", element: <KanbanBoard /> },
           { path: "tasks", element: <div>My Tasks Page</div> },
           { path: "projects", element: <div>Projects Page</div> },
           { path: "sprints", element: <div>Sprints Page</div> },
