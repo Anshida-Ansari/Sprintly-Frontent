@@ -20,7 +20,7 @@ const mapSubtask = (s: any) => ({
 
 export const subtaskService = {
     async getSubtasks(userStoryId: string): Promise<GetSubtasksResponse> {
-        const res = await api.get(`subtask/subtask/${userStoryId}`);
+        const res = await api.get(`userstory/subtask/${userStoryId}`);
 
         if (res.data && res.data.data) {
             res.data.data = res.data.data.map(mapSubtask);
@@ -30,22 +30,22 @@ export const subtaskService = {
     },
 
     async createSubtask(userStoryId: string, payload: CreateSubtaskPayload) {
-        const res = await api.post(`subtask/${userStoryId}/subtask`, payload);
+        const res = await api.post(`userstory/${userStoryId}/subtask`, payload);
         return res.data;
     },
 
     async updateSubtaskStatus(subtaskId: string, status: SubtaskStatus) {
-        const res = await api.patch(`subtask/${subtaskId}/status`, { status });
+        const res = await api.patch(`userstory/${subtaskId}/status`, { status });
         return res.data;
     },
 
     async assignSubtask(subtaskId: string, payload: AssignSubtaskPayload) {
-        const res = await api.patch(`subtask/${subtaskId}/assign-members`, payload);
+        const res = await api.patch(`userstory/${subtaskId}/assign-members`, payload);
         return res.data;
     },
 
     async deleteSubtask(subtaskId: string) {
-        const res = await api.delete(`subtask/${subtaskId}`);
+        const res = await api.delete(`userstory/${subtaskId}`);
         return res.data;
     }
 };

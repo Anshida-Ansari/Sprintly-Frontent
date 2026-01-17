@@ -7,9 +7,11 @@ import type { ISprint, SprintStatus } from "../types/types.tsx";
 
 interface SprintListProps {
     projectId: string;
+    projectStartDate?: string | Date;
+    projectEndDate?: string | Date;
 }
 
-export default function SprintList({ projectId }: SprintListProps) {
+export default function SprintList({ projectId, projectStartDate, projectEndDate }: SprintListProps) {
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState<SprintStatus | undefined>();
@@ -56,16 +58,16 @@ export default function SprintList({ projectId }: SprintListProps) {
 
     const getStatusIcon = (status: SprintStatus) => {
         switch (status) {
-            case 'Active': return <Rocket size={16} className="text-indigo-500" />;
-            case 'Completed': return <CheckCircle2 size={16} className="text-emerald-500" />;
+            case 'ACTIVE': return <Rocket size={16} className="text-indigo-500" />;
+            case 'COMPLETED': return <CheckCircle2 size={16} className="text-emerald-500" />;
             default: return <Clock size={16} className="text-gray-400" />;
         }
     };
 
     const getStatusStyle = (status: SprintStatus) => {
         switch (status) {
-            case 'Active': return "bg-indigo-50 text-indigo-700 border-indigo-100";
-            case 'Completed': return "bg-emerald-50 text-emerald-700 border-emerald-100";
+            case 'ACTIVE': return "bg-indigo-50 text-indigo-700 border-indigo-100";
+            case 'COMPLETED': return "bg-emerald-50 text-emerald-700 border-emerald-100";
             default: return "bg-gray-50 text-gray-700 border-gray-100";
         }
     };
@@ -143,7 +145,7 @@ export default function SprintList({ projectId }: SprintListProps) {
                                 </div>
 
                                 <div className="flex items-center gap-3 self-end md:self-center">
-                                    {sprint.status === 'Planned' && (
+                                    {sprint.status === 'PLANNED' && (
                                         <button
                                             onClick={() => startMutation.mutate(sprint._id)}
                                             disabled={startMutation.isPending}
@@ -153,7 +155,7 @@ export default function SprintList({ projectId }: SprintListProps) {
                                             <Play size={18} />
                                         </button>
                                     )}
-                                    {sprint.status === 'Active' && (
+                                    {sprint.status === 'ACTIVE' && (
                                         <button
                                             onClick={() => completeMutation.mutate(sprint._id)}
                                             disabled={completeMutation.isPending}
@@ -170,7 +172,7 @@ export default function SprintList({ projectId }: SprintListProps) {
                                     >
                                         <Edit size={18} />
                                     </button>
-                                    {(sprint.status === 'Planned' || sprint.status === 'Completed') && (
+                                    {(sprint.status === 'PLANNED' || sprint.status === 'COMPLETED') && (
                                         <button
                                             onClick={() => deleteMutation.mutate(sprint._id)}
                                             disabled={deleteMutation.isPending}
@@ -204,6 +206,8 @@ export default function SprintList({ projectId }: SprintListProps) {
                 onSubmit={handleSubmit}
                 sprint={selectedSprint}
                 isLoading={createMutation.isPending || editMutation.isPending}
+                minDate={projectStartDate ? new Date(projectStartDate).toISOString() : undefined}
+                maxDate={projectEndDate ? new Date(projectEndDate).toISOString() : undefined}
             />
         </div>
     );

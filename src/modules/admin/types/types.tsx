@@ -133,7 +133,7 @@ export interface GetUserStoriesResponse {
 
 // Sprint Types
 
-export type SprintStatus = 'Planned' | 'Active' | 'Completed';
+export type SprintStatus = 'PLANNED' | 'ACTIVE' | 'COMPLETED';
 
 export interface ISprint {
     id: string;

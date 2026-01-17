@@ -8,9 +8,11 @@ interface SprintModalProps {
     onSubmit: (data: any) => void;
     sprint?: ISprint;
     isLoading?: boolean;
+    minDate?: string;
+    maxDate?: string;
 }
 
-export default function SprintModal({ isOpen, onClose, onSubmit, sprint, isLoading }: SprintModalProps) {
+export default function SprintModal({ isOpen, onClose, onSubmit, sprint, isLoading, minDate, maxDate }: SprintModalProps) {
     const [name, setName] = useState("");
     const [goal, setGoal] = useState("");
     const [startDate, setStartDate] = useState("");
@@ -60,6 +62,16 @@ export default function SprintModal({ isOpen, onClose, onSubmit, sprint, isLoadi
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                    {minDate && maxDate && (
+                        <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl flex items-start gap-2 text-xs font-bold text-amber-600">
+                            <span className="mt-0.5">⚠️</span>
+                            <span>
+                                Sprint dates must be within project timeline: <br />
+                                {new Date(minDate).toLocaleDateString()} - {new Date(maxDate).toLocaleDateString()}
+                            </span>
+                        </div>
+                    )}
+
                     <div className="space-y-2">
                         <label className="text-sm font-black text-gray-700 ml-1 flex items-center gap-2">
                             <Layout size={16} className="text-indigo-500" /> Sprint Name
@@ -94,6 +106,8 @@ export default function SprintModal({ isOpen, onClose, onSubmit, sprint, isLoadi
                             <input
                                 type="date"
                                 required
+                                min={minDate ? new Date(minDate).toISOString().split('T')[0] : undefined}
+                                max={maxDate ? new Date(maxDate).toISOString().split('T')[0] : undefined}
                                 className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-bold text-gray-900"
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
@@ -106,6 +120,8 @@ export default function SprintModal({ isOpen, onClose, onSubmit, sprint, isLoadi
                             <input
                                 type="date"
                                 required
+                                min={minDate ? new Date(minDate).toISOString().split('T')[0] : undefined}
+                                max={maxDate ? new Date(maxDate).toISOString().split('T')[0] : undefined}
                                 className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-bold text-gray-900"
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}

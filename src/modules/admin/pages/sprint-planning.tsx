@@ -152,19 +152,19 @@ export default function SprintPlanningPage() {
                                 key={sprint._id}
                                 onDrop={(e) => onDrop(e, sprint._id)}
                                 onDragOver={allowDrop}
-                                className={`rounded-[40px] border-2 transition-all overflow-hidden ${sprint.status === 'Active' ? 'border-indigo-600 bg-indigo-50/20 shadow-lg shadow-indigo-100' : 'border-gray-100 bg-white'
+                                className={`rounded-[40px] border-2 transition-all overflow-hidden ${sprint.status === 'ACTIVE' ? 'border-indigo-600 bg-indigo-50/20 shadow-lg shadow-indigo-100' : 'border-gray-100 bg-white'
                                     }`}
                             >
                                 {/* Sprint Header */}
                                 <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                                     <div className="flex items-start gap-4">
-                                        <div className={`p-3 rounded-2xl ${sprint.status === 'Active' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-gray-100 text-gray-400'}`}>
-                                            <Zap size={20} fill={sprint.status === 'Active' ? "currentColor" : "none"} />
+                                        <div className={`p-3 rounded-2xl ${sprint.status === 'ACTIVE' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-gray-100 text-gray-400'}`}>
+                                            <Zap size={20} fill={sprint.status === 'ACTIVE' ? "currentColor" : "none"} />
                                         </div>
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">
                                                 <h3 className="font-black text-xl text-gray-900">{sprint.name}</h3>
-                                                <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${sprint.status === 'Active' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'
+                                                <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${sprint.status === 'ACTIVE' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-500'
                                                     }`}>
                                                     {sprint.status}
                                                 </span>
@@ -184,7 +184,7 @@ export default function SprintPlanningPage() {
 
                                     {/* Action Buttons */}
                                     <div className="flex items-center gap-3">
-                                        {sprint.status === 'Planned' && (
+                                        {sprint.status === 'PLANNED' && (
                                             <button
                                                 onClick={() => startSprint.mutate(sprint._id)}
                                                 disabled={startSprint.isPending}
@@ -194,7 +194,7 @@ export default function SprintPlanningPage() {
                                                 Start Sprint
                                             </button>
                                         )}
-                                        {sprint.status === 'Active' && (
+                                        {sprint.status === 'ACTIVE' && (
                                             <button
                                                 onClick={() => completeSprint.mutate(sprint._id)}
                                                 disabled={completeSprint.isPending}

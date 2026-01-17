@@ -217,7 +217,13 @@ export default function ProjectDetail() {
 
                 {activeTab === 'sprints' && (
                     <div className="animate-in slide-in-from-right-4 duration-500 bg-white p-10 rounded-[40px] border border-gray-100 shadow-sm">
-                        <SprintList projectId={projectId || ""} />
+                        <div className="animate-in slide-in-from-right-4 duration-500 bg-white p-10 rounded-[40px] border border-gray-100 shadow-sm">
+                            <SprintList
+                                projectId={projectId || ""}
+                                projectStartDate={project.startDate}
+                                projectEndDate={project.endDate}
+                            />
+                        </div>
                     </div>
                 )}
             </div>

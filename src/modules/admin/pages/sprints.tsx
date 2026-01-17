@@ -83,7 +83,13 @@ export default function SprintsPage() {
             <div className="transition-all duration-500">
                 {selectedProjectId ? (
                     <div className="bg-white p-10 rounded-[48px] border border-gray-100 shadow-sm animate-in zoom-in-95 duration-500">
-                        <SprintList projectId={selectedProjectId} />
+                        <div className="bg-white p-10 rounded-[48px] border border-gray-100 shadow-sm animate-in zoom-in-95 duration-500">
+                            <SprintList
+                                projectId={selectedProjectId}
+                                projectStartDate={projects.find(p => p.id === selectedProjectId)?.startDate}
+                                projectEndDate={projects.find(p => p.id === selectedProjectId)?.endDate}
+                            />
+                        </div>
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center py-24 bg-gray-50/50 rounded-[48px] border border-dashed border-gray-200">
