@@ -15,6 +15,7 @@ import { useGetMembers } from "../hooks/useGetmembers";
 import { useUpdateUserStory } from "../hooks/useUserStories";
 import { UserAuth } from "../../auth/store/store";
 import type { IUserStory, ISubtask } from "../types/types";
+import DeleteConfirmationModal from "./delete-confirmation-modal";
 
 interface UserStoryDetailModalProps {
     isOpen: boolean;
@@ -26,6 +27,10 @@ export default function UserStoryDetailModal({ isOpen, onClose, story }: UserSto
     const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
     const [isEditingDescription, setIsEditingDescription] = useState(false);
     const [editedDescription, setEditedDescription] = useState(story.description);
+
+    // Delete Confirmation State
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [subtaskToDelete, setSubtaskToDelete] = useState<string | null>(null);
 
     const user = UserAuth((state) => state.user);
     const isAdmin = user?.role === "admin";
@@ -80,6 +85,22 @@ export default function UserStoryDetailModal({ isOpen, onClose, story }: UserSto
         }, {
             onSuccess: () => setIsEditingDescription(false)
         });
+    };
+
+    const handleDeleteClick = (subtaskId: string) => {
+        setSubtaskToDelete(subtaskId);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (subtaskToDelete) {
+            deleteSubtask.mutate(subtaskToDelete, {
+                onSuccess: () => {
+                    setIsDeleteModalOpen(false);
+                    setSubtaskToDelete(null);
+                }
+            });
+        }
     };
 
     const getPriorityStyle = (priority: string) => {
@@ -202,56 +223,90 @@ export default function UserStoryDetailModal({ isOpen, onClose, story }: UserSto
                             </div>
                         ) : (
                             <div className="space-y-3">
-                                {subtasks.map((subtask) => (
-                                    <div
-                                        key={subtask.id}
-                                        className="flex items-start gap-3 p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-all group"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={subtask.status === "completed"}
-                                            onChange={() => handleToggleSubtask(subtask)}
-                                            className="mt-1 w-5 h-5 rounded-md border-2 border-gray-300 text-indigo-600 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
-                                        />
-                                        <div className="flex-1 min-w-0">
-                                            <p className={`font-bold text-sm ${subtask.status === "completed" ? "line-through text-gray-400" : "text-gray-900"}`}>
-                                                {subtask.title}
-                                            </p>
-                                            {isAdmin && (
-                                                <div className="mt-2">
-                                                    <select
-                                                        value={subtask.assignedTo || ""}
-                                                        onChange={(e) => handleAssignSubtask(subtask.id, e.target.value)}
-                                                        className="text-xs px-3 py-1.5 bg-white border border-gray-200 rounded-lg font-bold text-gray-700 hover:border-indigo-300 transition-all cursor-pointer"
-                                                    >
-                                                        <option value="">Unassigned</option>
-                                                        {developers.map((dev: any) => (
-                                                            <option key={dev._id} value={dev._id}>
-                                                                {dev.name}
-                                                            </option>
-                                                        ))}
-                                                    </select>
+                                {subtasks.map((subtask) => {
+                                    const assignedDev = developers.find((d: any) => d._id === subtask.assignedTo);
+
+                                    return (
+                                        <div
+                                            key={subtask.id}
+                                            className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-all group border border-transparent hover:border-gray-200"
+                                        >
+                                            {/* Status: Checkbox for Developer, Badge for Admin */}
+                                            {isAdmin ? (
+                                                <div className={`
+                                                    px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border
+                                                    ${subtask.status === "completed"
+                                                        ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                                                        : "bg-gray-200 text-gray-600 border-gray-300"}
+                                                `}>
+                                                    {subtask.status === "completed" ? "DONE" : "TODO"}
                                                 </div>
+                                            ) : (
+                                                <input
+                                                    type="checkbox"
+                                                    checked={subtask.status === "completed"}
+                                                    onChange={() => handleToggleSubtask(subtask)}
+                                                    className="w-5 h-5 rounded-md border-2 border-gray-300 text-indigo-600 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                                                />
                                             )}
-                                            {!isAdmin && subtask.assignedTo && (
-                                                <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-500">
-                                                    <User size={12} />
-                                                    <span className="font-bold">
-                                                        {developers.find((d: any) => d._id === subtask.assignedTo)?.name || "Assigned"}
-                                                    </span>
+
+                                            <div className="flex-1 min-w-0 flex flex-col gap-2">
+                                                <p className={`font-bold text-sm ${subtask.status === "completed" ? "line-through text-gray-400" : "text-gray-900"}`}>
+                                                    {subtask.title}
+                                                </p>
+
+                                                {/* Assignment UI */}
+                                                <div className="flex items-center gap-2">
+                                                    {assignedDev ? (
+                                                        <div className="flex items-center gap-2 bg-white px-2 py-1 rounded-lg border border-gray-200 shadow-sm">
+                                                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-[9px] font-black text-indigo-600 uppercase">
+                                                                {assignedDev.name.slice(0, 2)}
+                                                            </div>
+                                                            <span className="text-xs font-bold text-gray-700">{assignedDev.name}</span>
+                                                            {isAdmin && (
+                                                                <button
+                                                                    onClick={() => handleAssignSubtask(subtask.id, "")}
+                                                                    className="ml-1 p-0.5 hover:bg-rose-50 text-gray-400 hover:text-rose-500 rounded transition-colors"
+                                                                    title="Unassign"
+                                                                >
+                                                                    <X size={12} />
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        isAdmin ? (
+                                                            <select
+                                                                value=""
+                                                                onChange={(e) => handleAssignSubtask(subtask.id, e.target.value)}
+                                                                className="text-xs px-2 py-1 bg-white border border-gray-200 rounded-lg font-bold text-gray-500 hover:border-indigo-300 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                                            >
+                                                                <option value="" disabled>Assign Member</option>
+                                                                {developers.map((dev: any) => (
+                                                                    <option key={dev._id} value={dev._id}>
+                                                                        {dev.name}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        ) : (
+                                                            <span className="text-xs font-medium text-gray-400 italic">Unassigned</span>
+                                                        )
+                                                    )}
                                                 </div>
+                                            </div>
+
+                                            {/* Delete Button (Admin Only) */}
+                                            {isAdmin && (
+                                                <button
+                                                    onClick={() => handleDeleteClick(subtask.id)}
+                                                    className="opacity-0 group-hover:opacity-100 p-2 hover:bg-rose-50 rounded-xl transition-all text-gray-400 hover:text-rose-600"
+                                                    title="Delete Subtask"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
                                             )}
                                         </div>
-                                        {isAdmin && (
-                                            <button
-                                                onClick={() => deleteSubtask.mutate(subtask.id)}
-                                                className="opacity-0 group-hover:opacity-100 p-2 hover:bg-rose-100 rounded-xl transition-all text-gray-400 hover:text-rose-600"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        )}
-                                    </div>
-                                ))}
+                                    );
+                                })}
 
                                 {subtasks.length === 0 && (
                                     <div className="text-center py-8 text-gray-400 font-bold text-sm">
@@ -285,6 +340,15 @@ export default function UserStoryDetailModal({ isOpen, onClose, story }: UserSto
                     </div>
                 </div>
             </div>
+
+            <DeleteConfirmationModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="Delete Subtask"
+                message="Are you sure you want to remove this subtask? This action cannot be undone."
+                isLoading={deleteSubtask.isPending}
+            />
         </div>
     );
 }
