@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Flag, CheckCircle2, Clock, PlayCircle, Search, Filter, ScrollText, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Edit2, Flag, CheckCircle2, Clock, PlayCircle, Search, Filter, ScrollText, ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import { useGetUserStories, useCreateUserStory, useUpdateUserStory } from "../hooks/useUserStories";
 import UserStoryModal from "./user-story-modal";
+import UserStoryDetailModal from "./user-story-detail-modal";
 import { PriorityStatus, UserStoryStatus, type IUserStory } from "../types/types";
 import { useDebounce } from "../../../shared/hooks/useDebounce";
 
@@ -15,9 +16,13 @@ export default function UserStoryList({ projectId, showHeader = true }: UserStor
     const debouncedSearch = useDebounce(search, 500);
     const [statusFilter, setStatusFilter] = useState<string>("");
     const [page, setPage] = useState(1);
-    const limit = 5; 
+    const limit = 5;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedStory, setSelectedStory] = useState<IUserStory | undefined>();
+
+    // Detail Modal State
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [selectedDetailStory, setSelectedDetailStory] = useState<IUserStory | undefined>();
 
     const { data: userStoriesRes, isLoading } = useGetUserStories(projectId, {
         search: debouncedSearch,
@@ -26,7 +31,17 @@ export default function UserStoryList({ projectId, showHeader = true }: UserStor
         limit
     });
 
-    
+    // Sync selectedDetailStory with fresh data from the list
+    useEffect(() => {
+        if (selectedDetailStory && userStoriesRes?.data) {
+            const updatedStory = userStoriesRes.data.find((s: IUserStory) => s.id === selectedDetailStory.id);
+            if (updatedStory) {
+                setSelectedDetailStory(updatedStory);
+            }
+        }
+    }, [userStoriesRes, selectedDetailStory?.id]);
+
+
     useEffect(() => {
         setPage(1);
     }, [debouncedSearch, statusFilter]);
@@ -39,9 +54,15 @@ export default function UserStoryList({ projectId, showHeader = true }: UserStor
         setIsModalOpen(true);
     };
 
-    const handleOpenEditModal = (story: IUserStory) => {
+    const handleOpenEditModal = (e: React.MouseEvent, story: IUserStory) => {
+        e.stopPropagation();
         setSelectedStory(story);
         setIsModalOpen(true);
+    };
+
+    const handleOpenDetailModal = (story: IUserStory) => {
+        setSelectedDetailStory(story);
+        setIsDetailModalOpen(true);
     };
 
     const handleSubmit = (data: any) => {
@@ -142,7 +163,11 @@ export default function UserStoryList({ projectId, showHeader = true }: UserStor
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 gap-4">
                         {userStoriesRes.data.map((story) => (
-                            <div key={story.id} className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all group relative overflow-hidden">
+                            <div
+                                key={story.id}
+                                onClick={() => handleOpenDetailModal(story)}
+                                className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all group relative overflow-hidden cursor-pointer"
+                            >
                                 <div className="flex items-start justify-between gap-4 relative z-10">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-3">
@@ -164,12 +189,17 @@ export default function UserStoryList({ projectId, showHeader = true }: UserStor
                                         </p>
                                     </div>
 
-                                    <button
-                                        onClick={() => handleOpenEditModal(story)}
-                                        className="p-3 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all shadow-sm bg-white border border-gray-100"
-                                    >
-                                        <Edit2 size={20} />
-                                    </button>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={(e) => handleOpenEditModal(e, story)}
+                                            className="p-3 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all shadow-sm bg-white border border-gray-100"
+                                        >
+                                            <Edit2 size={20} />
+                                        </button>
+                                        <div className="p-3 text-gray-300 group-hover:text-indigo-600 rounded-2xl transition-all">
+                                            <Eye size={20} />
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Decorative background element */}
@@ -195,8 +225,8 @@ export default function UserStoryList({ projectId, showHeader = true }: UserStor
                                         key={i + 1}
                                         onClick={() => setPage(i + 1)}
                                         className={`w-10 h-10 rounded-xl font-black text-sm transition-all ${page === i + 1
-                                                ? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
-                                                : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+                                            ? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
+                                            : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
                                             }`}
                                     >
                                         {i + 1}
@@ -237,6 +267,14 @@ export default function UserStoryList({ projectId, showHeader = true }: UserStor
                 userStory={selectedStory}
                 isLoading={isCreating || isUpdating}
             />
+
+            {selectedDetailStory && (
+                <UserStoryDetailModal
+                    isOpen={isDetailModalOpen}
+                    onClose={() => setIsDetailModalOpen(false)}
+                    story={selectedDetailStory}
+                />
+            )}
         </div>
     );
 }

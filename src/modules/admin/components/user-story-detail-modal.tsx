@@ -48,7 +48,7 @@ export default function UserStoryDetailModal({ isOpen, onClose, story }: UserSto
 
     const subtasks = subtasksRes?.data || [];
     const members = membersRes?.data || [];
-    const developers = members.filter((m: any) => m.role === "developers");
+    const developers = members.filter((m: any) => m.role === "developers" || m.role === "developer");
 
     const completedCount = subtasks.filter(s => s.status === "completed").length;
     const totalCount = subtasks.length;

@@ -23,60 +23,36 @@ export default function SprintsPage() {
                 </p>
             </div>
 
-            {/* Project Selection Grid */}
-            <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-black text-gray-900 flex items-center gap-3">
-                        <LayoutGrid size={22} className="text-indigo-500" />
-                        Select a Project
-                    </h3>
-                    <div className="text-xs font-bold bg-gray-100 text-gray-500 px-3 py-1.5 rounded-xl uppercase tracking-wider">
-                        {projects.length} Total Projects
+            {/* Project Selection Dropdown */}
+            <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm flex items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
+                        <LayoutGrid size={24} />
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-black text-gray-900">Select Project</h3>
+                        <p className="text-sm text-gray-400 font-bold">Choose a project to manage its sprints</p>
                     </div>
                 </div>
 
-                {isLoadingProjects ? (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="h-32 bg-gray-50 animate-pulse rounded-[32px] border border-gray-100"></div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="relative min-w-[300px]">
+                    <select
+                        value={selectedProjectId}
+                        onChange={(e) => setSelectedProjectId(e.target.value)}
+                        className="w-full pl-5 pr-10 py-4 bg-gray-50 border-2 border-transparent hover:border-indigo-100 focus:border-indigo-500 focus:bg-white rounded-2xl outline-none transition-all font-bold text-gray-700 cursor-pointer appearance-none"
+                        disabled={isLoadingProjects}
+                    >
+                        <option value="" disabled>Select a project...</option>
                         {projects.map((project) => (
-                            <button
-                                key={project.id}
-                                onClick={() => setSelectedProjectId(project.id)}
-                                className={`p-6 rounded-[32px] border-2 text-left transition-all group relative overflow-hidden ${selectedProjectId === project.id
-                                    ? "border-indigo-600 bg-indigo-50/30 shadow-lg shadow-indigo-100"
-                                    : "border-gray-100 bg-white hover:border-indigo-200 hover:shadow-md"
-                                    }`}
-                            >
-                                <div className="flex flex-col h-full justify-between gap-4 relative z-10">
-                                    <div>
-                                        <h4 className={`font-black text-lg leading-tight transition-colors ${selectedProjectId === project.id ? "text-indigo-600" : "text-gray-900"
-                                            }`}>
-                                            {project.name}
-                                        </h4>
-                                        <p className="text-sm text-gray-400 font-bold mt-1 line-clamp-1 uppercase tracking-widest">
-                                            {project.status}
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span className={`text-xs font-black px-3 py-1 rounded-full ${selectedProjectId === project.id ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-500"
-                                            }`}>
-                                            {selectedProjectId === project.id ? "Selected" : "View Sprints"}
-                                        </span>
-                                        <ChevronRight size={18} className={`transition-transform duration-300 ${selectedProjectId === project.id ? "translate-x-1 text-indigo-600" : "text-gray-300 group-hover:translate-x-1"
-                                            }`} />
-                                    </div>
-                                </div>
-                                <div className={`absolute top-0 right-0 w-24 h-24 rounded-full -mr-12 -mt-12 transition-all duration-500 ${selectedProjectId === project.id ? "bg-indigo-600/5 rotate-12 scale-150" : "bg-gray-50"
-                                    }`}></div>
-                            </button>
+                            <option key={project.id} value={project.id}>
+                                {project.name} ({project.status})
+                            </option>
                         ))}
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                        <ChevronRight size={20} className="rotate-90" />
                     </div>
-                )}
+                </div>
             </div>
 
             {/* Sprints Content */}
