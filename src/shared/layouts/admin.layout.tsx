@@ -1,9 +1,13 @@
 import { NavLink, Outlet } from "react-router-dom";
+import { useEffect } from "react";
 import {
   LayoutDashboard, FolderKanban, Users, Zap, ScrollText,
   UserPlus, Video, BarChart3, Settings, LogOut
 } from "lucide-react";
 import { useLogout } from "../hooks/useLogout";
+import { socket } from "../../lib/socket";
+import { UserAuth } from "../../modules/auth/store/store";
+import { toast } from "sonner";
 
 const sidebarLinks = [
   { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
@@ -19,6 +23,27 @@ const sidebarLinks = [
 
 export default function AdminLayout() {
   const logout = useLogout()
+  const user = UserAuth((state) => state.user);
+
+  useEffect(() => {
+    if (user?.id) {
+      socket.connect();
+      socket.emit("register-user", user.id);
+
+      socket.on("meeting-scheduled", (data: { title: string; date: string }) => {
+        toast.info(`New Meeting: ${data.title}`, {
+          description: `Scheduled for ${new Date(data.date).toLocaleString()}`,
+          duration: 5000,
+        });
+      });
+
+      return () => {
+        socket.off("meeting-scheduled");
+        socket.disconnect();
+      };
+    }
+  }, [user?.id]);
+
   return (
     <div className="flex min-h-screen bg-[#FDFDFF]">
       {/* Sidebar */}

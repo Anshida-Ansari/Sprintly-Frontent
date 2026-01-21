@@ -26,6 +26,8 @@ const ProjectDetail = lazy(() => import("../modules/admin/pages/project.detail")
 const UserStoriesPage = lazy(() => import("../modules/admin/pages/user-stories"));
 const SprintsPage = lazy(() => import("../modules/admin/pages/sprints"));
 const SprintPlanning = lazy(() => import("../modules/admin/pages/sprint-planning"));
+const Meetings = lazy(() => import("../modules/admin/pages/meetings"));
+const MeetingRoom = lazy(() => import("../modules/meeting/pages/MeetingRoom"));
 
 //public routes
 export const router = createBrowserRouter([
@@ -61,8 +63,9 @@ export const router = createBrowserRouter([
           { path: "sprints", element: <SprintsPage /> },
           { path: "sprint-planning", element: <SprintPlanning /> },
           { path: "user-stories", element: <UserStoriesPage /> },
+          { path: "meeting/:roomId", element: <MeetingRoom /> },
           { path: "team", element: <div>Team</div> },
-          { path: "meetings", element: <div>Meetings</div> },
+          { path: "meetings", element: <Meetings /> },
           { path: "reports", element: <div>Reports</div> },
           { path: "settings", element: <div>Settings</div> },
         ],
