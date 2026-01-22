@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useGetProject } from "../hooks/useGetProject";
 import { ArrowLeft, Calendar, GitBranch, Users, Clock, Edit, Layout, ScrollText, PlayCircle } from "lucide-react";
@@ -7,6 +8,7 @@ import { useEditProject } from "../hooks/useEditProject";
 import type { EditProjectPayload } from "../types/types";
 import UserStoryList from "../components/user-story-list";
 import SprintList from "../components/sprint.list.tsx";
+import { StandupChat } from "../../standup/components/standup.chat.tsx";
 
 export default function ProjectDetail() {
     const { projectId } = useParams<{ projectId: string }>();
@@ -14,7 +16,7 @@ export default function ProjectDetail() {
     const { data: projectResponse, isLoading } = useGetProject(projectId || "");
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { mutate: updateProject, isPending: isUpdating } = useEditProject();
-    const [activeTab, setActiveTab] = useState<'overview' | 'stories' | 'sprints'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'stories' | 'sprints' | 'standups'>('overview');
 
     const project = projectResponse?.data;
 
@@ -121,6 +123,17 @@ export default function ProjectDetail() {
                     <PlayCircle size={18} />
                     Sprints
                 </button>
+                <button
+                    onClick={() => setActiveTab('standups')}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-black transition-all ${activeTab === 'standups'
+                        ? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
+                        : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                        }`}
+                >
+                    <ScrollText size={18} />
+                    Standups
+                </button>
+
             </div>
 
             <div className="transition-all duration-300">
@@ -226,6 +239,29 @@ export default function ProjectDetail() {
                         </div>
                     </div>
                 )}
+                {activeTab === 'standups' && (
+                    <div className="animate-in slide-in-from-right-4 duration-500 bg-white p-10 rounded-[40px] border border-gray-100 shadow-sm space-y-8">
+
+                        <div>
+                            <h2 className="text-2xl font-black text-gray-900 mb-4">
+                                Daily Standups
+                            </h2>
+                            <p className="text-gray-500 font-medium">
+                                Team daily updates for this sprint
+                            </p>
+                        </div>
+
+                        {/* Standup Chat Interface */}
+                        <div className="h-[600px]">
+                            <StandupChat
+                                projectId={projectId || ""}
+                                sprintId={project.activeSprintId}
+                                userRole="admin"
+                            />
+                        </div>
+                    </div>
+                )}
+
             </div>
 
             <EditProjectModal
@@ -237,4 +273,6 @@ export default function ProjectDetail() {
             />
         </div>
     );
+
+
 }
