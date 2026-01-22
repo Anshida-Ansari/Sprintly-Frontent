@@ -20,7 +20,6 @@ export default function KanbanBoard() {
     const projects = projectsRes?.data || [];
     const allStories = storiesRes?.data || [];
 
-    // Filter only stories with active sprint
     const activeSprintStories = allStories.filter(s => s.sprintId);
 
     const columns = [
@@ -60,9 +59,7 @@ export default function KanbanBoard() {
         const storyId = e.dataTransfer.getData("storyId");
         const currentStatus = e.dataTransfer.getData("currentStatus");
 
-        // Developers can move to: In Progress, In Review
-        // Developers CANNOT move to: Done
-        // Admins can move to any status
+       
         if (isDeveloper && targetStatus === "Done") {
             return;
         }
