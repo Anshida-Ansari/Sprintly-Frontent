@@ -28,6 +28,7 @@ const SprintsPage = lazy(() => import("../modules/admin/pages/sprints"));
 const SprintPlanning = lazy(() => import("../modules/admin/pages/sprint-planning"));
 const Meetings = lazy(() => import("../modules/admin/pages/meetings"));
 const MeetingRoom = lazy(() => import("../modules/meeting/pages/MeetingRoom"));
+const MyTasksPage = lazy(() => import("../modules/developers/pages/my.tasks"));
 
 //public routes
 export const router = createBrowserRouter([
@@ -92,7 +93,7 @@ export const router = createBrowserRouter([
         children: [
           { path: "dashboard", element: <DashboardPage /> },
           { path: "kanban", element: <KanbanBoard /> },
-          { path: "tasks", element: <div>My Tasks Page</div> },
+          { path: "tasks", element: <MyTasksPage /> },
           { path: "projects", element: <div>Projects Page</div> },
           { path: "sprints", element: <div>Sprints Page</div> },
           { path: "standups", element: <div>Issues Page</div> },

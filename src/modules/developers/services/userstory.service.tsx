@@ -29,5 +29,13 @@ export const userStoryService = {
     async updateUserStoryStatus(userStoryId: string, status: string) {
         const res = await api.patch(`userstory/${userStoryId}/status`, { status });
         return res.data;
+    },
+
+    async getMyUserStories(): Promise<GetUserStoriesResponse> {
+        const res = await api.get('projects/my-tasks');
+        if (res.data && res.data.data) {
+            res.data.data = res.data.data.map(mapUserStory);
+        }
+        return res.data;
     }
 };

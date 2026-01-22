@@ -5,6 +5,7 @@ import { useProjects } from "../../admin/hooks/useProjects";
 import { UserAuth } from "../../auth/store/store";
 import UserStoryDetailModal from "../../admin/components/user-story-detail-modal";
 import type { IUserStory } from "../../admin/types/types";
+import { useGetSubtasks } from "../../admin/hooks/useSubtasks.tsx";
 
 export default function KanbanBoard() {
     const [selectedProjectId, setSelectedProjectId] = useState<string>("");
@@ -25,6 +26,7 @@ export default function KanbanBoard() {
     const columns = [
         { id: "In pending", title: "To Do", icon: Clock, color: "gray" },
         { id: "In progress", title: "In Progress", icon: Zap, color: "indigo" },
+        { id: "In review", title: "In Review", icon: AlertCircle, color: "amber" },
         { id: "Done", title: "Done", icon: CheckCircle2, color: "emerald" }
     ];
 
@@ -58,7 +60,9 @@ export default function KanbanBoard() {
         const storyId = e.dataTransfer.getData("storyId");
         const currentStatus = e.dataTransfer.getData("currentStatus");
 
-        // Prevent developers from moving to "Done"
+        // Developers can move to: In Progress, In Review
+        // Developers CANNOT move to: Done
+        // Admins can move to any status
         if (isDeveloper && targetStatus === "Done") {
             return;
         }
@@ -70,13 +74,6 @@ export default function KanbanBoard() {
 
     const allowDrop = (e: React.DragEvent) => {
         e.preventDefault();
-    };
-
-    // Mock subtask progress (will be replaced with real data)
-    const getSubtaskProgress = () => {
-        const total = Math.floor(Math.random() * 8) + 2;
-        const completed = Math.floor(Math.random() * total);
-        return { completed, total };
     };
 
     return (
@@ -124,7 +121,7 @@ export default function KanbanBoard() {
                     <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                     {columns.map((column) => {
                         const Icon = column.icon;
                         const stories = getStoriesByStatus(column.id);
@@ -160,52 +157,17 @@ export default function KanbanBoard() {
 
                                 {/* Story Cards */}
                                 <div className="flex-1 p-4 space-y-3 overflow-y-auto">
-                                    {stories.map((story) => {
-                                        const progress = getSubtaskProgress();
-                                        const progressPercent = (progress.completed / progress.total) * 100;
-
-                                        return (
-                                            <div
-                                                key={story.id}
-                                                draggable={!isDisabled}
-                                                onDragStart={(e) => onDragStart(e, story)}
-                                                onClick={() => setSelectedStory(story)}
-                                                className={`p-4 bg-white/[0.03] border border-white/[0.05] rounded-2xl hover:bg-white/[0.05] hover:border-indigo-500/30 transition-all group ${!isDisabled ? 'cursor-pointer' : 'cursor-not-allowed'
-                                                    }`}
-                                            >
-                                                <div className="flex items-start gap-3 mb-3">
-                                                    {!isDisabled && (
-                                                        <GripVertical size={16} className="text-gray-600 mt-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                    )}
-                                                    <div className="flex-1">
-                                                        <h4 className="font-bold text-sm text-white leading-snug mb-2">
-                                                            {story.title}
-                                                        </h4>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md border flex items-center gap-1 ${getPriorityStyle(story.priority)}`}>
-                                                                {getPriorityIcon(story.priority)}
-                                                                {story.priority}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* Subtask Progress */}
-                                                <div className="space-y-2">
-                                                    <div className="flex items-center justify-between text-xs">
-                                                        <span className="text-gray-400 font-bold">Subtasks</span>
-                                                        <span className="text-gray-300 font-black">{progress.completed}/{progress.total}</span>
-                                                    </div>
-                                                    <div className="h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
-                                                        <div
-                                                            className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-300"
-                                                            style={{ width: `${progressPercent}%` }}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
+                                    {stories.map((story) => (
+                                        <StoryCard
+                                            key={story.id}
+                                            story={story}
+                                            isDisabled={isDisabled}
+                                            onDragStart={onDragStart}
+                                            onClick={() => setSelectedStory(story)}
+                                            getPriorityStyle={getPriorityStyle}
+                                            getPriorityIcon={getPriorityIcon}
+                                        />
+                                    ))}
                                     {stories.length === 0 && (
                                         <div className="py-20 text-center">
                                             <p className="text-sm font-bold text-gray-600">No stories here</p>
@@ -225,6 +187,59 @@ export default function KanbanBoard() {
                     onClose={() => setSelectedStory(null)}
                     story={selectedStory}
                 />
+            )}
+        </div>
+    );
+}
+
+// Story Card Component with Real Subtask Data
+function StoryCard({ story, isDisabled, onDragStart, onClick, getPriorityStyle, getPriorityIcon }: any) {
+    const { data: subtasksRes } = useGetSubtasks(story.id);
+    const subtasks = subtasksRes?.data || [];
+
+    const completedCount = subtasks.filter((s: any) => s.status === "completed").length;
+    const totalCount = subtasks.length;
+    const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+
+    return (
+        <div
+            draggable={!isDisabled}
+            onDragStart={(e) => onDragStart(e, story)}
+            onClick={onClick}
+            className={`p-4 bg-white/[0.03] border border-white/[0.05] rounded-2xl hover:bg-white/[0.05] hover:border-indigo-500/30 transition-all group ${!isDisabled ? 'cursor-pointer' : 'cursor-not-allowed'
+                }`}
+        >
+            <div className="flex items-start gap-3 mb-3">
+                {!isDisabled && (
+                    <GripVertical size={16} className="text-gray-600 mt-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                )}
+                <div className="flex-1">
+                    <h4 className="font-bold text-sm text-white leading-snug mb-2">
+                        {story.title}
+                    </h4>
+                    <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md border flex items-center gap-1 ${getPriorityStyle(story.priority)}`}>
+                            {getPriorityIcon(story.priority)}
+                            {story.priority}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Subtask Progress - Real Data */}
+            {totalCount > 0 && (
+                <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-400 font-bold">Subtasks</span>
+                        <span className="text-gray-300 font-black">{completedCount}/{totalCount}</span>
+                    </div>
+                    <div className="h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-300"
+                            style={{ width: `${progressPercent}%` }}
+                        />
+                    </div>
+                </div>
             )}
         </div>
     );
