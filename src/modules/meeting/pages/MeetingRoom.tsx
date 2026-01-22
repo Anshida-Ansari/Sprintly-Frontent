@@ -2,7 +2,33 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useWebRTC } from '../hooks/useWebRTC';
 import { UserAuth } from '../../auth/store/store';
 import { Camera, Mic, MicOff, CameraOff, PhoneOff } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+
+const VideoPlayer = ({ stream, isLocal = false, label }: { stream: MediaStream | null, isLocal?: boolean, label: string }) => {
+    const videoRef = useRef<HTMLVideoElement>(null);
+
+    useEffect(() => {
+        if (videoRef.current && stream) {
+            videoRef.current.srcObject = stream;
+        }
+    }, [stream]);
+
+    return (
+        <div className={`relative bg-gray-800 rounded-[32px] overflow-hidden border border-gray-700 ${isLocal ? 'border-2 border-indigo-500 shadow-2xl shadow-indigo-500/20' : ''}`}>
+            <video
+                ref={videoRef}
+                autoPlay
+                muted={isLocal}
+                playsInline
+                className={`w-full h-full object-cover ${isLocal ? 'mirror' : ''}`}
+            />
+            <div className="absolute bottom-6 left-6 flex items-center gap-3 bg-black/50 backdrop-blur-md px-4 py-2 rounded-2xl">
+                {isLocal && <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />}
+                <span className="font-bold text-sm">{label}</span>
+            </div>
+        </div>
+    );
+};
 
 export default function MeetingRoom() {
     const navigate = useNavigate();
@@ -61,33 +87,21 @@ export default function MeetingRoom() {
 
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
                 {/* Local Video */}
-                <div className="relative bg-gray-800 rounded-[32px] overflow-hidden border-2 border-indigo-500 shadow-2xl shadow-indigo-500/20">
-                    <video
-                        autoPlay
-                        muted
-                        playsInline
-                        ref={(el) => { if (el && localStream) el.srcObject = localStream; }}
-                        className="w-full h-full object-cover mirror"
+                {localStream && (
+                    <VideoPlayer
+                        stream={localStream}
+                        isLocal={true}
+                        label={`You (${user?.name || 'Me'})`}
                     />
-                    <div className="absolute bottom-6 left-6 flex items-center gap-3 bg-black/50 backdrop-blur-md px-4 py-2 rounded-2xl">
-                        <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
-                        <span className="font-bold text-sm">You ({user?.name || 'Me'})</span>
-                    </div>
-                </div>
+                )}
 
                 {/* Remote Videos */}
                 {Object.entries(remoteStreams).map(([socketId, stream]) => (
-                    <div key={socketId} className="relative bg-gray-800 rounded-[32px] overflow-hidden border border-gray-700">
-                        <video
-                            autoPlay
-                            playsInline
-                            ref={(el) => { if (el) el.srcObject = stream; }}
-                            className="w-full h-full object-cover"
-                        />
-                        <div className="absolute bottom-6 left-6 flex items-center gap-3 bg-black/50 backdrop-blur-md px-4 py-2 rounded-2xl">
-                            <span className="font-bold text-sm">Participant {socketId.slice(0, 4)}</span>
-                        </div>
-                    </div>
+                    <VideoPlayer
+                        key={socketId}
+                        stream={stream}
+                        label={`Participant ${socketId.slice(0, 4)}`}
+                    />
                 ))}
 
                 {/* Placeholder if alone */}

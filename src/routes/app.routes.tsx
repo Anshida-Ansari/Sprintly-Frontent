@@ -30,6 +30,7 @@ const Meetings = lazy(() => import("../modules/admin/pages/meetings"));
 const MeetingRoom = lazy(() => import("../modules/meeting/pages/MeetingRoom"));
 const MyTasksPage = lazy(() => import("../modules/developers/pages/my.tasks"));
 const DeveloperStandup = lazy(() => import("../modules/standup/pages/developer.standup"));
+const DeveloperMeetings = lazy(() => import("../modules/meeting/pages/developer.meetings"));
 
 
 //public routes
@@ -99,6 +100,8 @@ export const router = createBrowserRouter([
           { path: "projects", element: <div>Projects Page</div> },
           { path: "sprints", element: <div>Sprints Page</div> },
           { path: "standups", element: <DeveloperStandup /> },
+          { path: "meetings", element: <DeveloperMeetings /> },
+          { path: "meeting/:roomId", element: <MeetingRoom /> },
           { path: "Performance", element: <div>Settings Page</div> },
           { path: "Profile", element: <div>Settings Page</div> },
         ],

@@ -73,12 +73,7 @@ export function useWebRTC(roomId: string, userId: string) {
                 // We wait for the newcomer to send an offer
             });
 
-            // We just joined and got the list of existing users
-            socket.on('existing-users', ({ }) => {
-                // In this implementation, the newcomer waits for existing users to initiate
-                // OR the newcomer initiates. To avoid race, usually one side initiates.
-                // Let's have the newcomer initiate to everyone.
-            });
+
 
             // Wait, the backend change sends existing users. Let's make the newcomer initiate.
             socket.on('existing-users', (users: { socketId: string }[]) => {

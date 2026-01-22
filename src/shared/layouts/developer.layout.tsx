@@ -10,7 +10,8 @@ import {
   LogOut,
   Cpu,
   Terminal,
-  Kanban
+  Kanban,
+  Video
 } from "lucide-react";
 import { useLogout } from "../hooks/useLogout";
 
@@ -21,6 +22,7 @@ const sidebarLinks = [
   { name: "Projects", path: "/developers/projects", icon: Box },
   { name: "Sprints", path: "/developers/sprints", icon: Zap },
   { name: "Standups", path: "/developers/standups", icon: MessagesSquare },
+  { name: "Meetings", path: "/developers/meetings", icon: Video },
   { name: "Performance", path: "/developers/performance", icon: BarChart3 },
   { name: "Profile", path: "/developers/profile", icon: UserCircle },
 
