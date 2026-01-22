@@ -18,7 +18,6 @@ export function useWebRTC(roomId: string, userId: string) {
     const [remoteStreams, setRemoteStreams] = useState<Record<string, MediaStream>>({});
     const peers = useRef<Record<string, PeerConnection>>({});
 
-    // 1. Initialize Local Stream
     const initLocalStream = useCallback(async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -33,19 +32,16 @@ export function useWebRTC(roomId: string, userId: string) {
     const createPeerConnection = useCallback((targetSocketId: string, stream: MediaStream) => {
         const pc = new RTCPeerConnection(configuration);
 
-        // Add local tracks to peer connection
         stream.getTracks().forEach(track => {
             pc.addTrack(track, stream);
         });
 
-        // Handle ICE candidates
         pc.onicecandidate = (event) => {
             if (event.candidate) {
                 socket.emit('ice-candidate', { roomId, to: targetSocketId, candidate: event.candidate });
             }
         };
 
-        // Handle incoming streams
         pc.ontrack = (event) => {
             setRemoteStreams(prev => ({
                 ...prev,
@@ -67,15 +63,12 @@ export function useWebRTC(roomId: string, userId: string) {
 
             socket.emit('join-room', roomId, userId);
 
-            // A new user has joined the room
             socket.on('user-joined', async ({ socketId }: { socketId: string }) => {
                 console.log('User joined:', socketId);
-                // We wait for the newcomer to send an offer
             });
 
 
 
-            // Wait, the backend change sends existing users. Let's make the newcomer initiate.
             socket.on('existing-users', (users: { socketId: string }[]) => {
                 users.forEach(async (user) => {
                     const pc = createPeerConnection(user.socketId, stream);
@@ -130,11 +123,9 @@ export function useWebRTC(roomId: string, userId: string) {
             socket.off('ice-candidate');
             socket.off('user-left');
 
-            // Cleanup peer connections
             Object.values(peers.current).forEach(p => p.connection.close());
             peers.current = {};
 
-            // Stop local tracks
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
             }

@@ -9,8 +9,6 @@ export default function DeveloperMeetings() {
     const { meetings, isLoading } = useMeetings(selectedProjectId);
 
     const projects = projectsRes?.data || [];
-
-    // Auto-select first project if none selected
     useEffect(() => {
         if (!selectedProjectId && projects.length > 0) {
             setSelectedProjectId(projects[0].id);
