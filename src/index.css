@@ -1,18 +1,19 @@
-body, html {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  min-height: 100vh;
+body,
+html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	min-height: 100vh;
 }
 
 .container {
-  width: 100%;
-  max-width: 100%; 
+	width: 100%;
+	max-width: 100%;
 }
 .custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
+	width: 5px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #e2e8f0;
-  border-radius: 10px;
+	background: #e2e8f0;
+	border-radius: 10px;
 }

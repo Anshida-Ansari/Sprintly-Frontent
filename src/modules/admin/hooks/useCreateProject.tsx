@@ -4,16 +4,17 @@ import { projectService } from "../services/project.service";
 import type { CreateProjectPayload } from "../types/types";
 
 export function useCreateProject() {
-    const queryClient = useQueryClient();
+	const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: (payload: CreateProjectPayload) => projectService.createProject(payload),
-        onSuccess: (res) => {
-            toast.success(res.message || "Project created successfully");
-            queryClient.invalidateQueries({ queryKey: ['projects'] });
-        },
-        onError: (err: any) => {
-            toast.error(err.response?.data?.message || "Failed to create project");
-        }
-    });
+	return useMutation({
+		mutationFn: (payload: CreateProjectPayload) =>
+			projectService.createProject(payload),
+		onSuccess: (res) => {
+			toast.success(res.message || "Project created successfully");
+			queryClient.invalidateQueries({ queryKey: ["projects"] });
+		},
+		onError: (err: any) => {
+			toast.error(err.response?.data?.message || "Failed to create project");
+		},
+	});
 }

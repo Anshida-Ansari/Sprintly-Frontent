@@ -1,120 +1,166 @@
 // Force update
-import { useState } from 'react';
-import { Calendar, Clock, Video, Plus, Search, Filter, ArrowUpRight, User } from 'lucide-react';
-import ScheduleMeetingModal from '../components/schedule-meeting-modal';
-import { useMeetings } from '../hooks/useMeetings';
-import { useProjects } from '../hooks/useProjects';
+
+import {
+	ArrowUpRight,
+	Calendar,
+	Clock,
+	Filter,
+	Plus,
+	Search,
+	User,
+	Video,
+} from "lucide-react";
+import { useState } from "react";
+import ScheduleMeetingModal from "../components/schedule-meeting-modal";
+import { useMeetings } from "../hooks/useMeetings";
+import { useProjects } from "../hooks/useProjects";
 
 export default function Meetings() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedProjectId, setSelectedProjectId] = useState<string>('');
-    const { data: projectsRes } = useProjects({ page: 1, limit: 100 });
-    const { meetings, isLoading } = useMeetings(selectedProjectId);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [selectedProjectId, setSelectedProjectId] = useState<string>("");
+	const { data: projectsRes } = useProjects({ page: 1, limit: 100 });
+	const { meetings, isLoading } = useMeetings(selectedProjectId);
 
-    const projects = projectsRes?.data || [];
+	const projects = projectsRes?.data || [];
 
-    return (
-        <div className="p-8 max-w-[1600px] mx-auto min-h-screen bg-gray-50/50">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-                <div>
-                    <h1 className="text-4xl font-black text-gray-900 tracking-tight">Meetings</h1>
-                    <p className="text-gray-500 mt-2 font-bold text-lg">Manage and schedule your team syncs</p>
-                </div>
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-indigo-200 transition-all active:scale-95"
-                >
-                    <Plus size={24} />
-                    <span>Schedule Meeting</span>
-                </button>
-            </div>
+	return (
+		<div className="p-8 max-w-[1600px] mx-auto min-h-screen bg-gray-50/50">
+			{/* Header Section */}
+			<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+				<div>
+					<h1 className="text-4xl font-black text-gray-900 tracking-tight">
+						Meetings
+					</h1>
+					<p className="text-gray-500 mt-2 font-bold text-lg">
+						Manage and schedule your team syncs
+					</p>
+				</div>
+				<button
+					onClick={() => setIsModalOpen(true)}
+					className="flex items-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-indigo-200 transition-all active:scale-95"
+				>
+					<Plus size={24} />
+					<span>Schedule Meeting</span>
+				</button>
+			</div>
 
-            {/* Filters & Search */}
-            <div className="bg-white p-6 rounded-[32px] shadow-sm border border-gray-100 mb-8 flex flex-wrap gap-4 items-center">
-                <div className="flex-1 min-w-[300px] relative">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                    <input
-                        placeholder="Search meetings..."
-                        className="w-full pl-14 pr-6 py-4 bg-gray-50 border-2 border-transparent focus:border-indigo-600 focus:bg-white rounded-2xl font-bold transition-all outline-none"
-                    />
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="relative">
-                        <Filter className="absolute left-5 top-1/2 -translate-y-1/2 text-indigo-600" size={20} />
-                        <select
-                            value={selectedProjectId}
-                            onChange={(e) => setSelectedProjectId(e.target.value)}
-                            className="pl-14 pr-8 py-4 bg-gray-50 border-2 border-transparent focus:border-indigo-600 focus:bg-white rounded-2xl font-bold transition-all outline-none appearance-none cursor-pointer min-w-[200px]"
-                        >
-                            <option value="">All Projects</option>
-                            {projects?.map((p: any) => (
-                                <option key={p.id} value={p.id}>{p.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-            </div>
+			{/* Filters & Search */}
+			<div className="bg-white p-6 rounded-[32px] shadow-sm border border-gray-100 mb-8 flex flex-wrap gap-4 items-center">
+				<div className="flex-1 min-w-[300px] relative">
+					<Search
+						className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"
+						size={20}
+					/>
+					<input
+						placeholder="Search meetings..."
+						className="w-full pl-14 pr-6 py-4 bg-gray-50 border-2 border-transparent focus:border-indigo-600 focus:bg-white rounded-2xl font-bold transition-all outline-none"
+					/>
+				</div>
+				<div className="flex items-center gap-4">
+					<div className="relative">
+						<Filter
+							className="absolute left-5 top-1/2 -translate-y-1/2 text-indigo-600"
+							size={20}
+						/>
+						<select
+							value={selectedProjectId}
+							onChange={(e) => setSelectedProjectId(e.target.value)}
+							className="pl-14 pr-8 py-4 bg-gray-50 border-2 border-transparent focus:border-indigo-600 focus:bg-white rounded-2xl font-bold transition-all outline-none appearance-none cursor-pointer min-w-[200px]"
+						>
+							<option value="">All Projects</option>
+							{projects?.map((p: any) => (
+								<option key={p.id} value={p.id}>
+									{p.name}
+								</option>
+							))}
+						</select>
+					</div>
+				</div>
+			</div>
 
-            {/* Meetings List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {isLoading ? (
-                    [1, 2, 3].map(i => (
-                        <div key={i} className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 animate-pulse h-[280px]" />
-                    ))
-                ) : meetings.length > 0 ? (
-                    meetings.map((meeting: any) => (
-                        <div key={meeting.id} className="group bg-white p-8 rounded-[40px] shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 border border-gray-100 transition-all duration-500 hover:-translate-y-2 flex flex-col justify-between">
-                            <div>
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="p-4 bg-indigo-50 rounded-3xl text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500">
-                                        <Video size={28} />
-                                    </div>
-                                    <div className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl font-black text-sm uppercase tracking-wider">
-                                        {meeting.status}
-                                    </div>
-                                </div>
-                                <h3 className="text-xl font-black text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors uppercase">{meeting.title}</h3>
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-3 text-gray-500 font-bold">
-                                        <Calendar size={18} className="text-indigo-400" />
-                                        <span>{new Date(meeting.date).toLocaleDateString()}</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 text-gray-500 font-bold">
-                                        <Clock size={18} className="text-indigo-400" />
-                                        <span>{new Date(meeting.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 text-gray-400 font-bold pt-4 border-t border-gray-50">
-                                        <User size={18} />
-                                        <span>{meeting.participants?.length || 0} Members assigned</span>
-                                    </div>
-                                </div>
-                            </div>
+			{/* Meetings List */}
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				{isLoading ? (
+					[1, 2, 3].map((i) => (
+						<div
+							key={i}
+							className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 animate-pulse h-[280px]"
+						/>
+					))
+				) : meetings.length > 0 ? (
+					meetings.map((meeting: any) => (
+						<div
+							key={meeting.id}
+							className="group bg-white p-8 rounded-[40px] shadow-sm hover:shadow-2xl hover:shadow-indigo-500/10 border border-gray-100 transition-all duration-500 hover:-translate-y-2 flex flex-col justify-between"
+						>
+							<div>
+								<div className="flex justify-between items-start mb-6">
+									<div className="p-4 bg-indigo-50 rounded-3xl text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500">
+										<Video size={28} />
+									</div>
+									<div className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl font-black text-sm uppercase tracking-wider">
+										{meeting.status}
+									</div>
+								</div>
+								<h3 className="text-xl font-black text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors uppercase">
+									{meeting.title}
+								</h3>
+								<div className="space-y-3">
+									<div className="flex items-center gap-3 text-gray-500 font-bold">
+										<Calendar size={18} className="text-indigo-400" />
+										<span>{new Date(meeting.date).toLocaleDateString()}</span>
+									</div>
+									<div className="flex items-center gap-3 text-gray-500 font-bold">
+										<Clock size={18} className="text-indigo-400" />
+										<span>
+											{new Date(meeting.date).toLocaleTimeString([], {
+												hour: "2-digit",
+												minute: "2-digit",
+											})}
+										</span>
+									</div>
+									<div className="flex items-center gap-3 text-gray-400 font-bold pt-4 border-t border-gray-50">
+										<User size={18} />
+										<span>
+											{meeting.participants?.length || 0} Members assigned
+										</span>
+									</div>
+								</div>
+							</div>
 
-                            <button
-                                onClick={() => window.location.href = `/admin/meeting/${meeting.roomId}`}
-                                className="mt-8 w-full py-4 bg-gray-900 group-hover:bg-indigo-600 text-white rounded-2xl font-black transition-all flex items-center justify-center gap-3"
-                            >
-                                Join Meeting
-                                <ArrowUpRight size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                            </button>
-                        </div>
-                    ))
-                ) : (
-                    <div className="col-span-full py-20 text-center bg-white rounded-[40px] border-2 border-dashed border-gray-200">
-                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
-                            <Video size={40} />
-                        </div>
-                        <h3 className="text-2xl font-black text-gray-400">No meetings scheduled</h3>
-                        <p className="text-gray-400 font-bold mt-2">Get started by scheduling your first team sync</p>
-                    </div>
-                )}
-            </div>
+							<button
+								onClick={() =>
+									(window.location.href = `/admin/meeting/${meeting.roomId}`)
+								}
+								className="mt-8 w-full py-4 bg-gray-900 group-hover:bg-indigo-600 text-white rounded-2xl font-black transition-all flex items-center justify-center gap-3"
+							>
+								Join Meeting
+								<ArrowUpRight
+									size={20}
+									className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+								/>
+							</button>
+						</div>
+					))
+				) : (
+					<div className="col-span-full py-20 text-center bg-white rounded-[40px] border-2 border-dashed border-gray-200">
+						<div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
+							<Video size={40} />
+						</div>
+						<h3 className="text-2xl font-black text-gray-400">
+							No meetings scheduled
+						</h3>
+						<p className="text-gray-400 font-bold mt-2">
+							Get started by scheduling your first team sync
+						</p>
+					</div>
+				)}
+			</div>
 
-            <ScheduleMeetingModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-            />
-        </div>
-    );
+			<ScheduleMeetingModal
+				isOpen={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+			/>
+		</div>
+	);
 }
