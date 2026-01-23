@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	AlertCircle,
 	ArrowLeft,
@@ -10,18 +10,59 @@ import {
 	User,
 	XCircle,
 } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
+import ConfirmationModal from "../../../shared/components/ConfirmationModal";
 import { companyService } from "../services/company.services";
 
 export default function SuperAdminCompanyDetail() {
 	const { companyId } = useParams();
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
+	const [confirmationModal, setConfirmationModal] = useState<{
+		isOpen: boolean;
+		type: "approve" | "reject";
+	}>({
+		isOpen: false,
+		type: "approve",
+	});
 
 	const { data, isLoading, isError } = useQuery({
 		queryKey: ["company", companyId],
 		queryFn: () => companyService.getCompanyDetails(companyId!),
 		enabled: !!companyId,
 	});
+
+	const approveMutation = useMutation({
+		mutationFn: (id: string) => companyService.UpdateStatus(id, "approved"),
+		onSuccess: () => {
+			toast.success("Company approved successfully");
+			queryClient.invalidateQueries({ queryKey: ["company", companyId] });
+			setConfirmationModal((prev) => ({ ...prev, isOpen: false }));
+		},
+		onError: () => toast.error("Failed to approve company"),
+	});
+
+	const rejectMutation = useMutation({
+		mutationFn: (id: string) => companyService.UpdateStatus(id, "rejected"),
+		onSuccess: () => {
+			toast.success("Company rejected successfully");
+			queryClient.invalidateQueries({ queryKey: ["company", companyId] });
+			setConfirmationModal((prev) => ({ ...prev, isOpen: false }));
+		},
+		onError: () => toast.error("Failed to reject company"),
+	});
+
+	const handleConfirm = () => {
+		if (!companyId) return;
+
+		if (confirmationModal.type === "approve") {
+			approveMutation.mutate(companyId);
+		} else {
+			rejectMutation.mutate(companyId);
+		}
+	};
 
 	if (isLoading)
 		return (
@@ -40,7 +81,6 @@ export default function SuperAdminCompanyDetail() {
 
 	const company = data.data;
 
-	// Define the allowed status keys
 	type CompanyStatus = "approved" | "rejected" | "pending";
 
 	const statusStyles: Record<CompanyStatus, string> = {
@@ -67,12 +107,26 @@ export default function SuperAdminCompanyDetail() {
 
 				{/* Action Buttons */}
 				<div className="flex gap-3">
-					<button className="flex items-center gap-2 px-4 py-2 border border-red-200 text-red-600 hover:bg-red-50 rounded-lg font-medium transition">
-						<XCircle className="w-4 h-4" /> Reject
-					</button>
-					<button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg font-medium shadow-sm transition">
-						<CheckCircle2 className="w-4 h-4" /> Approve Company
-					</button>
+					{company.status !== "rejected" && (
+						<button
+							onClick={() =>
+								setConfirmationModal({ isOpen: true, type: "reject" })
+							}
+							className="flex items-center gap-2 px-4 py-2 border border-red-200 text-red-600 hover:bg-red-50 rounded-lg font-medium transition"
+						>
+							<XCircle className="w-4 h-4" /> Reject
+						</button>
+					)}
+					{company.status !== "approved" && (
+						<button
+							onClick={() =>
+								setConfirmationModal({ isOpen: true, type: "approve" })
+							}
+							className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg font-medium shadow-sm transition"
+						>
+							<CheckCircle2 className="w-4 h-4" /> Approve Company
+						</button>
+					)}
 				</div>
 			</div>
 
@@ -92,7 +146,7 @@ export default function SuperAdminCompanyDetail() {
 								</p>
 								<div className="flex items-center gap-2 text-gray-700">
 									<Mail className="w-4 h-4 text-gray-400" />
-									<span>{company.email}</span>
+									<span>{company.email || "N/A"}</span>
 								</div>
 							</div>
 							<div className="space-y-1">
@@ -100,10 +154,9 @@ export default function SuperAdminCompanyDetail() {
 									Status
 								</p>
 								<span
-									className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-										statusStyles[company.status as CompanyStatus] ||
+									className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${statusStyles[company.status as CompanyStatus] ||
 										statusStyles.pending
-									}`}
+										}`}
 								>
 									{company.status}
 								</span>
@@ -115,9 +168,14 @@ export default function SuperAdminCompanyDetail() {
 								<div className="flex items-center gap-2 text-gray-700">
 									<Calendar className="w-4 h-4 text-gray-400" />
 									<span>
-										{new Date(company.createdAt).toLocaleDateString(undefined, {
-											dateStyle: "long",
-										})}
+										{company.createdAt
+											? new Date(company.createdAt).toLocaleDateString(
+												undefined,
+												{
+													dateStyle: "long",
+												},
+											)
+											: "N/A"}
 									</span>
 								</div>
 							</div>
@@ -152,6 +210,33 @@ export default function SuperAdminCompanyDetail() {
 					</div>
 				</div>
 			</div>
+
+			<ConfirmationModal
+				isOpen={confirmationModal.isOpen}
+				onClose={() =>
+					setConfirmationModal((prev) => ({ ...prev, isOpen: false }))
+				}
+				onConfirm={handleConfirm}
+				title={
+					confirmationModal.type === "approve"
+						? "Approve Company"
+						: "Reject Company"
+				}
+				message={
+					confirmationModal.type === "approve"
+						? "Are you sure you want to approve this company? They will be granted access to the platform."
+						: "Are you sure you want to reject this company? They will be denied access."
+				}
+				confirmText={
+					confirmationModal.type === "approve" ? "Yes, Approve" : "Yes, Reject"
+				}
+				variant={confirmationModal.type === "approve" ? "success" : "danger"}
+				isLoading={
+					confirmationModal.type === "approve"
+						? approveMutation.isPending
+						: rejectMutation.isPending
+				}
+			/>
 		</div>
 	);
 }

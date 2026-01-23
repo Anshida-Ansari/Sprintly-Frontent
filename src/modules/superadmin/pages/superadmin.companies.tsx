@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import ConfirmationModal from "../../../shared/components/ConfirmationModal";
 import { Pagination } from "../../../shared/components/pagination";
 import { Table } from "../../../shared/components/Table";
 import { useDebounce } from "../../../shared/hooks/useDebounce";
@@ -20,12 +21,22 @@ import type { Company } from "../types/types";
 export default function SuperAdminCompanyPage() {
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
+	const [confirmationModal, setConfirmationModal] = useState<{
+		isOpen: boolean;
+		type: "approve" | "reject";
+		companyId: string | null;
+	}>({
+		isOpen: false,
+		type: "approve",
+		companyId: null,
+	});
 
 	const approveMutation = useMutation({
 		mutationFn: (id: string) => companyService.UpdateStatus(id, "approved"),
 		onSuccess: () => {
 			toast.success("Company approved successfully");
 			queryClient.invalidateQueries({ queryKey: ["companies"] });
+			setConfirmationModal((prev) => ({ ...prev, isOpen: false }));
 		},
 		onError: () => toast.error("Failed to approve company"),
 	});
@@ -35,9 +46,20 @@ export default function SuperAdminCompanyPage() {
 		onSuccess: () => {
 			toast.success("Company rejected successfully");
 			queryClient.invalidateQueries({ queryKey: ["companies"] });
+			setConfirmationModal((prev) => ({ ...prev, isOpen: false }));
 		},
 		onError: () => toast.error("Failed to reject company"),
 	});
+
+	const handleConfirm = () => {
+		if (!confirmationModal.companyId) return;
+
+		if (confirmationModal.type === "approve") {
+			approveMutation.mutate(confirmationModal.companyId);
+		} else {
+			rejectMutation.mutate(confirmationModal.companyId);
+		}
+	};
 
 	const [page, setPage] = useState(1);
 	const [limit] = useState(10);
@@ -147,7 +169,13 @@ export default function SuperAdminCompanyPage() {
 						<div className="flex items-center gap-1">
 							{company.status !== "approved" && (
 								<button
-									onClick={() => approveMutation.mutate(company._id)}
+									onClick={() =>
+										setConfirmationModal({
+											isOpen: true,
+											type: "approve",
+											companyId: company._id,
+										})
+									}
 									className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors group"
 									title="Approve"
 								>
@@ -156,7 +184,13 @@ export default function SuperAdminCompanyPage() {
 							)}
 							{company.status !== "rejected" && (
 								<button
-									onClick={() => rejectMutation.mutate(company._id)}
+									onClick={() =>
+										setConfirmationModal({
+											isOpen: true,
+											type: "reject",
+											companyId: company._id,
+										})
+									}
 									className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
 									title="Reject"
 								>
@@ -185,6 +219,33 @@ export default function SuperAdminCompanyPage() {
 					/>
 				</div>
 			)}
+
+			<ConfirmationModal
+				isOpen={confirmationModal.isOpen}
+				onClose={() =>
+					setConfirmationModal((prev) => ({ ...prev, isOpen: false }))
+				}
+				onConfirm={handleConfirm}
+				title={
+					confirmationModal.type === "approve"
+						? "Approve Company"
+						: "Reject Company"
+				}
+				message={
+					confirmationModal.type === "approve"
+						? "Are you sure you want to approve this company? They will be granted access to the platform."
+						: "Are you sure you want to reject this company? They will be denied access."
+				}
+				confirmText={
+					confirmationModal.type === "approve" ? "Yes, Approve" : "Yes, Reject"
+				}
+				variant={confirmationModal.type === "approve" ? "success" : "danger"}
+				isLoading={
+					confirmationModal.type === "approve"
+						? approveMutation.isPending
+						: rejectMutation.isPending
+				}
+			/>
 		</div>
 	);
 }
