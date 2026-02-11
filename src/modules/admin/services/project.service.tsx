@@ -70,4 +70,8 @@ export const projectService = {
 		}
 		return res.data;
 	},
+	async addMember(projectId: string, memberId: string): Promise<any> {
+		const res = await api.patch(`project/${projectId}/add-member`, { memberId });
+		return res.data;
+	},
 };

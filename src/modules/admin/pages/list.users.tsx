@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Pagination } from "../../../shared/components/pagination";
+import ConfirmationModal from "../../../shared/components/ConfirmationModal";
 import { useDebounce } from "../../../shared/hooks/useDebounce";
 import InviteMemberModal from "../components/invite.modal";
 import { useBlockUser } from "../hooks/useBlockUser";
@@ -22,7 +23,7 @@ interface Member {
 	name: string;
 	email: string;
 	role: string;
-	status: "active" | "block";
+	status: "active" | "block" | "pending";
 	createdAt: string;
 }
 
@@ -31,6 +32,17 @@ export default function Members() {
 	const [search, setSearch] = useState("");
 	const debouncedSearch = useDebounce(search, 500);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [confirmationModal, setConfirmationModal] = useState<{
+		isOpen: boolean;
+		type: "block" | "unblock";
+		userId: string | null;
+		userName: string;
+	}>({
+		isOpen: false,
+		type: "block",
+		userId: null,
+		userName: "",
+	});
 
 	const { data, isLoading } = useGetMembers({
 		page,
@@ -43,12 +55,28 @@ export default function Members() {
 	const members = data?.data || [];
 	const totalPages = data?.totalPages || 1;
 
-	const handleInvite = (payload: { name: string; email: string }) => {
+	const handleInvite = (payload: { name: string; email: string; role: string }) => {
 		inviteMember(payload, {
 			onSuccess: () => {
 				setIsModalOpen(false);
 			},
 		});
+	};
+
+	const handleConfirmAction = () => {
+		if (confirmationModal.userId) {
+			blockUser(
+				{
+					userId: confirmationModal.userId,
+					status: confirmationModal.type === "block" ? "block" : "active",
+				},
+				{
+					onSuccess: () => {
+						setConfirmationModal((prev) => ({ ...prev, isOpen: false }));
+					},
+				},
+			);
+		}
 	};
 
 	return (
@@ -124,7 +152,7 @@ export default function Members() {
 								{/* User Info */}
 								<div className="col-span-5 flex items-center gap-4">
 									<div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-indigo-600 font-bold text-sm border border-slate-200 uppercase">
-										{member.name.substring(0, 2)}
+										{member.name?.substring(0, 2) || "??"}
 									</div>
 									<div className="flex flex-col min-w-0">
 										<span className="text-sm font-semibold text-slate-900 truncate group-hover:text-indigo-600 transition-colors">
@@ -149,16 +177,26 @@ export default function Members() {
 								{/* Status */}
 								<div className="col-span-2 hidden md:block">
 									<span
-										className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight ${
-											member.status === "active"
+										className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight ${member.status === "active"
 												? "bg-emerald-50 text-emerald-600"
-												: "bg-rose-50 text-rose-600"
-										}`}
+												: member.status === "pending"
+													? "bg-amber-50 text-amber-600"
+													: "bg-rose-50 text-rose-600"
+											}`}
 									>
 										<span
-											className={`w-1.5 h-1.5 rounded-full ${member.status === "active" ? "bg-emerald-500" : "bg-rose-500"}`}
+											className={`w-1.5 h-1.5 rounded-full ${member.status === "active"
+													? "bg-emerald-500"
+													: member.status === "pending"
+														? "bg-amber-500"
+														: "bg-rose-500"
+												}`}
 										/>
-										{member.status === "active" ? "Active" : "Blocked"}
+										{member.status === "active"
+											? "Active"
+											: member.status === "pending"
+												? "Pending"
+												: "Blocked"}
 									</span>
 								</div>
 
@@ -173,10 +211,17 @@ export default function Members() {
 								</div>
 
 								<div className="col-span-1 text-right flex justify-end gap-2">
-									{member.status === "active" ? (
+									{member.status === "pending" ? (
+										<span className="text-xs text-slate-400 italic pr-2">Awaiting setup</span>
+									) : member.status === "active" ? (
 										<button
 											onClick={() =>
-												blockUser({ userId: member._id, status: "block" })
+												setConfirmationModal({
+													isOpen: true,
+													type: "block",
+													userId: member._id,
+													userName: member.name,
+												})
 											}
 											disabled={blocking}
 											className="p-2 hover:bg-rose-50 rounded-xl text-slate-400 hover:text-rose-600 transition-colors"
@@ -187,7 +232,12 @@ export default function Members() {
 									) : (
 										<button
 											onClick={() =>
-												blockUser({ userId: member._id, status: "active" })
+												setConfirmationModal({
+													isOpen: true,
+													type: "unblock",
+													userId: member._id,
+													userName: member.name,
+												})
 											}
 											disabled={blocking}
 											className="p-2 hover:bg-emerald-50 rounded-xl text-slate-400 hover:text-emerald-600 transition-colors"
@@ -224,6 +274,36 @@ export default function Members() {
 				onClose={() => setIsModalOpen(false)}
 				onSubmit={handleInvite}
 				isLoading={inviting}
+			/>
+
+			<ConfirmationModal
+				isOpen={confirmationModal.isOpen}
+				onClose={() =>
+					setConfirmationModal((prev) => ({ ...prev, isOpen: false }))
+				}
+				onConfirm={handleConfirmAction}
+				title={
+					confirmationModal.type === "block" ? "Block User" : "Unblock User"
+				}
+				message={
+					confirmationModal.type === "block" ? (
+						<span>
+							Are you sure you want to block <b>{confirmationModal.userName}</b>
+							? They will lose access to the platform immediately.
+						</span>
+					) : (
+						<span>
+							Are you sure you want to unblock{" "}
+							<b>{confirmationModal.userName}</b>? They will regain access to
+							the platform.
+						</span>
+					)
+				}
+				confirmText={
+					confirmationModal.type === "block" ? "Yes, Block" : "Yes, Unblock"
+				}
+				variant={confirmationModal.type === "block" ? "danger" : "success"}
+				isLoading={blocking}
 			/>
 		</div>
 	);

@@ -1,4 +1,5 @@
-import { Calendar, FileText, GitBranch, Type, X } from "lucide-react";
+import { Calendar, FileText, GitBranch, Type, User, X } from "lucide-react";
+import { useGetMembers } from "../hooks/useGetmembers";
 import { useState } from "react";
 import type { CreateProjectPayload } from "../types/types";
 
@@ -21,7 +22,18 @@ export default function CreateProjectModal({
 		startDate: "",
 		endDate: "",
 		gitRepoUrl: "",
+		leadId: "",
 	});
+
+	const { data: membersData } = useGetMembers({
+		page: 1,
+		limit: 100, 
+	});
+
+	const potentialLeads =
+		membersData?.data?.filter(
+			(m: any) => m.role === "lead" || m.role === "admin",
+		) || [];
 
 	const handleChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -147,6 +159,29 @@ export default function CreateProjectModal({
 								className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition bg-gray-50/50"
 								disabled={isLoading}
 							/>
+						</div>
+
+						<div>
+							<label className="block text-sm font-bold text-gray-700 mb-1.5 flex items-center gap-2">
+								<User size={16} className="text-indigo-500" /> Assign Lead
+								(Optional)
+							</label>
+							<select
+								name="leadId"
+								value={formData.leadId || ""}
+								onChange={(e) =>
+									setFormData((prev) => ({ ...prev, leadId: e.target.value }))
+								}
+								className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-gray-50/50"
+								disabled={isLoading}
+							>
+								<option value="">Select a Lead</option>
+								{potentialLeads.map((lead: any) => (
+									<option key={lead.id} value={lead.id}>
+										{lead.name} ({lead.role})
+									</option>
+								))}
+							</select>
 						</div>
 
 						{/* Footer Buttons */}

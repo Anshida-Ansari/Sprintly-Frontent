@@ -15,15 +15,13 @@ export function useLogin() {
 		onSuccess: (res) => {
 			const { user, accessToken } = res.data;
 
-			// Update Zustand store
 			loginUser(user, accessToken);
 
-			// Toast
 			toast.success("Login successful");
 
-			// Role-based navigation
 			switch (user.role) {
 				case "admin":
+				case "lead":
 					navigate("/admin/dashboard", { replace: true });
 					break;
 				case "superadmin":

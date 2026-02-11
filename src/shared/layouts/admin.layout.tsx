@@ -63,8 +63,9 @@ export default function AdminLayout() {
 					<div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
 						<Zap className="text-white" size={20} fill="white" />
 					</div>
-					<h2 className="text-xl font-bold tracking-tight text-gray-900">
-						Sprintly<span className="text-indigo-600">.</span>
+					<h2 className="text-xl font-bold tracking-tight text-gray-900 flex flex-col">
+						<span>Sprintly<span className="text-indigo-600">.</span></span>
+						<span className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">{user?.role} Workspace</span>
 					</h2>
 				</div>
 
@@ -79,10 +80,9 @@ export default function AdminLayout() {
 								key={link.path}
 								to={link.path}
 								className={({ isActive }) =>
-									`flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${
-										isActive
-											? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
-											: "text-gray-500 hover:bg-indigo-50 hover:text-indigo-600"
+									`flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${isActive
+										? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
+										: "text-gray-500 hover:bg-indigo-50 hover:text-indigo-600"
 									}`
 								}
 							>

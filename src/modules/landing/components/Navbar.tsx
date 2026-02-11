@@ -10,7 +10,7 @@ import {
 	Users,
 	Zap,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
 	const navigate = useNavigate();

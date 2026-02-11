@@ -66,7 +66,7 @@ export default function SuperAdminCompanyPage() {
 	const [search, setSearch] = useState("");
 	const debouncedSearch = useDebounce(search, 500);
 
-	const { data, isPending } = useCompanies(page, limit, debouncedSearch);
+	const { data } = useCompanies(page, limit, debouncedSearch);
 
 	// FIXED COLUMNS TO MATCH YOUR TABLE TYPE
 	const columns = [

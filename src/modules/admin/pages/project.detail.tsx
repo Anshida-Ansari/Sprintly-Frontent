@@ -18,13 +18,18 @@ import UserStoryList from "../components/user-story-list";
 import { useEditProject } from "../hooks/useEditProject";
 import { useGetProject } from "../hooks/useGetProject";
 import type { EditProjectPayload } from "../types/types";
+import { UserAuth } from "../../auth/store/store";
+import AddMemberModal from "../components/add.member.modal";
+import { Plus } from "lucide-react";
 
 export default function ProjectDetail() {
 	const { projectId } = useParams<{ projectId: string }>();
 	const navigate = useNavigate();
 	const { data: projectResponse, isLoading } = useGetProject(projectId || "");
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
 	const { mutate: updateProject, isPending: isUpdating } = useEditProject();
+	const user = UserAuth((state) => state.user);
 	const [activeTab, setActiveTab] = useState<
 		"overview" | "stories" | "sprints" | "standups"
 	>("overview");
@@ -112,44 +117,40 @@ export default function ProjectDetail() {
 			<div className="flex items-center gap-2 p-1.5 bg-gray-100/50 rounded-2xl w-fit">
 				<button
 					onClick={() => setActiveTab("overview")}
-					className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-black transition-all ${
-						activeTab === "overview"
+					className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-black transition-all ${activeTab === "overview"
 							? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
 							: "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-					}`}
+						}`}
 				>
 					<Layout size={18} />
 					Overview
 				</button>
 				<button
 					onClick={() => setActiveTab("stories")}
-					className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-black transition-all ${
-						activeTab === "stories"
+					className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-black transition-all ${activeTab === "stories"
 							? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
 							: "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-					}`}
+						}`}
 				>
 					<ScrollText size={18} />
 					User Stories
 				</button>
 				<button
 					onClick={() => setActiveTab("sprints")}
-					className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-black transition-all ${
-						activeTab === "sprints"
+					className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-black transition-all ${activeTab === "sprints"
 							? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
 							: "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-					}`}
+						}`}
 				>
 					<PlayCircle size={18} />
 					Sprints
 				</button>
 				<button
 					onClick={() => setActiveTab("standups")}
-					className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-black transition-all ${
-						activeTab === "standups"
+					className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-black transition-all ${activeTab === "standups"
 							? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
 							: "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-					}`}
+						}`}
 				>
 					<ScrollText size={18} />
 					Standups
@@ -222,9 +223,20 @@ export default function ProjectDetail() {
 						<div className="space-y-8">
 							{/* Team Members */}
 							<div className="bg-white rounded-[40px] p-10 shadow-sm border border-gray-100 flex flex-col">
-								<h3 className="text-xl font-black text-gray-900 mb-8 flex items-center gap-3">
-									<Users size={24} className="text-orange-500" />
-									Core Team
+								<h3 className="text-xl font-black text-gray-900 mb-8 flex items-center justify-between gap-3">
+									<div className="flex items-center gap-2">
+										<Users size={24} className="text-orange-500" />
+										Core Team
+									</div>
+									{(user?.role === "admin" || user?.role === "lead") && (
+										<button
+											onClick={() => setIsAddMemberModalOpen(true)}
+											className="p-2 bg-orange-50 text-orange-600 rounded-xl hover:bg-orange-100 transition-colors"
+											title="Add Member"
+										>
+											<Plus size={20} />
+										</button>
+									)}
 								</h3>
 
 								{project.members && project.members.length > 0 ? (
@@ -304,6 +316,13 @@ export default function ProjectDetail() {
 				onSubmit={handleEditProject}
 				project={project}
 				isLoading={isUpdating}
+			/>
+
+			<AddMemberModal
+				isOpen={isAddMemberModalOpen}
+				onClose={() => setIsAddMemberModalOpen(false)}
+				projectId={projectId || ""}
+				currentMemberIds={project?.members || []}
 			/>
 		</div>
 	);

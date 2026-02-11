@@ -25,7 +25,7 @@ export default function AdminDashboard() {
 	const { mutate: inviteMember, isPending } = useInviteMember();
 	const { data: statsRes } = useDashboardStats();
 
-	const handleInvite = (data: { name: string; email: string }) => {
+	const handleInvite = (data: { name: string; email: string; role: string }) => {
 		inviteMember(data, {
 			onSuccess: () => setIsModalOpen(false),
 		});

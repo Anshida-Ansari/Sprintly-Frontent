@@ -1,6 +1,7 @@
 export interface InviteMemberPayload {
 	name: string;
 	email: string;
+	role: string;
 }
 
 export interface InviteMemberResponse {
@@ -24,6 +25,31 @@ export interface SetPasswordPayload {
 
 export interface SetPasswordResponse {
 	message: string;
+}
+
+// Member Types
+export type MemberRole = "superadmin" | "admin" | "lead" | "developers" | "developer";
+export type MemberStatus = "active" | "block" | "pending";
+
+export interface IMember {
+	id: string;
+	_id: string;
+	name: string;
+	email: string;
+	role: MemberRole;
+	status: MemberStatus;
+	companyId: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface GetMembersResponse {
+	success: boolean;
+	data: IMember[];
+	total: number;
+	page: number;
+	limit: number;
+	totalPages: number;
 }
 
 export type ProjectStatus = "Active" | "Completed";
@@ -55,6 +81,7 @@ export interface CreateProjectPayload {
 	startDate: string | Date;
 	endDate: string | Date;
 	gitRepoUrl?: string;
+	leadId?: string;
 }
 
 export interface EditProjectPayload {
@@ -103,6 +130,9 @@ export interface IUserStory {
 	status: UserStoryStatus;
 	priority: PriorityStatus;
 	sprintId?: string;
+	assignedTo?: string[];
+	estimationPoints?: number;
+	acceptanceCriteria?: string[];
 	createdAt: string;
 	updatedAt?: string;
 }
@@ -112,6 +142,7 @@ export interface CreateUserStoryPayload {
 	description?: string;
 	priority?: PriorityStatus;
 	sprintId?: string;
+	assignedTo?: string[];
 }
 
 export interface EditUserStoryPayload {
@@ -120,6 +151,7 @@ export interface EditUserStoryPayload {
 	status?: UserStoryStatus;
 	priority?: PriorityStatus;
 	sprintId?: string;
+	assignedTo?: string[];
 }
 
 export interface GetUserStoriesResponse {

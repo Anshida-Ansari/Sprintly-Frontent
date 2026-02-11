@@ -26,11 +26,15 @@ export default function UserStoryModal({
 		description: string;
 		priority: PriorityStatus;
 		status: UserStoryStatus;
+		estimationPoints: number;
+		acceptanceCriteria: string[];
 	}>({
 		title: "",
 		description: "",
 		priority: PriorityStatus.MEDIUM,
 		status: UserStoryStatus.IN_PENDING,
+		estimationPoints: 0,
+		acceptanceCriteria: [],
 	});
 
 	useEffect(() => {
@@ -40,6 +44,8 @@ export default function UserStoryModal({
 				description: userStory.description,
 				priority: userStory.priority,
 				status: userStory.status,
+				estimationPoints: userStory.estimationPoints || 0,
+				acceptanceCriteria: userStory.acceptanceCriteria || [],
 			});
 		} else {
 			setFormData({
@@ -47,6 +53,8 @@ export default function UserStoryModal({
 				description: "",
 				priority: PriorityStatus.MEDIUM,
 				status: UserStoryStatus.IN_PENDING,
+				estimationPoints: 0,
+				acceptanceCriteria: [],
 			});
 		}
 	}, [userStory, isOpen]);
@@ -158,6 +166,40 @@ export default function UserStoryModal({
 						)}
 					</div>
 
+					{/* New Fields */}
+					<div className="grid grid-cols-2 gap-4">
+						<div className="space-y-2">
+							<label className="text-sm font-bold text-gray-400 uppercase tracking-wider">
+								Estimation (Points)
+							</label>
+							<input
+								type="number"
+								min={0}
+								value={formData.estimationPoints}
+								onChange={(e) =>
+									setFormData({ ...formData, estimationPoints: Number(e.target.value) })
+								}
+								className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-bold text-gray-700"
+								placeholder="e.g. 5"
+							/>
+						</div>
+					</div>
+
+					<div className="space-y-2">
+						<label className="text-sm font-bold text-gray-400 uppercase tracking-wider">
+							Acceptance Criteria (One per line)
+						</label>
+						<textarea
+							rows={4}
+							value={formData.acceptanceCriteria.join("\n")}
+							onChange={(e) =>
+								setFormData({ ...formData, acceptanceCriteria: e.target.value.split("\n") })
+							}
+							className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium text-gray-700 resize-none"
+							placeholder="- Criteria 1&#10;- Criteria 2"
+						/>
+					</div>
+
 					<div className="flex gap-3 pt-4">
 						<button
 							type="button"
@@ -181,7 +223,7 @@ export default function UserStoryModal({
 						</button>
 					</div>
 				</form>
-			</div>
-		</div>
+			</div >
+		</div >
 	);
 }

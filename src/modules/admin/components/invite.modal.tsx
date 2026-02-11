@@ -4,7 +4,7 @@ import { useState } from "react";
 interface InviteMemberModalProps {
 	isOpen: boolean;
 	onClose: () => void;
-	onSubmit: (data: { name: string; email: string }) => void;
+	onSubmit: (data: { name: string; email: string; role: string }) => void;
 	isLoading?: boolean;
 }
 
@@ -16,11 +16,12 @@ export default function InviteMemberModal({
 }: InviteMemberModalProps) {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
+	const [role, setRole] = useState("developers");
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!name.trim() || !email.trim()) return;
-		onSubmit({ name: name.trim(), email: email.trim() });
+		onSubmit({ name: name.trim(), email: email.trim(), role });
 	};
 
 	if (!isOpen) return null;
@@ -86,6 +87,21 @@ export default function InviteMemberModal({
 								className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
 								disabled={isLoading}
 							/>
+						</div>
+
+						<div>
+							<label className="block text-sm font-medium text-gray-700 mb-1.5">
+								Role
+							</label>
+							<select
+								value={role}
+								onChange={(e) => setRole(e.target.value)}
+								className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-white"
+								disabled={isLoading}
+							>
+								<option value="developers">Developer</option>
+								<option value="lead">Lead</option>
+							</select>
 						</div>
 
 						{/* Footer Buttons */}

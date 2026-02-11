@@ -14,12 +14,13 @@ export default function AdminInviteMemberPage() {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 
+
 	const mutation = useInviteMember();
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		mutation.mutate(
-			{ name, email },
+			{ name, email, role: "developers" },
 			{
 				onSuccess: () => {
 					toast.success(`Invitation sent to ${name}`);

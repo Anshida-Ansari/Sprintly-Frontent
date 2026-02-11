@@ -6,7 +6,6 @@ import {
 	Clock,
 	Loader2,
 	Send,
-	User,
 } from "lucide-react";
 import { useState } from "react";
 import { useAddComment } from "../hooks/useAddCommnet";

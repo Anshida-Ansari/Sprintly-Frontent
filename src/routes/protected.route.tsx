@@ -17,7 +17,7 @@ export default function ProtectedRoutes() {
 	console.log(user);
 
 	if (location.pathname === "/dashboard") {
-		if (user.role === "admin") {
+		if (user.role === "admin" || user.role === "lead") {
 			return <Navigate to="/admin/dashboard" replace />;
 		}
 

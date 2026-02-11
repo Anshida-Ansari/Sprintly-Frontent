@@ -6,7 +6,7 @@ interface User {
 	name: string;
 	email: string;
 	companyName: string;
-	role: "superadmin" | "admin" | "developers";
+	role: "superadmin" | "admin" | "developers" | "lead";
 }
 
 interface AuthState {

@@ -1,10 +1,6 @@
 import { Calendar, Layout, Loader2, Target, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import type {
-	CreateSprintPayload,
-	EditSprintPayload,
-	ISprint,
-} from "../types/types.tsx";
+import type {ISprint} from "../types/types.tsx";
 
 interface SprintModalProps {
 	isOpen: boolean;

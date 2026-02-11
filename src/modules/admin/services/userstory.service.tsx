@@ -15,6 +15,9 @@ const mapUserStory = (s: any) => ({
 	projectId: s._projectId || s.projectId,
 	companyId: s._companyId || s.companyId,
 	sprintId: s._sprintId || s.sprintId,
+	assignedTo: s._assignedTo || s.assignedTo,
+	estimationPoints: s._estimationPoints ?? s.estimationPoints ?? 0,
+	acceptanceCriteria: s._acceptanceCriteria || s.acceptanceCriteria || [],
 	createdAt: s._createdAt || s.createdAt,
 	updatedAt: s._updatedAt || s.updatedAt,
 });

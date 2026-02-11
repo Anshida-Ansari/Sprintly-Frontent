@@ -6,19 +6,20 @@ import {
 	Plus,
 	Save,
 	Trash2,
-	User,
 	X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { UserAuth } from "../../auth/store/store";
 import { useGetMembers } from "../hooks/useGetmembers";
+import { useGetProject } from "../hooks/useGetProject";
 import {
 	useAssignSubtask,
 	useCreateSubtask,
 	useDeleteSubtask,
 	useGetSubtasks,
 	useUpdateSubtaskStatus,
-} from "../hooks/useSubtasks.tsx";
+} from "../hooks/useSubtasks";
 import { useUpdateUserStory } from "../hooks/useUserStories";
 import type { ISubtask, IUserStory } from "../types/types";
 import DeleteConfirmationModal from "./delete-confirmation-modal";
@@ -37,15 +38,16 @@ export default function UserStoryDetailModal({
 	const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
 	const [isEditingDescription, setIsEditingDescription] = useState(false);
 	const [editedDescription, setEditedDescription] = useState(story.description);
+	const [isAssignDropdownOpen, setIsAssignDropdownOpen] = useState(false);
 
-	// Delete Confirmation State
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [subtaskToDelete, setSubtaskToDelete] = useState<string | null>(null);
 
 	const user = UserAuth((state) => state.user);
 	const isAdmin = user?.role === "admin";
 
-	console.log("User role:", user?.role, "isAdmin:", isAdmin);
+	const { data: projectRes } = useGetProject(story?.projectId);
+	const project = projectRes?.data;
 
 	const { data: subtasksRes, isLoading: loadingSubtasks } = useGetSubtasks(
 		story.id,
@@ -64,8 +66,12 @@ export default function UserStoryDetailModal({
 
 	const subtasks = subtasksRes?.data || [];
 	const members = membersRes?.data || [];
+
+	// Filter developers: Must be 'developer' role AND member of the project
 	const developers = members.filter(
-		(m: any) => m.role === "developers" || m.role === "developer",
+		(m: any) =>
+			(m.role === "developers" || m.role === "developer") &&
+			(project?.members || []).includes(m._id)
 	);
 
 	const completedCount = subtasks.filter(
@@ -99,6 +105,33 @@ export default function UserStoryDetailModal({
 
 	const handleAssignSubtask = (subtaskId: string, developerId: string) => {
 		assignSubtask.mutate({ subtaskId, payload: { assignedTo: developerId } });
+	};
+
+	// ... existing logic
+
+	const handleAssignMemberToStory = (memberId: string) => {
+		const currentAssigned = story.assignedTo || [];
+
+		// Check if member is already assigned (frontend validation)
+		if (currentAssigned.includes(memberId)) {
+			return; // Already filtered by dropdown, but double-check
+		}
+
+		const newAssigned = [...(currentAssigned as any || []), memberId];
+		const member = members.find((m: any) => m._id === memberId);
+
+		updateStory.mutate({
+			projectId: story.projectId,
+			userStoryId: story.id,
+			data: { assignedTo: newAssigned }
+		}, {
+			onSuccess: () => {
+				if (member) {
+					// Visible success message showing member name
+					toast.success(`${member.name} assigned successfully! 🎉`);
+				}
+			}
+		});
 	};
 
 	const handleSaveDescription = () => {
@@ -175,6 +208,38 @@ export default function UserStoryDetailModal({
 								</span>
 							</span>
 						</div>
+
+						{/* Assignees (Lead/Admin) */}
+						{(isAdmin || user?.role === "lead") && (
+							<div className="mt-2 flex items-center gap-2">
+								<span className="text-sm font-bold text-gray-500">Assigned:</span>
+								<div className="flex -space-x-2">
+									{(story.assignedTo || []).map((assigneeId) => {
+										const member = members.find((m: any) => m._id === assigneeId);
+										return member ? (
+											<div key={member._id} className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-[10px] font-bold text-indigo-700 border border-white ring-2 ring-white">
+												{member.name.substring(0, 2)}
+											</div>
+										) : null;
+									})}
+									<select
+										onChange={(e) => {
+											if (e.target.value) handleAssignMemberToStory(e.target.value);
+										}}
+										value=""
+										className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 cursor-pointer border-none outline-none text-[0px]"
+										title="Add Member"
+									>
+										<option value="">+</option>
+										{developers.filter((d: any) => !(story.assignedTo || []).includes(d._id)).map((dev: any) => (
+											<option key={dev._id} value={dev._id} className="text-sm">
+												{dev.name}
+											</option>
+										))}
+									</select>
+								</div>
+							</div>
+						)}
 					</div>
 					<button
 						onClick={onClose}
@@ -240,6 +305,45 @@ export default function UserStoryDetailModal({
 						)}
 					</div>
 
+					{/* Estimation & Acceptance Criteria */}
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+						{/* Estimation */}
+						<div className="space-y-2">
+							<h3 className="text-sm font-black text-gray-700 uppercase tracking-wider flex items-center gap-2">
+								Estimation
+							</h3>
+							<div className="flex items-center gap-2">
+								<span className="text-3xl font-black text-indigo-600">
+									{story.estimationPoints || 0}
+								</span>
+								<span className="text-xs font-bold text-gray-400 uppercase tracking-wider mt-2">
+									Points
+								</span>
+							</div>
+						</div>
+
+						{/* Acceptance Criteria */}
+						<div className="space-y-3">
+							<h3 className="text-sm font-black text-gray-700 uppercase tracking-wider flex items-center gap-2">
+								Acceptance Criteria
+							</h3>
+							{story.acceptanceCriteria && story.acceptanceCriteria.length > 0 ? (
+								<ul className="space-y-2">
+									{story.acceptanceCriteria.map((criteria: string, index: number) => (
+										<li key={index} className="flex items-start gap-3 text-sm font-medium text-gray-600">
+											<div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-2 shrink-0" />
+											{criteria}
+										</li>
+									))}
+								</ul>
+							) : (
+								<p className="text-sm text-gray-400 italic">
+									No criteria defined.
+								</p>
+							)}
+						</div>
+					</div>
+
 					{/* Progress Bar */}
 					{totalCount > 0 && (
 						<div className="space-y-2">
@@ -288,12 +392,11 @@ export default function UserStoryDetailModal({
 												<div
 													className={`
                                                     px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border
-                                                    ${
-																											subtask.status ===
-																											"completed"
-																												? "bg-emerald-50 text-emerald-600 border-emerald-100"
-																												: "bg-gray-200 text-gray-600 border-gray-300"
-																										}
+                                                    ${subtask.status ===
+															"completed"
+															? "bg-emerald-50 text-emerald-600 border-emerald-100"
+															: "bg-gray-200 text-gray-600 border-gray-300"
+														}
                                                 `}
 												>
 													{subtask.status === "completed" ? "DONE" : "TODO"}
@@ -383,8 +486,8 @@ export default function UserStoryDetailModal({
 							</div>
 						)}
 
-						{/* Add Subtask (Admin Only) */}
-						{isAdmin && (
+						{/* Add Subtask (Developers Only) */}
+						{user?.role === "developers" && (
 							<div className="flex gap-2 pt-2">
 								<input
 									type="text"

@@ -2,7 +2,6 @@ import {
 	BarChart3,
 	Box,
 	CheckSquare,
-	Cpu,
 	Kanban,
 	LayoutDashboard,
 	LogOut,
