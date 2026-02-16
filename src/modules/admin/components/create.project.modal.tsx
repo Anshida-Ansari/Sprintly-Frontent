@@ -1,7 +1,8 @@
-import { Calendar, FileText, GitBranch, Type, User, X } from "lucide-react";
+import { Calendar, FileText, GitBranch, Github, Type, User, X } from "lucide-react";
 import { useGetMembers } from "../hooks/useGetmembers";
 import { useState } from "react";
 import type { CreateProjectPayload } from "../types/types";
+import { useGitHubStatus } from "../hooks/useGitHubStatus";
 
 interface CreateProjectModalProps {
 	isOpen: boolean;
@@ -27,8 +28,11 @@ export default function CreateProjectModal({
 
 	const { data: membersData } = useGetMembers({
 		page: 1,
-		limit: 100, 
+		limit: 100,
 	});
+
+	const { data: githubStatus } = useGitHubStatus();
+	const isGitHubConnected = githubStatus?.isConnected || false;
 
 	const potentialLeads =
 		membersData?.data?.filter(
@@ -145,21 +149,47 @@ export default function CreateProjectModal({
 							</div>
 						</div>
 
-						<div>
-							<label className="block text-sm font-bold text-gray-700 mb-1.5 flex items-center gap-2">
-								<GitBranch size={16} className="text-gray-500" /> Git Repository
-								(Optional)
-							</label>
-							<input
-								type="url"
-								name="gitRepoUrl"
-								value={formData.gitRepoUrl}
-								onChange={handleChange}
-								placeholder="https://github.com/org/repo"
-								className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition bg-gray-50/50"
-								disabled={isLoading}
-							/>
-						</div>
+						{/* GitHub Integration */}
+						{isGitHubConnected ? (
+							<div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4">
+								<div className="flex items-start gap-3">
+									<div className="p-2 bg-white rounded-lg shadow-sm">
+										<Github size={20} className="text-purple-600" />
+									</div>
+									<div className="flex-1">
+										<h4 className="font-bold text-gray-900 mb-1">
+											GitHub Repository Auto-Creation
+										</h4>
+										<p className="text-sm text-gray-600">
+											A private repository will be automatically created as <span className="font-mono bg-white px-2 py-0.5 rounded border border-purple-200">{formData.name.toLowerCase().replace(/\s+/g, '-')}</span>
+										</p>
+										<p className="text-xs text-purple-600 mt-2 flex items-center gap-1">
+											<span className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
+											Connected as @{githubStatus?.githubUsername}
+										</p>
+									</div>
+								</div>
+							</div>
+						) : (
+							<div>
+								<label className="block text-sm font-bold text-gray-700 mb-1.5 flex items-center gap-2">
+									<GitBranch size={16} className="text-gray-500" /> Git Repository
+									(Optional)
+								</label>
+								<input
+									type="url"
+									name="gitRepoUrl"
+									value={formData.gitRepoUrl}
+									onChange={handleChange}
+									placeholder="https://github.com/org/repo"
+									className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition bg-gray-50/50"
+									disabled={isLoading}
+								/>
+								<p className="text-xs text-gray-500 mt-2">
+									💡 Connect GitHub in Settings to auto-create repositories
+								</p>
+							</div>
+						)}
 
 						<div>
 							<label className="block text-sm font-bold text-gray-700 mb-1.5 flex items-center gap-2">

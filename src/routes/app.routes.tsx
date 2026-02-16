@@ -7,60 +7,33 @@ const Login = lazy(() => import("../modules/auth/pages/login"));
 const Register = lazy(() => import("../modules/auth/pages/register"));
 const OTP = lazy(() => import("../modules/auth/pages/otp"));
 const LandingPage = lazy(() => import("../modules/landing/pages/Landing"));
-const AdminDashboard = lazy(
-	() => import("../modules/admin/pages/admin.dashboard"),
-);
-const SuperAdminDashboard = lazy(
-	() => import("../modules/superadmin/pages/superadmin.dashboard"),
-);
-const ForgotPassword = lazy(
-	() => import("../modules/auth/pages/forgotPassword"),
-);
+const AdminDashboard = lazy(() => import("../modules/admin/pages/admin.dashboard"));
+const SuperAdminDashboard = lazy(() => import("../modules/superadmin/pages/superadmin.dashboard"));
+const ForgotPassword = lazy(() => import("../modules/auth/pages/forgotPassword"));
 const ForgotPasswordOtp = lazy(() => import("../modules/auth/pages/forgotOtp"));
 const ResetPassword = lazy(() => import("../modules/auth/pages/resetPassword"));
 const AdminLayout = lazy(() => import("../shared/layouts/admin.layout"));
-const SuperAdminLayout = lazy(
-	() => import("../shared/layouts/superadmin.layout"),
-);
-const SuperAdminCompanyPage = lazy(
-	() => import("../modules/superadmin/pages/superadmin.companies"),
-);
-const SuperAdminCompanyDetail = lazy(
-	() => import("../modules/superadmin/pages/superadmin.companies.detail"),
-);
+const SuperAdminLayout = lazy(() => import("../shared/layouts/superadmin.layout"));
+const SuperAdminCompanyPage = lazy(() => import("../modules/superadmin/pages/superadmin.companies"));
+const SuperAdminCompanyDetail = lazy(() => import("../modules/superadmin/pages/superadmin.companies.detail"));
 const MemberAccept = lazy(() => import("../modules/auth/pages/setPassword"));
-const DeveloperLayout = lazy(
-	() => import("../shared/layouts/developer.layout"),
-);
-const DashboardPage = lazy(
-	() => import("../modules/developers/pages/developers.dashboard"),
-);
-const KanbanBoard = lazy(
-	() => import("../modules/developers/pages/kanban-board"),
-);
+const DeveloperLayout = lazy(() => import("../shared/layouts/developer.layout"));
+const DashboardPage = lazy(() => import("../modules/developers/pages/developers.dashboard"));
+const KanbanBoard = lazy(() => import("../modules/developers/pages/kanban-board"));
 const Members = lazy(() => import("../modules/admin/pages/list.users"));
 const Projects = lazy(() => import("../modules/admin/pages/projects"));
-const ProjectDetail = lazy(
-	() => import("../modules/admin/pages/project.detail"),
-);
-const UserStoriesPage = lazy(
-	() => import("../modules/admin/pages/user-stories"),
-);
+const ProjectDetail = lazy(() => import("../modules/admin/pages/project.detail"));
+const UserStoriesPage = lazy(() => import("../modules/admin/pages/user-stories"));
 const SprintsPage = lazy(() => import("../modules/admin/pages/sprints"));
-const SprintPlanning = lazy(
-	() => import("../modules/admin/pages/sprint-planning"),
-);
+const SprintPlanning = lazy(() => import("../modules/admin/pages/sprint-planning"));
 const Meetings = lazy(() => import("../modules/admin/pages/meetings"));
 const MeetingRoom = lazy(() => import("../modules/meeting/pages/MeetingRoom"));
 const MyTasksPage = lazy(() => import("../modules/developers/pages/my.tasks"));
-const DeveloperStandup = lazy(
-	() => import("../modules/standup/pages/developer.standup"),
-);
-const DeveloperMeetings = lazy(
-	() => import("../modules/meeting/pages/developer.meetings"),
-);
+const DeveloperStandup = lazy(() => import("../modules/standup/pages/developer.standup"));
+const DeveloperMeetings = lazy(() => import("../modules/meeting/pages/developer.meetings"));
+const Settings = lazy(() => import("../modules/admin/pages/settings"));
 
-//public routes
+
 export const router = createBrowserRouter([
 	// PUBLIC
 	{
@@ -98,7 +71,7 @@ export const router = createBrowserRouter([
 					{ path: "team", element: <div>Team</div> },
 					{ path: "meetings", element: <Meetings /> },
 					{ path: "reports", element: <div>Reports</div> },
-					{ path: "settings", element: <div>Settings</div> },
+					{ path: "settings", element: <Settings /> },
 				],
 			},
 
@@ -109,10 +82,7 @@ export const router = createBrowserRouter([
 				children: [
 					{ path: "dashboard", element: <SuperAdminDashboard /> },
 					{ path: "companies", element: <SuperAdminCompanyPage /> },
-					{
-						path: "companies/:companyId",
-						element: <SuperAdminCompanyDetail />,
-					},
+					{path: "companies/:companyId",element: <SuperAdminCompanyDetail />},
 					{ path: "logs", element: <div>Active Logs</div> },
 					{ path: "subscriptions", element: <div>Subscription Plans</div> },
 					{ path: "settings", element: <div>Settings</div> },
