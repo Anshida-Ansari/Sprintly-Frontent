@@ -7,28 +7,25 @@ import {
 	ShieldCheck,
 	User,
 } from "lucide-react";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useRegister } from "../hooks/useRegister";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, type RegisterFormData } from "../schemas/auth.schemas";
 
 export default function Register() {
 	const { mutate, isPending } = useRegister();
-	const [form, setForm] = useState({
-		name: "",
-		email: "",
-		companyName: "",
-		password: "",
-		confirmPassword: "",
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<RegisterFormData>({
+		resolver: zodResolver(registerSchema),
 	});
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target;
-		setForm((prev) => ({ ...prev, [name]: value }));
-	};
-
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		mutate(form);
+	const onSubmit = (data: RegisterFormData) => {
+		mutate(data);
 	};
 
 	return (
@@ -61,97 +58,118 @@ export default function Register() {
 					</div>
 
 					{/* Industrial Register Form */}
-					<form onSubmit={handleSubmit} className="space-y-3">
+					<form onSubmit={handleSubmit(onSubmit)} className="space-y-3" noValidate>
 						<div className="grid grid-cols-2 gap-3">
 							{/* Admin Name */}
-							<div className="group relative border-2 border-slate-100 rounded-2xl p-3 focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-50 transition-all bg-slate-50/30">
-								<p className="text-[9px] font-black uppercase tracking-widest text-slate-400 group-focus-within:text-blue-600 mb-1">
+							<div className={`group relative border-2 ${errors.name ? 'border-red-500' : 'border-slate-100'} rounded-2xl p-3 focus-within:border-${errors.name ? 'red' : 'blue'}-600 focus-within:ring-4 focus-within:ring-${errors.name ? 'red' : 'blue'}-50 transition-all bg-slate-50/30`}>
+								<p className={`text-[9px] font-black uppercase tracking-widest ${errors.name ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1`}>
 									Lead Admin
 								</p>
 								<div className="flex items-center gap-2">
 									<User size={14} className="text-slate-300" />
 									<input
-										name="name"
-										type="text"
+										{...register("name")}
 										placeholder="Full Name"
-										value={form.name}
-										onChange={handleChange}
-										required
 										className="w-full bg-transparent outline-none font-bold text-md placeholder:text-slate-300"
 									/>
 								</div>
 							</div>
 
 							{/* Company Name */}
-							<div className="group relative border-2 border-slate-100 rounded-2xl p-3 focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-50 transition-all bg-slate-50/30">
-								<p className="text-[9px] font-black uppercase tracking-widest text-slate-400 group-focus-within:text-blue-600 mb-1">
+							<div className={`group relative border-2 ${errors.companyName ? 'border-red-500' : 'border-slate-100'} rounded-2xl p-3 focus-within:border-${errors.companyName ? 'red' : 'blue'}-600 focus-within:ring-4 focus-within:ring-${errors.companyName ? 'red' : 'blue'}-50 transition-all bg-slate-50/30`}>
+								<p className={`text-[9px] font-black uppercase tracking-widest ${errors.companyName ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1`}>
 									Company
 								</p>
 								<div className="flex items-center gap-2">
 									<Building2 size={14} className="text-slate-300" />
 									<input
-										name="companyName"
-										type="text"
+										{...register("companyName")}
 										placeholder="Acme Corp"
-										value={form.companyName}
-										onChange={handleChange}
-										required
 										className="w-full bg-transparent outline-none font-bold text-md placeholder:text-slate-300"
 									/>
 								</div>
 							</div>
 						</div>
+						{/* Error messages for name and company */}
+						<div className="grid grid-cols-2 gap-3 -mt-2">
+							<div>
+								{errors.name && (
+									<p className="text-red-500 text-xs font-medium">
+										{errors.name.message}
+									</p>
+								)}
+							</div>
+							<div>
+								{errors.companyName && (
+									<p className="text-red-500 text-xs font-medium">
+										{errors.companyName.message}
+									</p>
+								)}
+							</div>
+						</div>
 
 						{/* Email */}
-						<div className="group relative border-2 border-slate-100 rounded-2xl p-4 focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-50 transition-all bg-slate-50/30">
-							<p className="text-[9px] font-black uppercase tracking-widest text-slate-400 group-focus-within:text-blue-600 mb-1">
+						<div className={`group relative border-2 ${errors.email ? 'border-red-500' : 'border-slate-100'} rounded-2xl p-4 focus-within:border-${errors.email ? 'red' : 'blue'}-600 focus-within:ring-4 focus-within:ring-${errors.email ? 'red' : 'blue'}-50 transition-all bg-slate-50/30`}>
+							<p className={`text-[9px] font-black uppercase tracking-widest ${errors.email ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1`}>
 								Work Email
 							</p>
 							<div className="flex items-center gap-2">
 								<Mail size={16} className="text-slate-300" />
 								<input
-									name="email"
-									type="email"
+									{...register("email")}
 									placeholder="name@company.com"
-									value={form.email}
-									onChange={handleChange}
-									required
 									className="w-full bg-transparent outline-none font-bold text-lg placeholder:text-slate-300"
 								/>
 							</div>
 						</div>
+						{errors.email && (
+							<p className="text-red-500 text-xs mt-1 font-medium -mt-2">
+								{errors.email.message}
+							</p>
+						)}
 
 						<div className="grid grid-cols-2 gap-3">
 							{/* Password */}
-							<div className="group relative border-2 border-slate-100 rounded-2xl p-4 focus-within:border-blue-600 transition-all bg-slate-50/30">
-								<p className="text-[9px] font-black uppercase tracking-widest text-slate-400 group-focus-within:text-blue-600 mb-1">
+							<div className={`group relative border-2 ${errors.password ? 'border-red-500' : 'border-slate-100'} rounded-2xl p-4 focus-within:border-${errors.password ? 'red' : 'blue'}-600 transition-all bg-slate-50/30`}>
+								<p className={`text-[9px] font-black uppercase tracking-widest ${errors.password ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1`}>
 									Password
 								</p>
 								<input
-									name="password"
+									{...register("password")}
 									type="password"
 									placeholder="••••••••"
-									value={form.password}
-									onChange={handleChange}
-									required
 									className="w-full bg-transparent outline-none font-bold text-lg placeholder:text-slate-300"
 								/>
 							</div>
 
 							{/* Confirm Password */}
-							<div className="group relative border-2 border-slate-100 rounded-2xl p-4 focus-within:border-blue-600 transition-all bg-slate-50/30">
-								<p className="text-[9px] font-black uppercase tracking-widest text-slate-400 group-focus-within:text-blue-600 mb-1">
+							<div className={`group relative border-2 ${errors.confirmPassword ? 'border-red-500' : 'border-slate-100'} rounded-2xl p-4 focus-within:border-${errors.confirmPassword ? 'red' : 'blue'}-600 transition-all bg-slate-50/30`}>
+								<p className={`text-[9px] font-black uppercase tracking-widest ${errors.confirmPassword ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1`}>
 									Verify
 								</p>
 								<input
-									name="confirmPassword"
+									{...register("confirmPassword")}
 									type="password"
 									placeholder="••••••••"
-									value={form.confirmPassword}
-									onChange={handleChange}
-									required
 									className="w-full bg-transparent outline-none font-bold text-lg placeholder:text-slate-300"
 								/>
+							</div>
+						</div>
+						{/* Error messages for passwords */}
+						<div className="grid grid-cols-2 gap-3 -mt-2">
+							<div>
+								{errors.password && (
+									<p className="text-red-500 text-xs font-medium">
+										{errors.password.message}
+									</p>
+								)}
+							</div>
+							<div>
+								{errors.confirmPassword && (
+									<p className="text-red-500 text-xs font-medium">
+										{errors.confirmPassword.message}
+									</p>
+								)}
 							</div>
 						</div>
 

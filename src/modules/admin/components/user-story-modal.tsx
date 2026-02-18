@@ -1,10 +1,13 @@
 import { Loader2, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	type IUserStory,
 	PriorityStatus,
 	UserStoryStatus,
 } from "../types/types";
+import { userStorySchema, type UserStoryFormData } from "../schemas/admin.schemas";
 
 interface UserStoryModalProps {
 	isOpen: boolean;
@@ -21,209 +24,234 @@ export default function UserStoryModal({
 	userStory,
 	isLoading,
 }: UserStoryModalProps) {
-	const [formData, setFormData] = useState<{
-		title: string;
-		description: string;
-		priority: PriorityStatus;
-		status: UserStoryStatus;
-		estimationPoints: number;
-		acceptanceCriteria: string[];
-	}>({
-		title: "",
-		description: "",
-		priority: PriorityStatus.MEDIUM,
-		status: UserStoryStatus.IN_PENDING,
-		estimationPoints: 0,
-		acceptanceCriteria: [],
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+		reset,
+		setValue,
+	} = useForm<UserStoryFormData>({
+		resolver: zodResolver(userStorySchema),
+		defaultValues: {
+			title: "",
+			description: "",
+			priority: PriorityStatus.MEDIUM,
+			status: UserStoryStatus.IN_PENDING,
+			estimationPoints: 0,
+			acceptanceCriteria: [],
+			acceptanceCriteriaText: "",
+		},
 	});
 
 	useEffect(() => {
-		if (userStory) {
-			setFormData({
-				title: userStory.title,
-				description: userStory.description,
-				priority: userStory.priority,
-				status: userStory.status,
-				estimationPoints: userStory.estimationPoints || 0,
-				acceptanceCriteria: userStory.acceptanceCriteria || [],
-			});
-		} else {
-			setFormData({
-				title: "",
-				description: "",
-				priority: PriorityStatus.MEDIUM,
-				status: UserStoryStatus.IN_PENDING,
-				estimationPoints: 0,
-				acceptanceCriteria: [],
-			});
+		if (isOpen) {
+			if (userStory) {
+				setValue("title", userStory.title);
+				setValue("description", userStory.description);
+				setValue("priority", userStory.priority);
+				setValue("status", userStory.status);
+				setValue("estimationPoints", userStory.estimationPoints || 0);
+				setValue("acceptanceCriteria", userStory.acceptanceCriteria || []);
+				setValue(
+					"acceptanceCriteriaText",
+					userStory.acceptanceCriteria?.join("\n") || ""
+				);
+			} else {
+				reset({
+					title: "",
+					description: "",
+					priority: PriorityStatus.MEDIUM,
+					status: UserStoryStatus.IN_PENDING,
+					estimationPoints: 0,
+					acceptanceCriteria: [],
+					acceptanceCriteriaText: "",
+				});
+			}
 		}
-	}, [userStory, isOpen]);
+	}, [userStory, isOpen, reset, setValue]);
 
 	if (!isOpen) return null;
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		onSubmit(formData);
+	const handleFormSubmit = (data: UserStoryFormData) => {
+		// Convert text area back to array for acceptance criteria
+		const criteriaArray = data.acceptanceCriteriaText
+			? data.acceptanceCriteriaText.split("\n").filter((line) => line.trim() !== "")
+			: [];
+
+		const payload = {
+			...data,
+			acceptanceCriteria: criteriaArray,
+		};
+
+		// Remove helper field
+		delete (payload as any).acceptanceCriteriaText;
+
+		onSubmit(payload);
 	};
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-			<div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
-				<div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-					<h2 className="text-2xl font-black text-gray-900 tracking-tight">
-						{userStory ? "Edit User Story" : "Create User Story"}
+		<div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+			{/* Backdrop */}
+			<div
+				className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity"
+				onClick={onClose}
+			/>
+
+			{/* Modal Panel */}
+			<div className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 border border-gray-100">
+
+				{/* Header */}
+				<div className="px-6 py-4 flex justify-between items-center border-b border-gray-100 shrink-0">
+					<h2 className="text-lg font-semibold text-gray-900">
+						{userStory ? "Edit Issue" : "New Issue"}
 					</h2>
 					<button
 						onClick={onClose}
-						className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+						className="text-gray-400 hover:text-gray-600 transition-colors bg-transparent hover:bg-gray-100 p-1.5 rounded-md"
 					>
-						<X size={20} />
+						<X size={18} />
 					</button>
 				</div>
 
-				<form onSubmit={handleSubmit} className="p-8 space-y-6">
-					<div className="space-y-2">
-						<label className="text-sm font-bold text-gray-400 uppercase tracking-wider">
-							Title
-						</label>
-						<input
-							required
-							minLength={3}
-							maxLength={100}
-							type="text"
-							value={formData.title}
-							onChange={(e) =>
-								setFormData({ ...formData, title: e.target.value })
-							}
-							className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-bold text-gray-700"
-							placeholder="User story title..."
-						/>
-					</div>
-
-					<div className="space-y-2">
-						<label className="text-sm font-bold text-gray-400 uppercase tracking-wider">
-							Description
-						</label>
-						<textarea
-							required
-							minLength={5}
-							maxLength={500}
-							rows={4}
-							value={formData.description}
-							onChange={(e) =>
-								setFormData({ ...formData, description: e.target.value })
-							}
-							className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium text-gray-700 resize-none"
-							placeholder="Detailed description of the user story..."
-						/>
-					</div>
-
-					<div className="grid grid-cols-2 gap-4">
-						<div className="space-y-2">
-							<label className="text-sm font-bold text-gray-400 uppercase tracking-wider">
-								Priority
-							</label>
-							<select
-								value={formData.priority}
-								onChange={(e) =>
-									setFormData({
-										...formData,
-										priority: e.target.value as PriorityStatus,
-									})
-								}
-								className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-bold text-gray-700 bg-white"
-							>
-								{(Object.values(PriorityStatus) as string[]).map((p) => (
-									<option key={p} value={p}>
-										{p}
-									</option>
-								))}
-							</select>
-						</div>
-
-						{userStory && (
-							<div className="space-y-2">
-								<label className="text-sm font-bold text-gray-400 uppercase tracking-wider">
-									Status
-								</label>
-								<select
-									value={formData.status}
-									onChange={(e) =>
-										setFormData({
-											...formData,
-											status: e.target.value as UserStoryStatus,
-										})
-									}
-									className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-bold text-gray-700 bg-white"
-								>
-									{(Object.values(UserStoryStatus) as string[]).map((s) => (
-										<option key={s} value={s}>
-											{s}
-										</option>
-									))}
-								</select>
-							</div>
-						)}
-					</div>
-
-					{/* New Fields */}
-					<div className="grid grid-cols-2 gap-4">
-						<div className="space-y-2">
-							<label className="text-sm font-bold text-gray-400 uppercase tracking-wider">
-								Estimation (Points)
+				{/* Scrollable Content */}
+				<div className="overflow-y-auto p-6 custom-scrollbar flex-1">
+					<form
+						id="user-story-form"
+						onSubmit={handleSubmit(handleFormSubmit)}
+						className="space-y-5"
+						noValidate
+					>
+						<div className="space-y-1.5">
+							<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+								Title
 							</label>
 							<input
-								type="number"
-								min={0}
-								value={formData.estimationPoints}
-								onChange={(e) =>
-									setFormData({ ...formData, estimationPoints: Number(e.target.value) })
-								}
-								className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-bold text-gray-700"
-								placeholder="e.g. 5"
+								{...register("title")}
+								placeholder="Issue title..."
+								autoFocus
+								className={`w-full px-3 py-2.5 bg-white border ${errors.title ? "border-red-500" : "border-gray-200"
+									} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium text-gray-900 placeholder:text-gray-400`}
+							/>
+							{errors.title && (
+								<p className="text-red-500 text-xs mt-0.5">
+									{errors.title.message}
+								</p>
+							)}
+						</div>
+
+						<div className="space-y-1.5">
+							<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+								Description
+							</label>
+							<textarea
+								{...register("description")}
+								rows={4}
+								placeholder="Add a description..."
+								className={`w-full px-3 py-2.5 bg-white border ${errors.description ? "border-red-500" : "border-gray-200"
+									} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm text-gray-900 placeholder:text-gray-400 resize-none leading-relaxed`}
+							/>
+							{errors.description && (
+								<p className="text-red-500 text-xs mt-0.5">
+									{errors.description.message}
+								</p>
+							)}
+						</div>
+
+						<div className="grid grid-cols-2 gap-5">
+							<div className="space-y-1.5">
+								<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+									Priority
+								</label>
+								<div className="relative">
+									<select
+										{...register("priority")}
+										className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium text-gray-900 appearance-none cursor-pointer"
+									>
+										{(Object.values(PriorityStatus) as string[]).map((p) => (
+											<option key={p} value={p}>
+												{p}
+											</option>
+										))}
+									</select>
+									<div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-xs">
+										▼
+									</div>
+								</div>
+							</div>
+
+							<div className="space-y-1.5">
+								<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+									Estimate
+								</label>
+								<input
+									{...register("estimationPoints")}
+									type="number"
+									min={0}
+									className={`w-full px-3 py-2.5 bg-white border ${errors.estimationPoints
+										? "border-red-500"
+										: "border-gray-200"
+										} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium text-gray-900 placeholder:text-gray-400`}
+								/>
+							</div>
+
+							{userStory && (
+								<div className="space-y-1.5 col-span-2">
+									<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+										Status
+									</label>
+									<div className="relative">
+										<select
+											{...register("status")}
+											className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium text-gray-900 appearance-none cursor-pointer"
+										>
+											{(Object.values(UserStoryStatus) as string[]).map((s) => (
+												<option key={s} value={s}>
+													{s}
+												</option>
+											))}
+										</select>
+										<div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-xs">
+											▼
+										</div>
+									</div>
+								</div>
+							)}
+						</div>
+
+						<div className="space-y-1.5">
+							<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+								Acceptance Criteria <span className="text-gray-400 font-normal lowercase">(one per line)</span>
+							</label>
+							<textarea
+								{...register("acceptanceCriteriaText")}
+								rows={3}
+								placeholder="- Criteria 1..."
+								className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm text-gray-900 placeholder:text-gray-400 resize-none font-mono text-xs"
 							/>
 						</div>
-					</div>
+					</form>
+				</div>
 
-					<div className="space-y-2">
-						<label className="text-sm font-bold text-gray-400 uppercase tracking-wider">
-							Acceptance Criteria (One per line)
-						</label>
-						<textarea
-							rows={4}
-							value={formData.acceptanceCriteria.join("\n")}
-							onChange={(e) =>
-								setFormData({ ...formData, acceptanceCriteria: e.target.value.split("\n") })
-							}
-							className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium text-gray-700 resize-none"
-							placeholder="- Criteria 1&#10;- Criteria 2"
-						/>
-					</div>
-
-					<div className="flex gap-3 pt-4">
-						<button
-							type="button"
-							onClick={onClose}
-							className="flex-1 px-6 py-3 border border-gray-200 text-gray-600 rounded-xl font-bold hover:bg-gray-50 transition shadow-sm"
-						>
-							Cancel
-						</button>
-						<button
-							disabled={isLoading}
-							type="submit"
-							className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg shadow-indigo-200 flex items-center justify-center gap-2"
-						>
-							{isLoading ? (
-								<Loader2 className="animate-spin" size={20} />
-							) : userStory ? (
-								"Update Story"
-							) : (
-								"Create Story"
-							)}
-						</button>
-					</div>
-				</form>
-			</div >
-		</div >
+				{/* Footer */}
+				<div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3 rounded-b-xl shrink-0">
+					<button
+						type="button"
+						onClick={onClose}
+						className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+					>
+						Cancel
+					</button>
+					<button
+						type="submit"
+						form="user-story-form" // Connects to form id
+						disabled={isLoading}
+						className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-shadow shadow-sm disabled:opacity-50 flex items-center gap-2"
+					>
+						{isLoading && <Loader2 className="animate-spin" size={14} />}
+						{userStory ? "Save Changes" : "Create Issue"}
+					</button>
+				</div>
+			</div>
+		</div>
 	);
 }

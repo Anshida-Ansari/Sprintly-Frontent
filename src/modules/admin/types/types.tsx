@@ -62,7 +62,7 @@ export interface IProject {
 	startDate: string;
 	endDate: string;
 	gitRepoUrl?: string;
-	members: string[];
+	members: IMember[];
 	createdAt: string;
 	updatedAt: string;
 }
@@ -143,6 +143,8 @@ export interface CreateUserStoryPayload {
 	priority?: PriorityStatus;
 	sprintId?: string;
 	assignedTo?: string[];
+	estimationPoints?: number;
+	acceptanceCriteria?: string[];
 }
 
 export interface EditUserStoryPayload {
@@ -152,6 +154,8 @@ export interface EditUserStoryPayload {
 	priority?: PriorityStatus;
 	sprintId?: string;
 	assignedTo?: string[];
+	estimationPoints?: number;
+	acceptanceCriteria?: string[];
 }
 
 export interface GetUserStoriesResponse {

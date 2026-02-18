@@ -1,8 +1,11 @@
 import { Calendar, FileText, GitBranch, Github, Type, User, X } from "lucide-react";
 import { useGetMembers } from "../hooks/useGetmembers";
-import { useState } from "react";
+import { useEffect } from "react";
 import type { CreateProjectPayload } from "../types/types";
 import { useGitHubStatus } from "../hooks/useGitHubStatus";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createProjectSchema, type CreateProjectFormData } from "../schemas/admin.schemas";
 
 interface CreateProjectModalProps {
 	isOpen: boolean;
@@ -17,13 +20,21 @@ export default function CreateProjectModal({
 	onSubmit,
 	isLoading = false,
 }: CreateProjectModalProps) {
-	const [formData, setFormData] = useState<CreateProjectPayload>({
-		name: "",
-		description: "",
-		startDate: "",
-		endDate: "",
-		gitRepoUrl: "",
-		leadId: "",
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+		reset,
+	} = useForm<CreateProjectFormData>({
+		resolver: zodResolver(createProjectSchema),
+		defaultValues: {
+			name: "",
+			description: "",
+			startDate: "",
+			endDate: "",
+			gitRepoUrl: "",
+			leadId: "",
+		},
 	});
 
 	const { data: membersData } = useGetMembers({
@@ -39,18 +50,15 @@ export default function CreateProjectModal({
 			(m: any) => m.role === "lead" || m.role === "admin",
 		) || [];
 
-	const handleChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-	) => {
-		const { name, value } = e.target;
-		setFormData((prev) => ({ ...prev, [name]: value }));
+	const handleFormSubmit = (data: CreateProjectFormData) => {
+		onSubmit(data as CreateProjectPayload);
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!formData.name || !formData.startDate || !formData.endDate) return;
-		onSubmit(formData);
-	};
+	useEffect(() => {
+		if (!isOpen) {
+			reset();
+		}
+	}, [isOpen, reset]);
 
 	if (!isOpen) return null;
 
@@ -85,21 +93,22 @@ export default function CreateProjectModal({
 					</div>
 
 					{/* Form */}
-					<form onSubmit={handleSubmit} className="space-y-5">
+					<form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5" noValidate>
 						<div>
 							<label className="block text-sm font-bold text-gray-700 mb-1.5 flex items-center gap-2">
 								<Type size={16} className="text-indigo-500" /> Project Name
 							</label>
 							<input
-								type="text"
-								name="name"
-								value={formData.name}
-								onChange={handleChange}
-								required
+								{...register("name")}
 								placeholder="e.g. Website Redesign"
-								className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-gray-50/50"
+								className={`w-full px-4 py-3 border ${errors.name ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-${errors.name ? 'red' : 'indigo'}-500 focus:border-transparent transition bg-gray-50/50`}
 								disabled={isLoading}
 							/>
+							{errors.name && (
+								<p className="text-red-500 text-xs mt-1 font-medium">
+									{errors.name.message}
+								</p>
+							)}
 						</div>
 
 						<div>
@@ -107,15 +116,17 @@ export default function CreateProjectModal({
 								<FileText size={16} className="text-indigo-500" /> Description
 							</label>
 							<textarea
-								name="description"
-								value={formData.description}
-								onChange={handleChange}
-								required
+								{...register("description")}
 								placeholder="Briefly describe the goals..."
 								rows={3}
-								className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-gray-50/50 resize-none"
+								className={`w-full px-4 py-3 border ${errors.description ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-${errors.description ? 'red' : 'indigo'}-500 focus:border-transparent transition bg-gray-50/50 resize-none`}
 								disabled={isLoading}
 							/>
+							{errors.description && (
+								<p className="text-red-500 text-xs mt-1 font-medium">
+									{errors.description.message}
+								</p>
+							)}
 						</div>
 
 						<div className="grid grid-cols-2 gap-4">
@@ -124,28 +135,32 @@ export default function CreateProjectModal({
 									<Calendar size={16} className="text-emerald-500" /> Start Date
 								</label>
 								<input
+									{...register("startDate")}
 									type="date"
-									name="startDate"
-									value={formData.startDate.toString()}
-									onChange={handleChange}
-									required
-									className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition bg-gray-50/50"
+									className={`w-full px-4 py-3 border ${errors.startDate ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-${errors.startDate ? 'red' : 'emerald'}-500 focus:border-transparent transition bg-gray-50/50`}
 									disabled={isLoading}
 								/>
+								{errors.startDate && (
+									<p className="text-red-500 text-xs mt-1 font-medium">
+										{errors.startDate.message}
+									</p>
+								)}
 							</div>
 							<div>
 								<label className="block text-sm font-bold text-gray-700 mb-1.5 flex items-center gap-2">
 									<Calendar size={16} className="text-rose-500" /> End Date
 								</label>
 								<input
+									{...register("endDate")}
 									type="date"
-									name="endDate"
-									value={formData.endDate.toString()}
-									onChange={handleChange}
-									required
-									className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition bg-gray-50/50"
+									className={`w-full px-4 py-3 border ${errors.endDate ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-${errors.endDate ? 'red' : 'rose'}-500 focus:border-transparent transition bg-gray-50/50`}
 									disabled={isLoading}
 								/>
+								{errors.endDate && (
+									<p className="text-red-500 text-xs mt-1 font-medium">
+										{errors.endDate.message}
+									</p>
+								)}
 							</div>
 						</div>
 
@@ -161,7 +176,7 @@ export default function CreateProjectModal({
 											GitHub Repository Auto-Creation
 										</h4>
 										<p className="text-sm text-gray-600">
-											A private repository will be automatically created as <span className="font-mono bg-white px-2 py-0.5 rounded border border-purple-200">{formData.name.toLowerCase().replace(/\s+/g, '-')}</span>
+											A private repository will be automatically created
 										</p>
 										<p className="text-xs text-purple-600 mt-2 flex items-center gap-1">
 											<span className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
@@ -177,14 +192,16 @@ export default function CreateProjectModal({
 									(Optional)
 								</label>
 								<input
-									type="url"
-									name="gitRepoUrl"
-									value={formData.gitRepoUrl}
-									onChange={handleChange}
+									{...register("gitRepoUrl")}
 									placeholder="https://github.com/org/repo"
-									className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent transition bg-gray-50/50"
+									className={`w-full px-4 py-3 border ${errors.gitRepoUrl ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-${errors.gitRepoUrl ? 'red' : 'gray'}-500 focus:border-transparent transition bg-gray-50/50`}
 									disabled={isLoading}
 								/>
+								{errors.gitRepoUrl && (
+									<p className="text-red-500 text-xs mt-1 font-medium">
+										{errors.gitRepoUrl.message}
+									</p>
+								)}
 								<p className="text-xs text-gray-500 mt-2">
 									💡 Connect GitHub in Settings to auto-create repositories
 								</p>
@@ -197,12 +214,8 @@ export default function CreateProjectModal({
 								(Optional)
 							</label>
 							<select
-								name="leadId"
-								value={formData.leadId || ""}
-								onChange={(e) =>
-									setFormData((prev) => ({ ...prev, leadId: e.target.value }))
-								}
-								className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-gray-50/50"
+								{...register("leadId")}
+								className={`w-full px-4 py-3 border ${errors.leadId ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-${errors.leadId ? 'red' : 'indigo'}-500 focus:border-transparent transition bg-gray-50/50`}
 								disabled={isLoading}
 							>
 								<option value="">Select a Lead</option>
@@ -212,6 +225,11 @@ export default function CreateProjectModal({
 									</option>
 								))}
 							</select>
+							{errors.leadId && (
+								<p className="text-red-500 text-xs mt-1 font-medium">
+									{errors.leadId.message}
+								</p>
+							)}
 						</div>
 
 						{/* Footer Buttons */}
@@ -226,7 +244,7 @@ export default function CreateProjectModal({
 							</button>
 							<button
 								type="submit"
-								disabled={isLoading || !formData.name}
+								disabled={isLoading}
 								className="flex-1 px-5 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-200"
 							>
 								{isLoading ? (

@@ -1,8 +1,8 @@
 import {
 	Calendar,
 	CheckCircle2,
-	Clock,
 	Edit,
+	Layers,
 	Play,
 	Plus,
 	Rocket,
@@ -22,6 +22,103 @@ import {
 import type { ISprint, SprintStatus } from "../types/types.tsx";
 import DeleteConfirmationModal from "./delete-confirmation-modal.tsx";
 import SprintModal from "./sprint.modal.tsx";
+
+interface SprintRowProps {
+	sprint: ISprint;
+	onEdit: (sprint: ISprint) => void;
+	onDelete: (id: string) => void;
+	onStart: (id: string) => void;
+	onComplete: (id: string) => void;
+	isProcessing: boolean;
+}
+
+function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, isProcessing }: SprintRowProps) {
+	const isActive = sprint.status === "ACTIVE";
+	const isCompleted = sprint.status === "COMPLETED";
+
+	return (
+		<div className={`group grid grid-cols-12 gap-4 px-4 py-4 items-center border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-default ${isActive ? "bg-gray-50/50" : ""}`}>
+			{/* Name & Identifier */}
+			<div className="col-span-5 flex items-center gap-3 min-w-0">
+				<div className={`w-3 h-3 rounded-full shrink-0 ${isActive ? "bg-black shadow-[0_0_0_2px_rgba(0,0,0,0.1)] ring-2 ring-white" : isCompleted ? "bg-emerald-600" : "bg-gray-300"}`} />
+				<div className="flex flex-col min-w-0">
+					<span className={`text-sm font-bold truncate ${isActive ? "text-black" : "text-gray-700"}`}>
+						{sprint.name}
+					</span>
+					{sprint.goal && (
+						<span className="text-xs text-gray-500 font-medium truncate max-w-[240px] leading-tight mt-0.5">
+							{sprint.goal}
+						</span>
+					)}
+				</div>
+			</div>
+
+			{/* Status Badge - Bold */}
+			<div className="col-span-2 flex items-center">
+				<span className={`text-[11px] font-black uppercase tracking-wider px-2 py-1 rounded-md ${isActive
+					? "bg-black text-white"
+					: isCompleted
+						? "bg-emerald-100 text-emerald-800"
+						: "bg-gray-100 text-gray-600"
+					}`}>
+					{sprint.status === "ACTIVE" ? "Current" : sprint.status === "COMPLETED" ? "Done" : "Planned"}
+				</span>
+			</div>
+
+			{/* Date Range */}
+			<div className="col-span-3 text-xs text-gray-900 font-bold tracking-tight flex items-center gap-2">
+				<Calendar size={14} className="text-gray-400 stroke-[2.5]" />
+				<span>
+					{new Date(sprint.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+					<span className="mx-1.5 text-gray-300">/</span>
+					{new Date(sprint.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+				</span>
+			</div>
+
+			{/* Actions - Hover Only */}
+			<div className="col-span-2 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+				{sprint.status === "PLANNED" && (
+					<button
+						onClick={(e) => { e.stopPropagation(); onStart(sprint._id); }}
+						disabled={isProcessing}
+						className="p-2 text-gray-500 hover:text-black hover:bg-gray-200 rounded-lg transition-all"
+						title="Start Sprint"
+					>
+						<Play size={14} className="fill-current" />
+					</button>
+				)}
+				{isActive && (
+					<button
+						onClick={(e) => { e.stopPropagation(); onComplete(sprint._id); }}
+						disabled={isProcessing}
+						className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+						title="Complete Sprint"
+					>
+						<CheckCircle2 size={16} strokeWidth={2.5} />
+					</button>
+				)}
+
+				<button
+					onClick={(e) => { e.stopPropagation(); onEdit(sprint); }}
+					className="p-2 text-gray-500 hover:text-black hover:bg-gray-200 rounded-lg transition-all"
+					title="Edit"
+				>
+					<Edit size={14} strokeWidth={2.5} />
+				</button>
+
+				{(sprint.status === "PLANNED" || sprint.status === "COMPLETED") && (
+					<button
+						onClick={(e) => { e.stopPropagation(); onDelete(sprint._id); }}
+						className="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+						title="Delete"
+					>
+						<Trash2 size={14} strokeWidth={2.5} />
+					</button>
+				)}
+			</div>
+		</div>
+	);
+}
 
 interface SprintListProps {
 	projectId: string;
@@ -101,27 +198,8 @@ export default function SprintList({
 		}
 	};
 
-	const getStatusIcon = (status: SprintStatus) => {
-		switch (status) {
-			case "ACTIVE":
-				return <Rocket size={18} className="text-indigo-500" />;
-			case "COMPLETED":
-				return <CheckCircle2 size={18} className="text-emerald-500" />;
-			default:
-				return <Clock size={18} className="text-gray-400" />;
-		}
-	};
 
-	const getStatusStyle = (status: SprintStatus) => {
-		switch (status) {
-			case "ACTIVE":
-				return "bg-indigo-50 text-indigo-700 border-indigo-200 shadow-indigo-100";
-			case "COMPLETED":
-				return "bg-emerald-50 text-emerald-700 border-emerald-200 shadow-emerald-100";
-			default:
-				return "bg-gray-50 text-gray-600 border-gray-200";
-		}
-	};
+
 
 	return (
 		<div className="space-y-8">
@@ -168,123 +246,50 @@ export default function SprintList({
 				</button>
 			</div>
 
-			{/* Sprint Grid/List */}
-			{isLoading ? (
-				<div className="py-24 flex flex-col items-center justify-center gap-4">
-					<div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-					<p className="text-gray-400 font-bold animate-pulse">
-						Loading sprints...
-					</p>
+			{/* Sprint List Content */}
+			<div className="flex flex-col">
+				{/* Table Header */}
+				<div className="grid grid-cols-12 gap-4 px-4 py-3 border-b-2 border-gray-100 text-[11px] font-black text-gray-900 uppercase tracking-wider select-none bg-white">
+					<div className="col-span-5 pl-1">Sprint Name</div>
+					<div className="col-span-2">Status</div>
+					<div className="col-span-3">Timeline</div>
+					<div className="col-span-2 text-right">Actions</div>
 				</div>
-			) : sprints.length === 0 ? (
-				<div className="py-24 text-center bg-gray-50 rounded-[40px] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center">
-					<div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center mb-6">
-						<Calendar className="text-indigo-200" size={40} />
+
+				{isLoading ? (
+					<div className="py-20 flex justify-center">
+						<div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
 					</div>
-					<h3 className="text-xl font-black text-gray-900 mb-2">
-						No Sprints Found
-					</h3>
-					<p className="text-gray-400 font-bold mb-8 max-w-xs">
-						Start planning your next iteration by creating a new sprint.
-					</p>
-					<button
-						onClick={handleOpenCreate}
-						className="px-8 py-3 bg-white border-2 border-gray-100 text-gray-900 rounded-2xl font-black hover:border-indigo-200 hover:text-indigo-600 transition shadow-sm"
-					>
-						Create First Sprint
-					</button>
-				</div>
-			) : (
-				<div className="grid grid-cols-1 gap-5">
-					{sprints.map((sprint) => (
-						<div
-							key={sprint._id}
-							className="group bg-white border border-gray-100 rounded-[32px] p-6 hover:shadow-xl hover:shadow-gray-200/40 hover:border-indigo-100 transition-all duration-300 relative overflow-hidden"
-						>
-							<div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-								<div className="flex items-center gap-6 flex-1 min-w-0">
-									<div
-										className={`w-16 h-16 rounded-[20px] flex items-center justify-center border shadow-sm transition-transform group-hover:scale-110 group-hover:rotate-3 ${getStatusStyle(sprint.status)}`}
-									>
-										{getStatusIcon(sprint.status)}
-									</div>
-									<div className="flex-1 min-w-0 space-y-2">
-										<div className="flex items-center gap-3">
-											<h3 className="text-xl font-black text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
-												{sprint.name}
-											</h3>
-											<span
-												className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${getStatusStyle(sprint.status)}`}
-											>
-												{sprint.status}
-											</span>
-										</div>
-										<div className="flex items-center gap-4 text-gray-500 text-sm font-bold">
-											<div className="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-lg border border-gray-100">
-												<Calendar size={14} className="text-indigo-500" />
-												<span>
-													{new Date(sprint.startDate).toLocaleDateString()}
-												</span>
-												<span className="text-gray-300">-</span>
-												<span>
-													{new Date(sprint.endDate).toLocaleDateString()}
-												</span>
-											</div>
-										</div>
-									</div>
-								</div>
-
-								<div className="flex items-center gap-2 self-end md:self-center bg-gray-50/50 p-2 rounded-2xl border border-gray-100">
-									{sprint.status === "PLANNED" && (
-										<button
-											onClick={() => startMutation.mutate(sprint._id)}
-											disabled={startMutation.isPending}
-											className="p-3 bg-white text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all border border-indigo-100 hover:border-indigo-200 shadow-sm disabled:opacity-50"
-											title="Start Sprint"
-										>
-											<Play size={20} className="fill-current" />
-										</button>
-									)}
-									{sprint.status === "ACTIVE" && (
-										<button
-											onClick={() => completeMutation.mutate(sprint._id)}
-											disabled={completeMutation.isPending}
-											className="p-3 bg-white text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all border border-emerald-100 hover:border-emerald-200 shadow-sm disabled:opacity-50"
-											title="Complete Sprint"
-										>
-											<CheckCircle2 size={20} />
-										</button>
-									)}
-									<div className="w-px h-8 bg-gray-200 mx-1"></div>
-									<button
-										onClick={() => handleOpenEdit(sprint)}
-										className="p-3 text-gray-400 hover:text-indigo-600 hover:bg-white rounded-xl transition-all hover:shadow-sm"
-										title="Edit Sprint"
-									>
-										<Edit size={20} />
-									</button>
-									{(sprint.status === "PLANNED" ||
-										sprint.status === "COMPLETED") && (
-										<button
-											onClick={() => handleDeleteClick(sprint._id)}
-											disabled={deleteMutation.isPending}
-											className="p-3 text-gray-400 hover:text-rose-600 hover:bg-white rounded-xl transition-all hover:shadow-sm disabled:opacity-50"
-											title="Delete Sprint"
-										>
-											<Trash2 size={20} />
-										</button>
-									)}
-								</div>
-							</div>
-
-							{/* Decorative background */}
-							<div
-								className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-gray-50 to-transparent rounded-full -mr-32 -mt-32 transition-opacity opacity-0 group-hover:opacity-100 pointer-events-none`}
-							></div>
+				) : sprints.length === 0 ? (
+					<div className="py-16 text-center">
+						<div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gray-50 mb-3">
+							<Layers size={20} className="text-gray-400" />
 						</div>
-					))}
-				</div>
-			)}
+						<h3 className="text-sm font-medium text-gray-900">No sprints found</h3>
+						<p className="text-xs text-gray-500 mt-1 mb-4">Get started by planning your first sprint.</p>
+						<button
+							onClick={handleOpenCreate}
+							className="text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+						>
+							+ Create Sprint
+						</button>
+					</div>
+				) : (
+					<div className="divide-y divide-gray-50">
+						{sprints.map((sprint) => (
+							<SprintRow
+								key={sprint._id}
+								sprint={sprint}
+								onEdit={handleOpenEdit}
+								onDelete={handleDeleteClick}
+								onStart={(id) => startMutation.mutate(id)}
+								onComplete={(id) => completeMutation.mutate(id)}
+								isProcessing={startMutation.isPending || completeMutation.isPending || deleteMutation.isPending}
+							/>
+						))}
+					</div>
+				)}
+			</div>
 
 			{/* Pagination */}
 			{totalPages > 1 && (

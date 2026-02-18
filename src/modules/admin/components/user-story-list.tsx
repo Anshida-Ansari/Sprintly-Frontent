@@ -5,11 +5,9 @@ import {
 	Clock,
 	Edit2,
 	Eye,
-	Filter,
 	Flag,
 	PlayCircle,
 	Plus,
-	ScrollText,
 	Search,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -20,6 +18,7 @@ import {
 	useUpdateUserStory,
 } from "../hooks/useUserStories";
 import {
+	type IMember,
 	type IUserStory,
 	PriorityStatus,
 	UserStoryStatus,
@@ -30,17 +29,19 @@ import UserStoryModal from "./user-story-modal";
 interface UserStoryListProps {
 	projectId: string;
 	showHeader?: boolean;
+	members?: IMember[];
 }
 
 export default function UserStoryList({
 	projectId,
 	showHeader = true,
+	members = [],
 }: UserStoryListProps) {
 	const [search, setSearch] = useState("");
 	const debouncedSearch = useDebounce(search, 500);
 	const [statusFilter, setStatusFilter] = useState<string>("");
 	const [page, setPage] = useState(1);
-	const limit = 5;
+	const limit = 10; // Increased limit for list view
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedStory, setSelectedStory] = useState<IUserStory | undefined>();
 
@@ -138,80 +139,63 @@ export default function UserStoryList({
 		? Math.ceil(userStoriesRes.total / limit)
 		: 0;
 
+	// Helper to get assignee details
+	const getAssigneeDetails = (assigneeIds?: string[]) => {
+		if (!assigneeIds || assigneeIds.length === 0) return null;
+		// Return only the first assignee for the list view to keep it clean
+		const member = members.find(m => m.id === assigneeIds[0] || m._id === assigneeIds[0]);
+		return member;
+	};
+
 	return (
-		<div className="space-y-6">
-			{showHeader && (
-				<div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-					<div className="flex items-center gap-4">
-						<div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
-							<ScrollText size={24} />
-						</div>
-						<div>
-							<h3 className="text-2xl font-black text-gray-900 tracking-tight">
-								User Stories
-							</h3>
-							<p className="text-sm text-gray-400 font-bold uppercase tracking-widest mt-1">
-								{userStoriesRes?.total || 0} Stories Available
-							</p>
-						</div>
-					</div>
-
-					<button
-						onClick={handleOpenCreateModal}
-						className="px-6 py-3 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-700 transition shadow-lg shadow-indigo-100 flex items-center gap-2"
-					>
-						<Plus size={20} strokeWidth={3} />
-						Draft New Story
-					</button>
-				</div>
-			)}
-
-			<div className="flex flex-col md:flex-row gap-4 items-center bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
-				<div className="relative flex-1 w-full">
+		<div className="space-y-4">
+			{/* Header Actions */}
+			<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-2 rounded-xl border border-gray-100 shadow-sm">
+				<div className="relative flex-1 w-full md:max-w-md">
 					<Search
-						className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-						size={18}
+						className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+						size={16}
 					/>
 					<input
 						type="text"
-						placeholder="Search stories by title or ID..."
+						placeholder="Filter issues..."
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
-						className="w-full pl-12 pr-4 py-3 bg-gray-50/50 border-transparent border focus:border-indigo-500 focus:bg-white rounded-2xl outline-none transition-all text-sm font-bold"
+						className="w-full pl-9 pr-4 py-2 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 placeholder:text-gray-400"
 					/>
 				</div>
 
-				<div className="flex items-center gap-3 w-full md:w-auto">
-					<div className="relative w-full md:w-48">
-						<Filter
-							className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-							size={16}
-						/>
-						<select
-							value={statusFilter}
-							onChange={(e) => setStatusFilter(e.target.value)}
-							className="w-full pl-10 pr-4 py-3 bg-gray-50/50 border-transparent border focus:border-indigo-500 focus:bg-white rounded-2xl outline-none transition-all text-sm font-bold appearance-none cursor-pointer"
-						>
-							<option value="">All Statuses</option>
-							{(Object.values(UserStoryStatus) as string[]).map((s) => (
-								<option key={s} value={s}>
-									{s}
-								</option>
-							))}
-						</select>
-					</div>
+				<div className="flex items-center gap-2 w-full md:w-auto px-2">
+					<div className="h-4 w-px bg-gray-200 mx-1 hidden md:block"></div>
+					<select
+						value={statusFilter}
+						onChange={(e) => setStatusFilter(e.target.value)}
+						className="bg-transparent text-sm font-medium text-gray-600 border-none focus:ring-0 cursor-pointer hover:text-gray-900"
+					>
+						<option value="">All Statuses</option>
+						{(Object.values(UserStoryStatus) as string[]).map((s) => (
+							<option key={s} value={s}>
+								{s}
+							</option>
+						))}
+					</select>
+					<button
+						onClick={handleOpenCreateModal}
+						className="ml-auto md:ml-2 px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 transition flex items-center gap-1.5 shadow-sm"
+					>
+						<Plus size={14} strokeWidth={3} />
+						New Issue
+					</button>
 				</div>
 			</div>
 
-			{isLoading ? (
-				<div className="flex flex-col items-center justify-center py-20 bg-white rounded-[40px] border border-gray-100 border-dashed">
-					<div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-					<p className="text-gray-400 font-bold animate-pulse">
-						Fetching backlogs...
-					</p>
-				</div>
-			) : userStoriesRes?.data && userStoriesRes.data.length > 0 ? (
-				<div className="space-y-6">
+			{/* List View */}
+			<div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden min-h-[400px]">
+				{isLoading ? (
+					<div className="flex items-center justify-center h-64">
+						<div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+					</div>
+				) : userStoriesRes?.data && userStoriesRes.data.length > 0 ? (
 					<div className="grid grid-cols-1 gap-4">
 						{userStoriesRes.data.map((story) => (
 							<div
@@ -242,6 +226,29 @@ export default function UserStoryList({
 										<p className="text-gray-500 text-sm font-medium line-clamp-2 max-w-2xl leading-relaxed">
 											{story.description}
 										</p>
+
+										{/* Assignees (New) */}
+										{story.assignedTo && story.assignedTo.length > 0 && (
+											<div className="flex items-center gap-2 pt-1">
+												<div className="flex -space-x-2">
+													{story.assignedTo.slice(0, 3).map((assigneeId, idx) => {
+														const member = members.find(m => m.id === assigneeId || m._id === assigneeId);
+														return member ? (
+															<img
+																key={idx}
+																src={`https://ui-avatars.com/api/?name=${member.name}&background=random&color=fff&size=32`}
+																alt={member.name}
+																className="w-6 h-6 rounded-full ring-2 ring-white"
+																title={member.name}
+															/>
+														) : null;
+													})}
+												</div>
+												{story.assignedTo.length > 3 && (
+													<span className="text-xs text-gray-400 font-medium">+{story.assignedTo.length - 3}</span>
+												)}
+											</div>
+										)}
 									</div>
 
 									<div className="flex gap-2">
@@ -262,61 +269,44 @@ export default function UserStoryList({
 							</div>
 						))}
 					</div>
-
-					{/* Pagination Controls */}
-					{totalPages > 1 && (
-						<div className="flex items-center justify-between bg-white px-6 py-4 rounded-[32px] border border-gray-100 shadow-sm">
-							<button
-								onClick={() => setPage((p) => Math.max(1, p - 1))}
-								disabled={page === 1}
-								className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition disabled:opacity-30 disabled:hover:bg-transparent"
-							>
-								<ChevronLeft size={24} />
-							</button>
-
-							<div className="flex items-center gap-2">
-								{[...Array(totalPages)].map((_, i) => (
-									<button
-										key={i + 1}
-										onClick={() => setPage(i + 1)}
-										className={`w-10 h-10 rounded-xl font-black text-sm transition-all ${
-											page === i + 1
-												? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
-												: "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
-										}`}
-									>
-										{i + 1}
-									</button>
-								))}
-							</div>
-
-							<button
-								onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-								disabled={page === totalPages}
-								className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition disabled:opacity-30 disabled:hover:bg-transparent"
-							>
-								<ChevronRight size={24} />
-							</button>
+				) : (
+					<div className="flex flex-col items-center justify-center py-20 bg-white">
+						<div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
+							<Search className="text-gray-300" size={20} />
 						</div>
-					)}
-				</div>
-			) : (
-				<div className="text-center py-24 bg-white rounded-[40px] border border-dashed border-gray-200">
-					<div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-						<Flag className="text-gray-200" size={40} />
+						<h4 className="text-gray-900 font-medium text-sm mb-1">No issues found</h4>
+						<button
+							onClick={handleOpenCreateModal}
+							className="mt-2 text-indigo-600 text-xs font-semibold hover:underline"
+						>
+							Create Issue
+						</button>
 					</div>
-					<h4 className="text-xl font-black text-gray-900 mb-2">
-						Clean Backlog!
-					</h4>
-					<p className="text-gray-400 font-bold max-w-xs mx-auto">
-						No user stories found matching your current filters.
+				)}
+			</div>
+
+			{/* Pagination Controls */}
+			{totalPages > 1 && (
+				<div className="flex items-center justify-between px-2">
+					<p className="text-xs text-gray-500 font-medium">
+						Showing page {page} of {totalPages}
 					</p>
-					<button
-						onClick={handleOpenCreateModal}
-						className="mt-6 px-8 py-3 bg-indigo-50 text-indigo-600 rounded-2xl font-black hover:bg-indigo-100 transition"
-					>
-						Create One Now
-					</button>
+					<div className="flex items-center gap-2">
+						<button
+							onClick={() => setPage((p) => Math.max(1, p - 1))}
+							disabled={page === 1}
+							className="p-1.5 text-gray-500 hover:text-indigo-600 disabled:opacity-30 disabled:hover:text-gray-500"
+						>
+							<ChevronLeft size={16} />
+						</button>
+						<button
+							onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+							disabled={page === totalPages}
+							className="p-1.5 text-gray-500 hover:text-indigo-600 disabled:opacity-30 disabled:hover:text-gray-500"
+						>
+							<ChevronRight size={16} />
+						</button>
+					</div>
 				</div>
 			)}
 

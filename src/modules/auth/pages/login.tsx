@@ -1,19 +1,23 @@
 import { ArrowRight, Fingerprint, Loader2 } from "lucide-react";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLogin } from "../hooks/useLogin";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, type LoginFormData } from "../schemas/auth.schemas";
 
 export default function Login() {
 	const { mutate: login, isPending } = useLogin();
-	const [form, setForm] = useState({ email: "", password: "" });
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setForm({ ...form, [e.target.name]: e.target.value });
-	};
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<LoginFormData>({
+		resolver: zodResolver(loginSchema),
+	});
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		login(form);
+	const onSubmit = (data: LoginFormData) => {
+		login(data);
 	};
 
 	return (
@@ -54,25 +58,26 @@ export default function Login() {
 					</div>
 
 					{/* Standard but Modern Form */}
-					<form onSubmit={handleSubmit} className="space-y-4">
-						<div className="group relative border-2 border-slate-100 rounded-2xl p-4 focus-within:border-blue-600 transition-all duration-300">
-							<p className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-focus-within:text-blue-600 mb-1">
+					<form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+						<div className={`group relative border-2 ${errors.email ? 'border-red-500' : 'border-slate-100'} rounded-2xl p-4 focus-within:border-${errors.email ? 'red' : 'blue'}-600 transition-all duration-300`}>
+							<p className={`text-[10px] font-black uppercase tracking-widest ${errors.email ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1`}>
 								Identity
 							</p>
 							<input
-								name="email"
-								type="email"
+								{...register("email")}
 								placeholder="name@company.com"
-								value={form.email}
-								onChange={handleChange}
-								required
 								className="w-full bg-transparent outline-none font-bold text-lg placeholder:text-slate-200"
 							/>
 						</div>
+						{errors.email && (
+							<p className="text-red-500 text-xs mt-1 font-medium -mt-3">
+								{errors.email.message}
+							</p>
+						)}
 
-						<div className="group relative border-2 border-slate-100 rounded-2xl p-4 focus-within:border-blue-600 transition-all duration-300">
+						<div className={`group relative border-2 ${errors.password ? 'border-red-500' : 'border-slate-100'} rounded-2xl p-4 focus-within:border-${errors.password ? 'red' : 'blue'}-600 transition-all duration-300`}>
 							<div className="flex justify-between items-center mb-1">
-								<p className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-focus-within:text-blue-600">
+								<p className={`text-[10px] font-black uppercase tracking-widest ${errors.password ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'}`}>
 									Access Key
 								</p>
 								<Link
@@ -83,15 +88,17 @@ export default function Login() {
 								</Link>
 							</div>
 							<input
-								name="password"
+								{...register("password")}
 								type="password"
 								placeholder="••••••••"
-								value={form.password}
-								onChange={handleChange}
-								required
 								className="w-full bg-transparent outline-none font-bold text-lg placeholder:text-slate-200"
 							/>
 						</div>
+						{errors.password && (
+							<p className="text-red-500 text-xs mt-1 font-medium -mt-3">
+								{errors.password.message}
+							</p>
+						)}
 
 						<button
 							type="submit"

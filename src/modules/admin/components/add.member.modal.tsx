@@ -4,18 +4,20 @@ import { useState } from "react";
 import { useGetMembers } from "../hooks/useGetmembers";
 import { useAddMemberToProject } from "../hooks/useAddMemberToProject";
 
+import type { IMember } from "../types/types";
+
 interface AddMemberModalProps {
     isOpen: boolean;
     onClose: () => void;
     projectId: string;
-    currentMemberIds: string[];
+    currentMembers: IMember[];
 }
 
 export default function AddMemberModal({
     isOpen,
     onClose,
     projectId,
-    currentMemberIds,
+    currentMembers,
 }: AddMemberModalProps) {
     const [search, setSearch] = useState("");
     const { data: membersRes, isLoading: loadingMembers } = useGetMembers({
@@ -29,7 +31,7 @@ export default function AddMemberModal({
 
     // Filter out members already in the project
     const availableMembers = members.filter(
-        (m: any) => !currentMemberIds.includes(m._id)
+        (m: any) => !currentMembers.some((cm) => cm.id === m.id || cm._id === m._id)
     );
 
     const handleAdd = (memberId: string) => {

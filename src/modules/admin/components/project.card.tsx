@@ -47,11 +47,29 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
 			</p>
 
 			<div className="flex items-center justify-between pt-4 border-t border-gray-50">
-				<div className="flex -space-x-2">
-					{/* Placeholder for members avatars - assuming we might get member count or avatars later */}
-					<div className="w-8 h-8 rounded-full bg-indigo-50 border-2 border-white flex items-center justify-center text-xs font-bold text-indigo-600">
-						<Users size={14} />
-					</div>
+				<div className="flex -space-x-2 overflow-hidden">
+					{project.members && project.members.length > 0 ? (
+						<>
+							{project.members.slice(0, 3).map((member) => (
+								<div
+									key={member.id || member._id}
+									className="w-8 h-8 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center text-xs font-bold text-indigo-600"
+									title={member.name}
+								>
+									{member.name?.substring(0, 2).toUpperCase()}
+								</div>
+							))}
+							{project.members.length > 3 && (
+								<div className="w-8 h-8 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-xs font-bold text-gray-500">
+									+{project.members.length - 3}
+								</div>
+							)}
+						</>
+					) : (
+						<div className="w-8 h-8 rounded-full bg-gray-50 border-2 border-white flex items-center justify-center text-xs font-bold text-gray-400">
+							<Users size={14} />
+						</div>
+					)}
 				</div>
 
 				<div className="flex items-center gap-3 text-gray-400 text-xs font-medium">

@@ -1,6 +1,9 @@
 import { Calendar, Layout, Loader2, Target, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import type {ISprint} from "../types/types.tsx";
+import { useEffect } from "react";
+import type { ISprint } from "../types/types.tsx";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { sprintSchema, type SprintFormData } from "../schemas/admin.schemas";
 
 interface SprintModalProps {
 	isOpen: boolean;
@@ -21,34 +24,38 @@ export default function SprintModal({
 	minDate,
 	maxDate,
 }: SprintModalProps) {
-	const [name, setName] = useState("");
-	const [goal, setGoal] = useState("");
-	const [startDate, setStartDate] = useState("");
-	const [endDate, setEndDate] = useState("");
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+		reset,
+		setValue,
+	} = useForm<SprintFormData>({
+		resolver: zodResolver(sprintSchema),
+		defaultValues: {
+			name: "",
+			goal: "",
+			startDate: "",
+			endDate: "",
+		},
+	});
 
 	useEffect(() => {
 		if (sprint) {
-			setName(sprint.name);
-			setGoal(sprint.goal || "");
-			setStartDate(new Date(sprint.startDate).toISOString().split("T")[0]);
-			setEndDate(new Date(sprint.endDate).toISOString().split("T")[0]);
+			setValue("name", sprint.name);
+			setValue("goal", sprint.goal || "");
+			setValue("startDate", new Date(sprint.startDate).toISOString().split("T")[0]);
+			setValue("endDate", new Date(sprint.endDate).toISOString().split("T")[0]);
 		} else {
-			setName("");
-			setGoal("");
-			setStartDate("");
-			setEndDate("");
+			reset();
 		}
-	}, [sprint, isOpen]);
+	}, [sprint, isOpen, reset, setValue]);
 
 	if (!isOpen) return null;
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
+	const handleFormSubmit = (data: SprintFormData) => {
 		const payload = {
-			name,
-			goal,
-			startDate,
-			endDate,
+			...data,
 			...(sprint && { status: sprint.status }),
 		};
 		onSubmit(payload);
@@ -77,7 +84,7 @@ export default function SprintModal({
 					</button>
 				</div>
 
-				<form onSubmit={handleSubmit} className="p-8 space-y-6">
+				<form onSubmit={handleSubmit(handleFormSubmit)} className="p-8 space-y-6" noValidate>
 					{minDate && maxDate && (
 						<div className="p-3 bg-amber-50 border border-amber-100 rounded-xl flex items-start gap-2 text-xs font-bold text-amber-600">
 							<span className="mt-0.5">⚠️</span>
@@ -94,13 +101,15 @@ export default function SprintModal({
 							<Layout size={16} className="text-indigo-500" /> Sprint Name
 						</label>
 						<input
-							type="text"
-							required
+							{...register("name")}
 							placeholder="e.g. Sprint 1: Foundation"
-							className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
+							className={`w-full px-5 py-4 bg-gray-50 border ${errors.name ? 'border-red-500' : 'border-transparent'} rounded-2xl focus:bg-white focus:border-${errors.name ? 'red' : 'indigo'}-500 focus:ring-4 focus:ring-${errors.name ? 'red' : 'indigo'}-500/10 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400`}
 						/>
+						{errors.name && (
+							<p className="text-red-500 text-xs mt-1 font-medium">
+								{errors.name.message}
+							</p>
+						)}
 					</div>
 
 					<div className="space-y-2">
@@ -108,11 +117,15 @@ export default function SprintModal({
 							<Target size={16} className="text-orange-500" /> Sprint Goal
 						</label>
 						<textarea
+							{...register("goal")}
 							placeholder="What do we want to achieve?"
-							className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400 min-h-[100px] resize-none"
-							value={goal}
-							onChange={(e) => setGoal(e.target.value)}
+							className={`w-full px-5 py-4 bg-gray-50 border ${errors.goal ? 'border-red-500' : 'border-transparent'} rounded-2xl focus:bg-white focus:border-${errors.goal ? 'red' : 'indigo'}-500 focus:ring-4 focus:ring-${errors.goal ? 'red' : 'indigo'}-500/10 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400 min-h-[100px] resize-none`}
 						/>
+						{errors.goal && (
+							<p className="text-red-500 text-xs mt-1 font-medium">
+								{errors.goal.message}
+							</p>
+						)}
 					</div>
 
 					<div className="grid grid-cols-2 gap-4">
@@ -121,8 +134,8 @@ export default function SprintModal({
 								<Calendar size={16} className="text-emerald-500" /> Start Date
 							</label>
 							<input
+								{...register("startDate")}
 								type="date"
-								required
 								min={
 									minDate
 										? new Date(minDate).toISOString().split("T")[0]
@@ -133,18 +146,21 @@ export default function SprintModal({
 										? new Date(maxDate).toISOString().split("T")[0]
 										: undefined
 								}
-								className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-bold text-gray-900"
-								value={startDate}
-								onChange={(e) => setStartDate(e.target.value)}
+								className={`w-full px-5 py-4 bg-gray-50 border ${errors.startDate ? 'border-red-500' : 'border-transparent'} rounded-2xl focus:bg-white focus:border-${errors.startDate ? 'red' : 'indigo'}-500 focus:ring-4 focus:ring-${errors.startDate ? 'red' : 'indigo'}-500/10 transition-all outline-none font-bold text-gray-900`}
 							/>
+							{errors.startDate && (
+								<p className="text-red-500 text-xs mt-1 font-medium">
+									{errors.startDate.message}
+								</p>
+							)}
 						</div>
 						<div className="space-y-2">
 							<label className="text-sm font-black text-gray-700 ml-1 flex items-center gap-2">
 								<Calendar size={16} className="text-rose-500" /> End Date
 							</label>
 							<input
+								{...register("endDate")}
 								type="date"
-								required
 								min={
 									minDate
 										? new Date(minDate).toISOString().split("T")[0]
@@ -155,10 +171,13 @@ export default function SprintModal({
 										? new Date(maxDate).toISOString().split("T")[0]
 										: undefined
 								}
-								className="w-full px-5 py-4 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-bold text-gray-900"
-								value={endDate}
-								onChange={(e) => setEndDate(e.target.value)}
+								className={`w-full px-5 py-4 bg-gray-50 border ${errors.endDate ? 'border-red-500' : 'border-transparent'} rounded-2xl focus:bg-white focus:border-${errors.endDate ? 'red' : 'indigo'}-500 focus:ring-4 focus:ring-${errors.endDate ? 'red' : 'indigo'}-500/10 transition-all outline-none font-bold text-gray-900`}
 							/>
+							{errors.endDate && (
+								<p className="text-red-500 text-xs mt-1 font-medium">
+									{errors.endDate.message}
+								</p>
+							)}
 						</div>
 					</div>
 
