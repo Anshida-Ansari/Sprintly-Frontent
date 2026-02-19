@@ -89,3 +89,28 @@ export const useAssignUserStoryToSprint = () => {
 		},
 	});
 };
+
+export const useAssignUserStoryToMember = () => {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({
+			userStoryId,
+			developerId,
+		}: {
+			projectId: string;
+			userStoryId: string;
+			developerId: string;
+		}) =>
+			userStoryService.assignUserStoryToMember(
+				userStoryId,
+				developerId,
+			),
+		onSuccess: (res: any) => {
+			queryClient.invalidateQueries({ queryKey: ["user-stories"] });
+			toast.success(res.message || "Member assigned successfully");
+		},
+		onError: (error: any) => {
+			toast.error(error.response?.data?.message || "Failed to assign member");
+		},
+	});
+};

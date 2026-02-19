@@ -30,9 +30,10 @@ interface SprintRowProps {
 	onStart: (id: string) => void;
 	onComplete: (id: string) => void;
 	isProcessing: boolean;
+	isReadOnly?: boolean;
 }
 
-function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, isProcessing }: SprintRowProps) {
+function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, isProcessing, isReadOnly = false }: SprintRowProps) {
 	const isActive = sprint.status === "ACTIVE";
 	const isCompleted = sprint.status === "COMPLETED";
 
@@ -76,46 +77,48 @@ function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, isProcessing
 			</div>
 
 			{/* Actions - Hover Only */}
-			<div className="col-span-2 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-				{sprint.status === "PLANNED" && (
+			{!isReadOnly && (
+				<div className="col-span-2 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+					{sprint.status === "PLANNED" && (
+						<button
+							onClick={(e) => { e.stopPropagation(); onStart(sprint._id); }}
+							disabled={isProcessing}
+							className="p-2 text-gray-500 hover:text-black hover:bg-gray-200 rounded-lg transition-all"
+							title="Start Sprint"
+						>
+							<Play size={14} className="fill-current" />
+						</button>
+					)}
+					{isActive && (
+						<button
+							onClick={(e) => { e.stopPropagation(); onComplete(sprint._id); }}
+							disabled={isProcessing}
+							className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+							title="Complete Sprint"
+						>
+							<CheckCircle2 size={16} strokeWidth={2.5} />
+						</button>
+					)}
+
 					<button
-						onClick={(e) => { e.stopPropagation(); onStart(sprint._id); }}
-						disabled={isProcessing}
+						onClick={(e) => { e.stopPropagation(); onEdit(sprint); }}
 						className="p-2 text-gray-500 hover:text-black hover:bg-gray-200 rounded-lg transition-all"
-						title="Start Sprint"
+						title="Edit"
 					>
-						<Play size={14} className="fill-current" />
+						<Edit size={14} strokeWidth={2.5} />
 					</button>
-				)}
-				{isActive && (
-					<button
-						onClick={(e) => { e.stopPropagation(); onComplete(sprint._id); }}
-						disabled={isProcessing}
-						className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
-						title="Complete Sprint"
-					>
-						<CheckCircle2 size={16} strokeWidth={2.5} />
-					</button>
-				)}
 
-				<button
-					onClick={(e) => { e.stopPropagation(); onEdit(sprint); }}
-					className="p-2 text-gray-500 hover:text-black hover:bg-gray-200 rounded-lg transition-all"
-					title="Edit"
-				>
-					<Edit size={14} strokeWidth={2.5} />
-				</button>
-
-				{(sprint.status === "PLANNED" || sprint.status === "COMPLETED") && (
-					<button
-						onClick={(e) => { e.stopPropagation(); onDelete(sprint._id); }}
-						className="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
-						title="Delete"
-					>
-						<Trash2 size={14} strokeWidth={2.5} />
-					</button>
-				)}
-			</div>
+					{(sprint.status === "PLANNED" || sprint.status === "COMPLETED") && (
+						<button
+							onClick={(e) => { e.stopPropagation(); onDelete(sprint._id); }}
+							className="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+							title="Delete"
+						>
+							<Trash2 size={14} strokeWidth={2.5} />
+						</button>
+					)}
+				</div>
+			)}
 		</div>
 	);
 }
@@ -124,12 +127,14 @@ interface SprintListProps {
 	projectId: string;
 	projectStartDate?: string | Date;
 	projectEndDate?: string | Date;
+	isReadOnly?: boolean;
 }
 
 export default function SprintList({
 	projectId,
 	projectStartDate,
 	projectEndDate,
+	isReadOnly = false,
 }: SprintListProps) {
 	const [page, setPage] = useState(1);
 	const [search, setSearch] = useState("");
@@ -237,13 +242,15 @@ export default function SprintList({
 						</div>
 					</div>
 				</div>
-				<button
-					onClick={handleOpenCreate}
-					className="flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-sm transition-all shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transform active:scale-95 whitespace-nowrap"
-				>
-					<Plus size={20} className="stroke-[3]" />
-					Create Sprint
-				</button>
+				{!isReadOnly && (
+					<button
+						onClick={handleOpenCreate}
+						className="flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-sm transition-all shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transform active:scale-95 whitespace-nowrap"
+					>
+						<Plus size={20} className="stroke-[3]" />
+						Create Sprint
+					</button>
+				)}
 			</div>
 
 			{/* Sprint List Content */}
@@ -267,12 +274,14 @@ export default function SprintList({
 						</div>
 						<h3 className="text-sm font-medium text-gray-900">No sprints found</h3>
 						<p className="text-xs text-gray-500 mt-1 mb-4">Get started by planning your first sprint.</p>
-						<button
-							onClick={handleOpenCreate}
-							className="text-xs font-semibold text-indigo-600 hover:text-indigo-700"
-						>
-							+ Create Sprint
-						</button>
+						{!isReadOnly && (
+							<button
+								onClick={handleOpenCreate}
+								className="text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+							>
+								+ Create Sprint
+							</button>
+						)}
 					</div>
 				) : (
 					<div className="divide-y divide-gray-50">

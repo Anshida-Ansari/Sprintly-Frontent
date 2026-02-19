@@ -12,7 +12,11 @@ import type {
 	IProject,
 } from "../types/types";
 
-export default function Projects() {
+interface ProjectsProps {
+	isReadOnly?: boolean;
+}
+
+export default function Projects({ isReadOnly = false }: ProjectsProps) {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [editingProject, setEditingProject] = useState<IProject | null>(null);
@@ -45,6 +49,7 @@ export default function Projects() {
 	};
 
 	const openEditModal = (project: IProject) => {
+		if (isReadOnly) return;
 		setEditingProject(project);
 		setIsEditModalOpen(true);
 	};
@@ -78,6 +83,7 @@ export default function Projects() {
 						key={project.id}
 						project={project}
 						onEdit={openEditModal}
+						isReadOnly={isReadOnly}
 					/>
 				))}
 				{projects.length === 0 && (
@@ -107,13 +113,15 @@ export default function Projects() {
 						<LayoutGrid size={20} />
 					</button>
 
-					<button
-						onClick={() => setIsModalOpen(true)}
-						className="px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 flex items-center gap-2"
-					>
-						<Plus size={20} />
-						New Project
-					</button>
+					{!isReadOnly && (
+						<button
+							onClick={() => setIsModalOpen(true)}
+							className="px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 flex items-center gap-2"
+						>
+							<Plus size={20} />
+							New Project
+						</button>
+					)}
 				</div>
 			</div>
 

@@ -30,12 +30,14 @@ interface UserStoryListProps {
 	projectId: string;
 	showHeader?: boolean;
 	members?: IMember[];
+	isReadOnly?: boolean;
 }
 
 export default function UserStoryList({
 	projectId,
 	showHeader = true,
 	members = [],
+	isReadOnly = false,
 }: UserStoryListProps) {
 	const [search, setSearch] = useState("");
 	const debouncedSearch = useDebounce(search, 500);
@@ -140,10 +142,10 @@ export default function UserStoryList({
 		: 0;
 
 	// Helper to get assignee details
-	const getAssigneeDetails = (assigneeIds?: string[]) => {
-		if (!assigneeIds || assigneeIds.length === 0) return null;
+	const getAssigneeDetails = (assigneeId?: string) => {
+		if (!assigneeId) return null;
 		// Return only the first assignee for the list view to keep it clean
-		const member = members.find(m => m.id === assigneeIds[0] || m._id === assigneeIds[0]);
+		const member = members.find(m => m.id === assigneeId || m._id === assigneeId);
 		return member;
 	};
 
@@ -170,7 +172,7 @@ export default function UserStoryList({
 					<select
 						value={statusFilter}
 						onChange={(e) => setStatusFilter(e.target.value)}
-						className="bg-transparent text-sm font-medium text-gray-600 border-none focus:ring-0 cursor-pointer hover:text-gray-900"
+						className="px-3 py-1.5 text-xs font-bold text-gray-700 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
 					>
 						<option value="">All Statuses</option>
 						{(Object.values(UserStoryStatus) as string[]).map((s) => (
@@ -179,13 +181,15 @@ export default function UserStoryList({
 							</option>
 						))}
 					</select>
-					<button
-						onClick={handleOpenCreateModal}
-						className="ml-auto md:ml-2 px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 transition flex items-center gap-1.5 shadow-sm"
-					>
-						<Plus size={14} strokeWidth={3} />
-						New Issue
-					</button>
+					{!isReadOnly && (
+						<button
+							onClick={handleOpenCreateModal}
+							className="ml-auto md:ml-2 px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 transition flex items-center gap-1.5 shadow-sm"
+						>
+							<Plus size={14} strokeWidth={3} />
+							New Issue
+						</button>
+					)}
 				</div>
 			</div>
 
@@ -227,37 +231,38 @@ export default function UserStoryList({
 											{story.description}
 										</p>
 
-										{/* Assignees (New) */}
-										{story.assignedTo && story.assignedTo.length > 0 && (
+										{/* Assignees (New - Single) */}
+										{story.assignedTo && (
 											<div className="flex items-center gap-2 pt-1">
 												<div className="flex -space-x-2">
-													{story.assignedTo.slice(0, 3).map((assigneeId, idx) => {
-														const member = members.find(m => m.id === assigneeId || m._id === assigneeId);
+													{(() => {
+														const member = members.find(
+															(m) =>
+																m.id === story.assignedTo || m._id === story.assignedTo,
+														);
 														return member ? (
 															<img
-																key={idx}
 																src={`https://ui-avatars.com/api/?name=${member.name}&background=random&color=fff&size=32`}
 																alt={member.name}
 																className="w-6 h-6 rounded-full ring-2 ring-white"
 																title={member.name}
 															/>
 														) : null;
-													})}
+													})()}
 												</div>
-												{story.assignedTo.length > 3 && (
-													<span className="text-xs text-gray-400 font-medium">+{story.assignedTo.length - 3}</span>
-												)}
 											</div>
 										)}
 									</div>
 
 									<div className="flex gap-2">
-										<button
-											onClick={(e) => handleOpenEditModal(e, story)}
-											className="p-3 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all shadow-sm bg-white border border-gray-100"
-										>
-											<Edit2 size={20} />
-										</button>
+										{!isReadOnly && (
+											<button
+												onClick={(e) => handleOpenEditModal(e, story)}
+												className="p-3 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all shadow-sm bg-white border border-gray-100"
+											>
+												<Edit2 size={20} />
+											</button>
+										)}
 										<div className="p-3 text-gray-300 group-hover:text-indigo-600 rounded-2xl transition-all">
 											<Eye size={20} />
 										</div>
@@ -275,40 +280,44 @@ export default function UserStoryList({
 							<Search className="text-gray-300" size={20} />
 						</div>
 						<h4 className="text-gray-900 font-medium text-sm mb-1">No issues found</h4>
-						<button
-							onClick={handleOpenCreateModal}
-							className="mt-2 text-indigo-600 text-xs font-semibold hover:underline"
-						>
-							Create Issue
-						</button>
+						{!isReadOnly && (
+							<button
+								onClick={handleOpenCreateModal}
+								className="mt-2 text-indigo-600 text-xs font-semibold hover:underline"
+							>
+								Create Issue
+							</button>
+						)}
 					</div>
 				)}
 			</div>
 
 			{/* Pagination Controls */}
-			{totalPages > 1 && (
-				<div className="flex items-center justify-between px-2">
-					<p className="text-xs text-gray-500 font-medium">
-						Showing page {page} of {totalPages}
-					</p>
-					<div className="flex items-center gap-2">
-						<button
-							onClick={() => setPage((p) => Math.max(1, p - 1))}
-							disabled={page === 1}
-							className="p-1.5 text-gray-500 hover:text-indigo-600 disabled:opacity-30 disabled:hover:text-gray-500"
-						>
-							<ChevronLeft size={16} />
-						</button>
-						<button
-							onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-							disabled={page === totalPages}
-							className="p-1.5 text-gray-500 hover:text-indigo-600 disabled:opacity-30 disabled:hover:text-gray-500"
-						>
-							<ChevronRight size={16} />
-						</button>
+			{
+				totalPages > 1 && (
+					<div className="flex items-center justify-between px-2">
+						<p className="text-xs text-gray-500 font-medium">
+							Showing page {page} of {totalPages}
+						</p>
+						<div className="flex items-center gap-2">
+							<button
+								onClick={() => setPage((p) => Math.max(1, p - 1))}
+								disabled={page === 1}
+								className="p-1.5 text-gray-500 hover:text-indigo-600 disabled:opacity-30 disabled:hover:text-gray-500"
+							>
+								<ChevronLeft size={16} />
+							</button>
+							<button
+								onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+								disabled={page === totalPages}
+								className="p-1.5 text-gray-500 hover:text-indigo-600 disabled:opacity-30 disabled:hover:text-gray-500"
+							>
+								<ChevronRight size={16} />
+							</button>
+						</div>
 					</div>
-				</div>
-			)}
+				)
+			}
 
 			<UserStoryModal
 				isOpen={isModalOpen}
@@ -318,13 +327,15 @@ export default function UserStoryList({
 				isLoading={isCreating || isUpdating}
 			/>
 
-			{selectedDetailStory && (
-				<UserStoryDetailModal
-					isOpen={isDetailModalOpen}
-					onClose={() => setIsDetailModalOpen(false)}
-					story={selectedDetailStory}
-				/>
-			)}
-		</div>
+			{
+				selectedDetailStory && (
+					<UserStoryDetailModal
+						isOpen={isDetailModalOpen}
+						onClose={() => setIsDetailModalOpen(false)}
+						story={selectedDetailStory}
+					/>
+				)
+			}
+		</div >
 	);
 }

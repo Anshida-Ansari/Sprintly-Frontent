@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { UserAuth } from "../../auth/store/store";
 import { useWebRTC } from "../hooks/useWebRTC";
+import { meetingService } from "../../admin/services/meeting.service";
 
 const VideoPlayer = ({
 	stream,
@@ -72,10 +73,20 @@ export default function MeetingRoom() {
 		}
 	};
 
-	const handleEndCall = () => {
+	const handleEndCall = async () => {
 		// Stop all tracks
 		if (localStream) {
 			localStream.getTracks().forEach((track) => track.stop());
+		}
+
+		// Update meeting status if admin
+		if (user?.role === "admin" && roomId) {
+			try {
+				await meetingService.updateMeetingStatus(roomId, "COMPLETED");
+				console.log("Meeting marked as completed");
+			} catch (error) {
+				console.error("Failed to update meeting status:", error);
+			}
 		}
 
 		// Navigate based on role (assuming role is available in user object, otherwise default to /)

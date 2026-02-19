@@ -100,7 +100,6 @@ export interface CreateProjectResponse {
 	data: any;
 }
 
-// User Story Types
 
 export const UserStoryStatus = {
 	IN_REVIEW: "In review",
@@ -130,7 +129,7 @@ export interface IUserStory {
 	status: UserStoryStatus;
 	priority: PriorityStatus;
 	sprintId?: string;
-	assignedTo?: string[];
+	assignedTo?: string;
 	estimationPoints?: number;
 	acceptanceCriteria?: string[];
 	createdAt: string;
@@ -142,7 +141,7 @@ export interface CreateUserStoryPayload {
 	description?: string;
 	priority?: PriorityStatus;
 	sprintId?: string;
-	assignedTo?: string[];
+	assignedTo?: string;
 	estimationPoints?: number;
 	acceptanceCriteria?: string[];
 }
@@ -153,7 +152,7 @@ export interface EditUserStoryPayload {
 	status?: UserStoryStatus;
 	priority?: PriorityStatus;
 	sprintId?: string;
-	assignedTo?: string[];
+	assignedTo?: string;
 	estimationPoints?: number;
 	acceptanceCriteria?: string[];
 }
@@ -166,7 +165,6 @@ export interface GetUserStoriesResponse {
 	limit: number;
 }
 
-// Sprint Types
 
 export type SprintStatus = "PLANNED" | "ACTIVE" | "COMPLETED";
 
@@ -208,9 +206,8 @@ export interface GetSprintsResponse {
 	totalPages: number;
 }
 
-// Subtask Types
 
-export type SubtaskStatus = "pending" | "completed";
+export type SubtaskStatus = "In pending" | "In progress" | "Done";
 
 export interface ISubtask {
 	id: string;

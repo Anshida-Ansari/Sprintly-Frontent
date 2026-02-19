@@ -20,6 +20,12 @@ const mapUserStory = (s: any) => ({
 	acceptanceCriteria: s._acceptanceCriteria || s.acceptanceCriteria || [],
 	createdAt: s._createdAt || s.createdAt,
 	updatedAt: s._updatedAt || s.updatedAt,
+	subtasks: (s.subtasks || []).map((st: any) => ({
+		...st,
+		id: st._id || st.id,
+		title: st._title || st.title,
+		status: st._status || st.status,
+	})),
 });
 
 export const userStoryService = {
@@ -80,6 +86,19 @@ export const userStoryService = {
 			userStoryId,
 			sprintId,
 		});
+		return res.data;
+	},
+
+	async assignUserStoryToMember(
+		userStoryId: string,
+		developerId: string,
+	) {
+		const res = await api.patch(
+			`projects/${userStoryId}/assign-member`,
+			{
+				developerId,
+			},
+		);
 		return res.data;
 	},
 };

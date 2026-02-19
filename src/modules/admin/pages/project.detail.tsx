@@ -23,7 +23,11 @@ import { useEditProject } from "../hooks/useEditProject";
 import { useGetProject } from "../hooks/useGetProject";
 import type { EditProjectPayload, IMember } from "../types/types";
 
-export default function ProjectDetail() {
+interface ProjectDetailProps {
+	isReadOnly?: boolean;
+}
+
+export default function ProjectDetail({ isReadOnly = false }: ProjectDetailProps) {
 	const { projectId } = useParams<{ projectId: string }>();
 	const navigate = useNavigate();
 	const { data: projectResponse, isLoading } = useGetProject(projectId || "");
@@ -50,10 +54,10 @@ export default function ProjectDetail() {
 			<div className="flex flex-col items-center justify-center h-full min-h-[400px] gap-4">
 				<p className="text-gray-500 font-medium">Project not found.</p>
 				<button
-					onClick={() => navigate("/admin/projects")}
+					onClick={() => navigate(isReadOnly ? "/developers/dashboard" : "/admin/projects")}
 					className="px-4 py-2 text-indigo-600 font-bold hover:bg-indigo-50 rounded-lg transition"
 				>
-					Back to Projects
+					Back to Dashboard
 				</button>
 			</div>
 		);
@@ -126,21 +130,23 @@ export default function ProjectDetail() {
 					<div className="flex items-center justify-between">
 						<nav className="flex items-center gap-2 text-sm text-gray-500 font-medium">
 							<span
-								onClick={() => navigate("/admin/projects")}
+								onClick={() => navigate(isReadOnly ? "/developers/dashboard" : "/admin/projects")}
 								className="hover:text-gray-900 cursor-pointer transition-colors"
 							>
-								Projects
+								{isReadOnly ? "Dashboard" : "Projects"}
 							</span>
 							<span className="text-gray-300">/</span>
 							<span className="text-gray-900">{project.name}</span>
 						</nav>
-						<button
-							onClick={() => setIsEditModalOpen(true)}
-							className="text-gray-500 hover:text-gray-900 p-2 rounded-md hover:bg-gray-100 transition-colors"
-							title="Project Settings"
-						>
-							<MoreHorizontal size={20} />
-						</button>
+						{!isReadOnly && (
+							<button
+								onClick={() => setIsEditModalOpen(true)}
+								className="text-gray-500 hover:text-gray-900 p-2 rounded-md hover:bg-gray-100 transition-colors"
+								title="Project Settings"
+							>
+								<MoreHorizontal size={20} />
+							</button>
+						)}
 					</div>
 
 					{/* Title & Actions */}
@@ -167,7 +173,8 @@ export default function ProjectDetail() {
 							</div>
 						</div>
 
-						{(user?.role === "admin" || user?.role === "lead") && (
+						{/* Actions - Hide for ReadOnly */}
+						{!isReadOnly && (user?.role === "admin" || user?.role === "lead") && (
 							<div className="flex items-center gap-3">
 								<button
 									onClick={() => setIsEditModalOpen(true)}
@@ -289,7 +296,8 @@ export default function ProjectDetail() {
 											{project.members?.length || 0}
 										</span>
 									</h3>
-									{(user?.role === "admin" || user?.role === "lead") && (
+									{/* Hide Add Member for ReadOnly */}
+									{!isReadOnly && (user?.role === "admin" || user?.role === "lead") && (
 										<button
 											onClick={() => setIsAddMemberModalOpen(true)}
 											className="text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-md transition-colors"
@@ -337,7 +345,7 @@ export default function ProjectDetail() {
 
 				{activeTab === "stories" && (
 					<div className="animate-in slide-in-from-right-4 duration-500">
-						<UserStoryList projectId={project.id} members={project.members} showHeader={false} />
+						<UserStoryList projectId={project.id} members={project.members} showHeader={false} isReadOnly={isReadOnly} />
 					</div>
 				)}
 
@@ -348,6 +356,7 @@ export default function ProjectDetail() {
 								projectId={projectId || ""}
 								projectStartDate={project.startDate}
 								projectEndDate={project.endDate}
+								isReadOnly={isReadOnly}
 							/>
 						</div>
 					</div>
@@ -366,7 +375,7 @@ export default function ProjectDetail() {
 							<StandupChat
 								projectId={projectId || ""}
 								sprintId={project.activeSprintId}
-								userRole="admin"
+								userRole={isReadOnly ? "developer" : "admin"}
 							/>
 						</div>
 					</div>

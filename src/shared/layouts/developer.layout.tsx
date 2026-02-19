@@ -29,20 +29,20 @@ const sidebarLinks = [
 export default function DeveloperLayout() {
 	const logout = useLogout();
 	return (
-		<div className="flex min-h-screen bg-[#050507] text-gray-400 font-sans selection:bg-indigo-500/30">
+		<div className="flex min-h-screen bg-slate-50 text-gray-600 font-sans selection:bg-indigo-100">
 			{/* Sidebar */}
-			<aside className="w-20 lg:w-64 border-r border-white/[0.05] flex flex-col sticky top-0 h-screen bg-[#08080A]">
+			<aside className="w-20 lg:w-64 border-r border-gray-200 flex flex-col sticky top-0 h-screen bg-white">
 				{/* Logo Area */}
 				<div className="p-6 mb-4">
 					<div className="flex items-center gap-3">
-						<div className="w-9 h-9 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl shadow-[0_0_20px_rgba(79,70,229,0.3)] flex items-center justify-center">
+						<div className="w-9 h-9 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl shadow-lg shadow-indigo-200 flex items-center justify-center">
 							<Terminal size={20} className="text-white" />
 						</div>
 						<div className="hidden lg:block">
-							<span className="text-white font-black tracking-tighter text-xl block leading-none">
+							<span className="text-gray-900 font-black tracking-tighter text-xl block leading-none">
 								Sprintly
 							</span>
-							<span className="text-[10px] font-mono text-indigo-500 font-bold uppercase tracking-widest">
+							<span className="text-[10px] font-mono text-indigo-600 font-bold uppercase tracking-widest">
 								Dev_Core
 							</span>
 						</div>
@@ -58,24 +58,24 @@ export default function DeveloperLayout() {
 								key={link.path}
 								to={link.path}
 								className={({ isActive }) =>
-									`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative ${
-										isActive
-											? "bg-white/[0.03] text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]"
-											: "hover:bg-white/[0.02] hover:text-gray-200"
+									`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative ${isActive
+										? "bg-indigo-50 text-indigo-700 font-bold shadow-sm ring-1 ring-indigo-100"
+										: "hover:bg-gray-50 hover:text-gray-900 font-medium"
 									}`
 								}
 							>
 								<Icon
 									size={20}
-									className="group-hover:scale-110 transition-transform duration-300"
+									className={`transition-transform duration-300 group-hover:scale-110 ${({ isActive }: { isActive: boolean }) => isActive ? "text-indigo-600" : "text-gray-400 group-hover:text-gray-600"
+										}`}
 								/>
-								<span className="hidden lg:block font-semibold text-sm tracking-tight">
+								<span className="hidden lg:block text-sm tracking-tight">
 									{link.name}
 								</span>
 
-								{/* Neon Active Pill */}
-								<div className="hidden lg:group-[.active]:block ml-auto">
-									<div className="w-1 h-5 bg-indigo-500 rounded-full shadow-[0_0_12px_#6366f1]" />
+								{/* Active Indicator */}
+								<div className="hidden lg:group-[.active]:block ml-auto opacity-0 group-[.active]:opacity-100 transition-opacity">
+									<div className="w-1.5 h-1.5 bg-indigo-600 rounded-full" />
 								</div>
 							</NavLink>
 						);
@@ -86,26 +86,23 @@ export default function DeveloperLayout() {
 				<button
 					type="button"
 					onClick={logout}
-					className="w-full flex items-center gap-3 px-4 py-3 text-rose-500/80 hover:text-rose-400 hover:bg-rose-500/5 rounded-xl transition-all group text-left"
+					className="w-full flex items-center gap-3 px-4 py-3 text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all group text-left mt-auto mb-2 mx-2 max-w-[calc(100%-16px)]"
 				>
 					<LogOut
 						size={20}
 						className="group-hover:-translate-x-1 transition-transform"
 					/>
-					<span className="hidden lg:block font-bold text-sm">Terminate</span>
+					<span className="hidden lg:block font-bold text-sm">Sign Out</span>
 				</button>
 			</aside>
 
 			{/* Main Stage */}
 			<main className="flex-1 overflow-y-auto relative">
-				{/* Subtle Background Glows */}
-				<div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
-				<div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-violet-500/5 blur-[100px] rounded-full pointer-events-none" />
-
-				<div className="p-8 lg:p-12 relative z-10">
+				<div className="p-8 lg:p-12 relative z-10 max-w-[1600px] mx-auto">
 					<Outlet />
 				</div>
 			</main>
 		</div>
 	);
 }
+

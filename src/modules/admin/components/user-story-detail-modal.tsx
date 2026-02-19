@@ -6,10 +6,12 @@ import {
 	Plus,
 	Save,
 	Trash2,
+	Users,
+	Search,
 	X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+
 import { UserAuth } from "../../auth/store/store";
 import { useGetMembers } from "../hooks/useGetmembers";
 import { useGetProject } from "../hooks/useGetProject";
@@ -20,7 +22,10 @@ import {
 	useGetSubtasks,
 	useUpdateSubtaskStatus,
 } from "../hooks/useSubtasks";
-import { useUpdateUserStory } from "../hooks/useUserStories";
+import {
+	useAssignUserStoryToMember,
+	useUpdateUserStory,
+} from "../hooks/useUserStories";
 import type { ISubtask, IUserStory } from "../types/types";
 import DeleteConfirmationModal from "./delete-confirmation-modal";
 
@@ -39,6 +44,7 @@ export default function UserStoryDetailModal({
 	const [isEditingDescription, setIsEditingDescription] = useState(false);
 	const [editedDescription, setEditedDescription] = useState(story.description);
 	const [isAssignDropdownOpen, setIsAssignDropdownOpen] = useState(false);
+	const [assignSearchQuery, setAssignSearchQuery] = useState("");
 
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [subtaskToDelete, setSubtaskToDelete] = useState<string | null>(null);
@@ -63,19 +69,24 @@ export default function UserStoryDetailModal({
 	const assignSubtask = useAssignSubtask(story.id);
 	const deleteSubtask = useDeleteSubtask(story.id);
 	const updateStory = useUpdateUserStory();
+	const assignMember = useAssignUserStoryToMember();
 
 	const subtasks = subtasksRes?.data || [];
 	const members = membersRes?.data || [];
 
 	// Filter developers: Must be 'developer' role AND member of the project
+	const projectMemberIds = (project?.members || []).map((pm: any) =>
+		typeof pm === "string" ? pm : (pm.id || pm._id),
+	);
+
 	const developers = members.filter(
 		(m: any) =>
 			(m.role === "developers" || m.role === "developer") &&
-			(project?.members || []).includes(m._id)
+			projectMemberIds.includes(m._id || m.id),
 	);
 
 	const completedCount = subtasks.filter(
-		(s) => s.status === "completed",
+		(s) => s.status === "Done",
 	).length;
 	const totalCount = subtasks.length;
 	const progressPercent =
@@ -99,7 +110,7 @@ export default function UserStoryDetailModal({
 	};
 
 	const handleToggleSubtask = (subtask: ISubtask) => {
-		const newStatus = subtask.status === "completed" ? "pending" : "completed";
+		const newStatus = subtask.status === "Done" ? "In pending" : "Done";
 		updateStatus.mutate({ subtaskId: subtask.id, status: newStatus });
 	};
 
@@ -110,27 +121,26 @@ export default function UserStoryDetailModal({
 	// ... existing logic
 
 	const handleAssignMemberToStory = (memberId: string) => {
-		const currentAssigned = story.assignedTo || [];
+		assignMember.mutate(
+			{
+				projectId: story.projectId,
+				userStoryId: story.id,
+				developerId: memberId,
+			},
+			{
+				onSuccess: () => {
+					setIsAssignDropdownOpen(false);
+					setAssignSearchQuery("");
+				},
+			},
+		);
+	};
 
-		// Check if member is already assigned (frontend validation)
-		if (currentAssigned.includes(memberId)) {
-			return; // Already filtered by dropdown, but double-check
-		}
-
-		const newAssigned = [...(currentAssigned as any || []), memberId];
-		const member = members.find((m: any) => m._id === memberId);
-
-		updateStory.mutate({
+	const handleRemoveMemberFromStory = () => {
+		assignMember.mutate({
 			projectId: story.projectId,
 			userStoryId: story.id,
-			data: { assignedTo: newAssigned }
-		}, {
-			onSuccess: () => {
-				if (member) {
-					// Visible success message showing member name
-					toast.success(`${member.name} assigned successfully! 🎉`);
-				}
-			}
+			developerId: "", // Empty string to unassign
 		});
 	};
 
@@ -208,38 +218,6 @@ export default function UserStoryDetailModal({
 								</span>
 							</span>
 						</div>
-
-						{/* Assignees (Lead/Admin) */}
-						{(isAdmin || user?.role === "lead") && (
-							<div className="mt-2 flex items-center gap-2">
-								<span className="text-sm font-bold text-gray-500">Assigned:</span>
-								<div className="flex -space-x-2">
-									{(story.assignedTo || []).map((assigneeId) => {
-										const member = members.find((m: any) => m._id === assigneeId);
-										return member ? (
-											<div key={member._id} className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-[10px] font-bold text-indigo-700 border border-white ring-2 ring-white">
-												{member.name.substring(0, 2)}
-											</div>
-										) : null;
-									})}
-									<select
-										onChange={(e) => {
-											if (e.target.value) handleAssignMemberToStory(e.target.value);
-										}}
-										value=""
-										className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 cursor-pointer border-none outline-none text-[0px]"
-										title="Add Member"
-									>
-										<option value="">+</option>
-										{developers.filter((d: any) => !(story.assignedTo || []).includes(d._id)).map((dev: any) => (
-											<option key={dev._id} value={dev._id} className="text-sm">
-												{dev.name}
-											</option>
-										))}
-									</select>
-								</div>
-							</div>
-						)}
 					</div>
 					<button
 						onClick={onClose}
@@ -364,6 +342,127 @@ export default function UserStoryDetailModal({
 						</div>
 					)}
 
+					{/* Assignee Section (Single) */}
+					<div className="space-y-4">
+						<h3 className="text-sm font-black text-gray-700 uppercase tracking-wider flex items-center gap-2">
+							<Users size={16} className="text-indigo-500" />
+							Assignee
+						</h3>
+
+						<div className="flex items-center gap-3">
+							{story.assignedTo ? (
+								(() => {
+									const member = members.find((m: any) => m._id === story.assignedTo || m.id === story.assignedTo);
+									return member ? (
+										<div
+											key={member._id}
+											className="flex items-center gap-2 pr-2 pl-1 py-1 bg-white border border-gray-200 rounded-full shadow-sm hover:border-indigo-200 transition-colors group/member"
+										>
+											<div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-[10px] font-black text-indigo-700 uppercase border border-white">
+												{member.name?.substring(0, 2)}
+											</div>
+											<span className="text-xs font-bold text-gray-700">
+												{member.name}
+											</span>
+											{(isAdmin || user?.role === "lead") && (
+												<button
+													onClick={() => handleRemoveMemberFromStory()}
+													className="p-0.5 hover:bg-rose-50 text-gray-300 hover:text-rose-500 rounded-full transition-colors ml-1"
+													title="Unassign"
+												>
+													<X size={12} strokeWidth={3} />
+												</button>
+											)}
+										</div>
+									) : (
+										<span className="text-xs text-red-400">
+											Assigned member not found
+										</span>
+									);
+								})()
+							) : (
+								<p className="text-xs text-gray-400 font-medium italic">Unassigned</p>
+							)}
+
+							{/* Assign/Reassign Button & Dropdown */}
+							{(isAdmin || user?.role === "lead") && (
+								<div className="relative">
+									<button
+										onClick={() => setIsAssignDropdownOpen(!isAssignDropdownOpen)}
+										className="w-8 h-8 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50 transition-all"
+										title={story.assignedTo ? "Change Assignee" : "Assign Member"}
+									>
+										{story.assignedTo ? (
+											<Edit3 size={14} strokeWidth={2.5} />
+										) : (
+											<Plus size={16} strokeWidth={3} />
+										)}
+									</button>
+
+									{isAssignDropdownOpen && (
+										<>
+											<div
+												className="fixed inset-0 z-10"
+												onClick={() => setIsAssignDropdownOpen(false)}
+											/>
+											<div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 p-2 z-20 animate-in fade-in zoom-in-95 duration-200">
+												<div className="relative mb-2">
+													<Search
+														size={14}
+														className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+													/>
+													<input
+														type="text"
+														value={assignSearchQuery}
+														onChange={(e) => setAssignSearchQuery(e.target.value)}
+														placeholder="Search members..."
+														autoFocus
+														className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-500 rounded-lg text-xs font-bold text-gray-900 placeholder:text-gray-400 outline-none transition-all"
+													/>
+												</div>
+												<div className="max-h-48 overflow-y-auto space-y-1 custom-scrollbar">
+													{developers
+														.filter(
+															(d: any) =>
+																d._id !== story.assignedTo &&
+																d.name
+																	.toLowerCase()
+																	.includes(assignSearchQuery.toLowerCase()),
+														)
+														.map((dev: any) => (
+															<button
+																key={dev._id}
+																onClick={() => handleAssignMemberToStory(dev._id)}
+																className="w-full flex items-center gap-3 p-2 hover:bg-indigo-50 rounded-lg transition-colors group/option text-left"
+															>
+																<div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-500 group-hover/option:bg-indigo-100 group-hover/option:text-indigo-600 transition-colors">
+																	{dev.name?.substring(0, 2)}
+																</div>
+																<span className="text-sm font-medium text-gray-600 group-hover/option:text-gray-900 truncate">
+																	{dev.name}
+																</span>
+															</button>
+														))}
+													{developers.filter(
+														(d: any) =>
+															d._id !== story.assignedTo &&
+															d.name
+																.toLowerCase()
+																.includes(assignSearchQuery.toLowerCase()),
+													).length === 0 && (
+															<div className="p-3 text-center text-xs text-gray-400 font-medium italic">
+																No members found
+															</div>
+														)}
+												</div>
+											</div>
+										</>
+									)}
+								</div>
+							)}
+						</div>
+					</div>
+
 					{/* Subtasks Section */}
 					<div className="space-y-4">
 						<h3 className="text-sm font-black text-gray-700 uppercase tracking-wider flex items-center gap-2">
@@ -393,18 +492,18 @@ export default function UserStoryDetailModal({
 													className={`
                                                     px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border
                                                     ${subtask.status ===
-															"completed"
+															"Done"
 															? "bg-emerald-50 text-emerald-600 border-emerald-100"
 															: "bg-gray-200 text-gray-600 border-gray-300"
 														}
                                                 `}
 												>
-													{subtask.status === "completed" ? "DONE" : "TODO"}
+													{subtask.status === "Done" ? "DONE" : "TODO"}
 												</div>
 											) : (
 												<input
 													type="checkbox"
-													checked={subtask.status === "completed"}
+													checked={subtask.status === "Done"}
 													onChange={() => handleToggleSubtask(subtask)}
 													className="w-5 h-5 rounded-md border-2 border-gray-300 text-indigo-600 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
 												/>
@@ -412,7 +511,7 @@ export default function UserStoryDetailModal({
 
 											<div className="flex-1 min-w-0 flex flex-col gap-2">
 												<p
-													className={`font-bold text-sm ${subtask.status === "completed" ? "line-through text-gray-400" : "text-gray-900"}`}
+													className={`font-bold text-sm ${subtask.status === "Done" ? "line-through text-gray-400" : "text-gray-900"}`}
 												>
 													{subtask.title}
 												</p>
@@ -422,7 +521,7 @@ export default function UserStoryDetailModal({
 													{assignedDev ? (
 														<div className="flex items-center gap-2 bg-white px-2 py-1 rounded-lg border border-gray-200 shadow-sm">
 															<div className="w-5 h-5 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-[9px] font-black text-indigo-600 uppercase">
-																{assignedDev.name.slice(0, 2)}
+																{assignedDev.name?.slice(0, 2)}
 															</div>
 															<span className="text-xs font-bold text-gray-700">
 																{assignedDev.name}

@@ -5,9 +5,14 @@ import type { IProject } from "../types/types";
 interface ProjectCardProps {
 	project: IProject;
 	onEdit: (project: IProject) => void;
+	isReadOnly?: boolean;
 }
 
-export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
+export default function ProjectCard({
+	project,
+	onEdit,
+	isReadOnly = false,
+}: ProjectCardProps) {
 	const navigate = useNavigate();
 	const statusColors = {
 		Active: "bg-emerald-100 text-emerald-700 border-emerald-200",
@@ -26,17 +31,20 @@ export default function ProjectCard({ project, onEdit }: ProjectCardProps) {
 					className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wide border ${statusColors[project.status as keyof typeof statusColors] || "bg-gray-100 text-gray-700"}`}
 				>
 					{statusLabel}
+					{statusLabel}
 				</span>
-				<button
-					onClick={(e) => {
-						e.stopPropagation();
-						onEdit(project);
-					}}
-					className="p-1.5 hover:bg-blue-50 rounded-lg text-gray-400 hover:text-blue-600 transition"
-					title="Edit Project"
-				>
-					<Pencil size={16} />
-				</button>
+				{!isReadOnly && (
+					<button
+						onClick={(e) => {
+							e.stopPropagation();
+							onEdit(project);
+						}}
+						className="p-1.5 hover:bg-blue-50 rounded-lg text-gray-400 hover:text-blue-600 transition"
+						title="Edit Project"
+					>
+						<Pencil size={16} />
+					</button>
+				)}
 			</div>
 
 			<h3 className="font-bold text-gray-900 text-lg mb-2 line-clamp-1 group-hover:text-indigo-600 transition-colors">

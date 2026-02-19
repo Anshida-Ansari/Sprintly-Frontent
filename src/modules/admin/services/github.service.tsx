@@ -5,6 +5,7 @@ export interface GitHubStatusResponse {
     githubUsername?: string;
     githubOrganization?: string;
     connectedAt?: Date;
+    key?: string;
 }
 
 export const githubService = {

@@ -13,6 +13,13 @@ const mapUserStory = (s: any) => ({
 	sprintId: s._sprintId || s.sprintId,
 	createdAt: s._createdAt || s.createdAt,
 	updatedAt: s._updatedAt || s.updatedAt,
+	subtasks: (s.subtasks || []).map((st: any) => ({
+		...st,
+		id: st._id || st.id,
+		title: st._title || st.title,
+		status: st._status || st.status,
+		priority: st._priority || st.priority,
+	})),
 });
 
 export const userStoryService = {

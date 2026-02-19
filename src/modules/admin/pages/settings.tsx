@@ -50,6 +50,19 @@ export default function Settings() {
                             <Link2 size={20} className="text-gray-700" />
                             <h2 className="text-xl font-bold text-gray-900">Integrations</h2>
                         </div>
+                        {githubStatus?.isConnected ? (
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
+                                    <CheckCircle2 size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-gray-900">Connected to GitHub</h3>
+                                    <p className="text-sm text-gray-500">
+                                        Key: {githubStatus?.key?.substring(0, 8)}...
+                                    </p>
+                                </div>
+                            </div>
+                        ) : null}
 
                         {/* GitHub Card */}
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all">
@@ -96,15 +109,15 @@ export default function Settings() {
                                                         <div className="space-y-1 text-sm">
                                                             <p className="text-emerald-700">
                                                                 <span className="font-semibold">Account:</span>{" "}
-                                                                <span className="font-mono">@{githubStatus.githubUsername}</span>
+                                                                <span className="font-mono">@{githubStatus?.githubUsername}</span>
                                                             </p>
-                                                            {githubStatus.githubOrganization && (
+                                                            {githubStatus?.githubOrganization && (
                                                                 <p className="text-emerald-700">
                                                                     <span className="font-semibold">Organization:</span>{" "}
                                                                     {githubStatus.githubOrganization}
                                                                 </p>
                                                             )}
-                                                            {githubStatus.connectedAt && (
+                                                            {githubStatus?.connectedAt && (
                                                                 <p className="text-xs text-emerald-600 mt-1">
                                                                     Connected on{" "}
                                                                     {new Date(githubStatus.connectedAt).toLocaleDateString("en-US", {

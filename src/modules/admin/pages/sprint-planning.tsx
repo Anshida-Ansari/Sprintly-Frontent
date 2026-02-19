@@ -22,11 +22,11 @@ import {
 	useAssignUserStoryToSprint,
 	useGetUserStories,
 } from "../hooks/useUserStories";
-import { type IUserStory, UserStoryStatus } from "../types/types";
+import { UserStoryStatus } from "../types/types";
 
 export default function SprintPlanningPage() {
 	const [selectedProjectId, setSelectedProjectId] = useState<string>("");
-	const [selectedStory, setSelectedStory] = useState<IUserStory | null>(null);
+	const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null);
 	const [searchQuery, setSearchQuery] = useState("");
 
 	const { data: projectsRes } = useProjects({ limit: 100 });
@@ -45,6 +45,8 @@ export default function SprintPlanningPage() {
 	const projects = projectsRes?.data || [];
 	const stories = storiesRes?.data || [];
 	const sprints = sprintsRes?.data || [];
+
+	const selectedStory = stories.find((s) => s.id === selectedStoryId) || null;
 
 	const backlog = stories
 		.filter((s) => !s.sprintId)
@@ -163,7 +165,7 @@ export default function SprintPlanningPage() {
 										key={story.id}
 										draggable
 										onDragStart={(e) => onDragStart(e, story.id)}
-										onClick={() => setSelectedStory(story)}
+										onClick={() => setSelectedStoryId(story.id)}
 										className="group flex items-center gap-3 p-3 bg-white hover:bg-gray-50 border border-transparent hover:border-indigo-100 rounded-lg cursor-pointer transition-all select-none"
 									>
 										<GripVertical
@@ -178,9 +180,9 @@ export default function SprintPlanningPage() {
 												<span className="text-[10px] text-gray-400 font-medium">
 													{story.id.slice(-4).toUpperCase()}
 												</span>
-												{story.assignedTo && story.assignedTo.length > 0 && (
-													<div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center text-[8px] font-bold text-gray-600">
-														{story.assignedTo.length}
+												{story.assignedTo && (
+													<div className="w-4 h-4 rounded-full bg-indigo-100 flex items-center justify-center text-[8px] font-bold text-indigo-600">
+														1
 													</div>
 												)}
 											</div>
@@ -298,7 +300,7 @@ export default function SprintPlanningPage() {
 														key={story.id}
 														draggable
 														onDragStart={(e) => onDragStart(e, story.id)}
-														onClick={() => setSelectedStory(story)}
+														onClick={() => setSelectedStoryId(story.id)}
 														className="flex items-center gap-4 px-6 py-3 bg-white hover:bg-gray-50 cursor-pointer transition group/story"
 													>
 														<GripVertical
@@ -322,12 +324,11 @@ export default function SprintPlanningPage() {
 															>
 																{story.status}
 															</span>
-															{story.assignedTo &&
-																story.assignedTo.length > 0 ? (
+															{story.assignedTo ? (
 																<div className="flex -space-x-1">
-																	{/* Avatar placeholders */}
+																	{/* Single Assignee Avatar */}
 																	<div className="w-6 h-6 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-indigo-600">
-																		{story.assignedTo.length}
+																		1
 																	</div>
 																</div>
 															) : (
@@ -363,7 +364,7 @@ export default function SprintPlanningPage() {
 			{selectedStory && (
 				<UserStoryDetailModal
 					isOpen={!!selectedStory}
-					onClose={() => setSelectedStory(null)}
+					onClose={() => setSelectedStoryId(null)}
 					story={selectedStory}
 				/>
 			)}
