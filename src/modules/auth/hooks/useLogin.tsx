@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { authService } from "../services/auth.services";
 import { UserAuth } from "../store/store";
 import type { LoginRequest } from "../types/types";
+import { buildPath, ROUTES } from "../../../constants/routes";
 
 export function useLogin() {
 	const navigate = useNavigate();
@@ -22,16 +23,16 @@ export function useLogin() {
 			switch (user.role) {
 				case "admin":
 				case "lead":
-					navigate("/admin/dashboard", { replace: true });
+					navigate(buildPath.admin(ROUTES.ADMIN.DASHBOARD), { replace: true });
 					break;
 				case "superadmin":
-					navigate("/superadmin/dashboard", { replace: true });
+					navigate(buildPath.superadmin(ROUTES.SUPERADMIN.DASHBOARD), { replace: true });
 					break;
 				case "developers":
-					navigate("/developers/dashboard", { replace: true });
+					navigate(buildPath.developer(ROUTES.DEVELOPER.DASHBOARD), { replace: true });
 					break;
 				default:
-					navigate("/", { replace: true });
+					navigate(ROUTES.PUBLIC.ROOT, { replace: true });
 			}
 		},
 

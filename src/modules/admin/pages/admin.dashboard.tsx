@@ -17,6 +17,7 @@ import InviteMemberBtn from "../components/invite.member.btn";
 import InviteMemberModal from "../components/invite.modal";
 import { useDashboardStats } from "../hooks/useDashboardStats";
 import { useInviteMember } from "../hooks/useInviteMember";
+import { buildPath, ROUTES } from "../../../constants/routes";
 
 export default function AdminDashboard() {
 	const navigate = useNavigate();
@@ -212,7 +213,7 @@ export default function AdminDashboard() {
 
 					<div className="space-y-3 relative z-10">
 						<button
-							onClick={() => navigate("/admin/projects")}
+							onClick={() => navigate(buildPath.admin(ROUTES.ADMIN.PROJECTS))}
 							className="w-full group bg-white hover:bg-indigo-600 text-gray-900 hover:text-white border border-gray-100 hover:border-indigo-600 py-4 px-6 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-sm"
 						>
 							<div className="p-2 bg-indigo-50 group-hover:bg-indigo-500 rounded-lg text-indigo-600 group-hover:text-white transition-colors">
@@ -222,7 +223,7 @@ export default function AdminDashboard() {
 						</button>
 
 						<button
-							onClick={() => navigate("/admin/sprints")}
+							onClick={() => navigate(buildPath.admin(ROUTES.ADMIN.SPRINTS))}
 							className="w-full group bg-white hover:bg-emerald-600 text-gray-900 hover:text-white border border-gray-100 hover:border-emerald-600 py-4 px-6 rounded-2xl font-bold flex items-center gap-3 transition-all shadow-sm"
 						>
 							<div className="p-2 bg-emerald-50 group-hover:bg-emerald-500 rounded-lg text-emerald-600 group-hover:text-white transition-colors">

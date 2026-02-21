@@ -2,6 +2,7 @@ import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import ProtectedRoutes from "./protected.route";
+import { ROUTES } from "../constants/routes";
 
 const Login = lazy(() => import("../modules/auth/pages/login"));
 const Register = lazy(() => import("../modules/auth/pages/register"));
@@ -37,17 +38,17 @@ const Settings = lazy(() => import("../modules/admin/pages/settings"));
 export const router = createBrowserRouter([
 	// PUBLIC
 	{
-		path: "/",
+		path: ROUTES.PUBLIC.ROOT,
 		element: <App />,
 		children: [
 			{ index: true, element: <LandingPage /> },
-			{ path: "register", element: <Register /> },
-			{ path: "login", element: <Login /> },
-			{ path: "otp", element: <OTP /> },
-			{ path: "forgot-password", element: <ForgotPassword /> },
-			{ path: "forgot-otp", element: <ForgotPasswordOtp /> },
-			{ path: "reset-password", element: <ResetPassword /> },
-			{ path: "member/accept", element: <MemberAccept /> },
+			{ path: ROUTES.PUBLIC.REGISTER.replace("/", ""), element: <Register /> },
+			{ path: ROUTES.PUBLIC.LOGIN.replace("/", ""), element: <Login /> },
+			{ path: ROUTES.PUBLIC.OTP.replace("/", ""), element: <OTP /> },
+			{ path: ROUTES.PUBLIC.FORGOT_PASSWORD.replace("/", ""), element: <ForgotPassword /> },
+			{ path: ROUTES.PUBLIC.FORGOT_OTP.replace("/", ""), element: <ForgotPasswordOtp /> },
+			{ path: ROUTES.PUBLIC.RESET_PASSWORD.replace("/", ""), element: <ResetPassword /> },
+			{ path: ROUTES.PUBLIC.MEMBER_ACCEPT.replace("/", ""), element: <MemberAccept /> },
 		],
 	},
 
@@ -57,55 +58,54 @@ export const router = createBrowserRouter([
 		children: [
 			// ADMIN
 			{
-				path: "/admin",
+				path: ROUTES.ADMIN.ROOT,
 				element: <AdminLayout />,
 				children: [
-					{ path: "dashboard", element: <AdminDashboard /> },
-					{ path: "projects", element: <Projects /> },
-					{ path: "projects/:projectId", element: <ProjectDetail /> },
-					{ path: "members", element: <Members /> },
-					{ path: "sprints", element: <SprintsPage /> },
-					{ path: "sprint-planning", element: <SprintPlanning /> },
-					{ path: "user-stories", element: <UserStoriesPage /> },
-					{ path: "meeting/:roomId", element: <MeetingRoom /> },
-					{ path: "team", element: <div>Team</div> },
-					{ path: "meetings", element: <Meetings /> },
-					{ path: "reports", element: <div>Reports</div> },
-					{ path: "settings", element: <Settings /> },
+					{ path: ROUTES.ADMIN.DASHBOARD, element: <AdminDashboard /> },
+					{ path: ROUTES.ADMIN.PROJECTS, element: <Projects /> },
+					{ path: ROUTES.ADMIN.PROJECT_DETAIL, element: <ProjectDetail /> },
+					{ path: ROUTES.ADMIN.MEMBERS, element: <Members /> },
+					{ path: ROUTES.ADMIN.SPRINTS, element: <SprintsPage /> },
+					{ path: ROUTES.ADMIN.SPRINT_PLANNING, element: <SprintPlanning /> },
+					{ path: ROUTES.ADMIN.USER_STORIES, element: <UserStoriesPage /> },
+					{ path: ROUTES.ADMIN.MEETING_ROOM, element: <MeetingRoom /> },
+					{ path: ROUTES.ADMIN.TEAM, element: <div>Team</div> },
+					{ path: ROUTES.ADMIN.MEETINGS, element: <Meetings /> },
+					{ path: ROUTES.ADMIN.REPORTS, element: <div>Reports</div> },
+					{ path: ROUTES.ADMIN.SETTINGS, element: <Settings /> },
 				],
 			},
 
 			// SUPER ADMIN
 			{
-				path: "/superadmin",
+				path: ROUTES.SUPERADMIN.ROOT,
 				element: <SuperAdminLayout />,
 				children: [
-					{ path: "dashboard", element: <SuperAdminDashboard /> },
-					{ path: "companies", element: <SuperAdminCompanyPage /> },
-					{ path: "companies/:companyId", element: <SuperAdminCompanyDetail /> },
-					{ path: "logs", element: <div>Active Logs</div> },
-					{ path: "subscriptions", element: <div>Subscription Plans</div> },
-					{ path: "settings", element: <div>Settings</div> },
+					{ path: ROUTES.SUPERADMIN.DASHBOARD, element: <SuperAdminDashboard /> },
+					{ path: ROUTES.SUPERADMIN.COMPANIES, element: <SuperAdminCompanyPage /> },
+					{ path: ROUTES.SUPERADMIN.COMPANY_DETAIL, element: <SuperAdminCompanyDetail /> },
+					{ path: ROUTES.SUPERADMIN.LOGS, element: <div>Active Logs</div> },
+					{ path: ROUTES.SUPERADMIN.SUBSCRIPTIONS, element: <div>Subscription Plans</div> },
+					{ path: ROUTES.SUPERADMIN.SETTINGS, element: <div>Settings</div> },
 				],
 			},
 
 			// DEVELOPERS
 			{
-				path: "/developers",
+				path: ROUTES.DEVELOPER.ROOT,
 				element: <DeveloperLayout />,
 				children: [
-					{ path: "dashboard", element: <DashboardPage /> },
-					{ path: "kanban", element: <KanbanBoard /> },
-					{ path: "tasks", element: <MyTasksPage /> },
-					{ path: "projects", element: <Projects isReadOnly={true} /> },
-					{ path: "projects/:projectId", element: <ProjectDetail isReadOnly={true} /> },
-					{ path: "sprints", element: <div>Sprints Page</div> },
-					{ path: "sprints", element: <div>Sprints Page</div> },
-					{ path: "standups", element: <DeveloperStandup /> },
-					{ path: "meetings", element: <DeveloperMeetings /> },
-					{ path: "meeting/:roomId", element: <MeetingRoom /> },
-					{ path: "Performance", element: <div>Settings Page</div> },
-					{ path: "Profile", element: <div>Settings Page</div> },
+					{ path: ROUTES.DEVELOPER.DASHBOARD, element: <DashboardPage /> },
+					{ path: ROUTES.DEVELOPER.KANBAN, element: <KanbanBoard /> },
+					{ path: ROUTES.DEVELOPER.TASKS, element: <MyTasksPage /> },
+					{ path: ROUTES.DEVELOPER.PROJECTS, element: <Projects isReadOnly={true} /> },
+					{ path: ROUTES.DEVELOPER.PROJECT_DETAIL, element: <ProjectDetail isReadOnly={true} /> },
+					{ path: ROUTES.DEVELOPER.SPRINTS, element: <div>Sprints Page</div> },
+					{ path: ROUTES.DEVELOPER.STANDUPS, element: <DeveloperStandup /> },
+					{ path: ROUTES.DEVELOPER.MEETINGS, element: <DeveloperMeetings /> },
+					{ path: ROUTES.DEVELOPER.MEETING_ROOM, element: <MeetingRoom /> },
+					{ path: ROUTES.DEVELOPER.PERFORMANCE, element: <div>Settings Page</div> },
+					{ path: ROUTES.DEVELOPER.PROFILE, element: <div>Settings Page</div> },
 				],
 			},
 		],

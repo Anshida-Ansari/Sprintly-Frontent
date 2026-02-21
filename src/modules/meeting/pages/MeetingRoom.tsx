@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { UserAuth } from "../../auth/store/store";
 import { useWebRTC } from "../hooks/useWebRTC";
 import { meetingService } from "../../admin/services/meeting.service";
+import { buildPath, ROUTES } from "../../../constants/routes";
 
 const VideoPlayer = ({
 	stream,
@@ -92,11 +93,11 @@ export default function MeetingRoom() {
 		// Navigate based on role (assuming role is available in user object, otherwise default to /)
 		// Adjust this logic if role property is named differently or nested
 		if (user?.role === "admin") {
-			navigate("/admin/meetings");
+			navigate(buildPath.admin(ROUTES.ADMIN.MEETINGS));
 		} else if (user?.role === "superadmin") {
-			navigate("/superadmin/dashboard");
+			navigate(buildPath.superadmin(ROUTES.SUPERADMIN.DASHBOARD));
 		} else {
-			navigate("/developers/dashboard");
+			navigate(buildPath.developer(ROUTES.DEVELOPER.DASHBOARD));
 		}
 	};
 
