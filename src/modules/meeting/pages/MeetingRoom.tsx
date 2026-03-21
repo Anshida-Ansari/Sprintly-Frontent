@@ -75,12 +75,10 @@ export default function MeetingRoom() {
 	};
 
 	const handleEndCall = async () => {
-		// Stop all tracks
 		if (localStream) {
 			localStream.getTracks().forEach((track) => track.stop());
 		}
 
-		// Update meeting status if admin
 		if (user?.role === "admin" && roomId) {
 			try {
 				await meetingService.updateMeetingStatus(roomId, "COMPLETED");
@@ -90,8 +88,7 @@ export default function MeetingRoom() {
 			}
 		}
 
-		// Navigate based on role (assuming role is available in user object, otherwise default to /)
-		// Adjust this logic if role property is named differently or nested
+		
 		if (user?.role === "admin") {
 			navigate(buildPath.admin(ROUTES.ADMIN.MEETINGS));
 		} else if (user?.role === "superadmin") {

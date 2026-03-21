@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { userStoryService } from "../services/userstory.service";
 import type {
+	AddCommentPayload,
 	CreateUserStoryPayload,
 	EditUserStoryPayload,
 } from "../types/types";
@@ -111,6 +112,18 @@ export const useAssignUserStoryToMember = () => {
 		},
 		onError: (error: any) => {
 			toast.error(error.response?.data?.message || "Failed to assign member");
+		},
+	});
+};
+
+export const useAddComment = (userStoryId: string) => {
+	return useMutation({
+		mutationFn: (payload: AddCommentPayload) =>
+			userStoryService.addComment(userStoryId, payload),
+		onError: (error: any) => {
+			toast.error(
+				error.response?.data?.message || "Failed to post comment",
+			);
 		},
 	});
 };

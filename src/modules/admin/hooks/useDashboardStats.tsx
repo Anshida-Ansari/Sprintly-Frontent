@@ -5,6 +5,6 @@ export function useDashboardStats() {
 	return useQuery({
 		queryKey: ["dashboard-stats"],
 		queryFn: () => dashboardService.getStats(),
-		refetchInterval: 30000, // Refresh every 30 seconds
+		refetchInterval: 30000,
 	});
 }

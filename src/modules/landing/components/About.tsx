@@ -3,7 +3,7 @@ import { Code2, Shield, Users } from "lucide-react";
 // components/landing/About.jsx
 export default function About() {
 	return (
-		<section id="about" className="bg-white py-20">
+		<section id="about" className="bg-slate-50 py-24">
 			<div className="max-w-7xl mx-auto px-6">
 				<div className="text-center mb-16">
 					<h2 className="text-4xl font-bold text-gray-900 mb-4">

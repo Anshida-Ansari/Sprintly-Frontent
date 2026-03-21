@@ -10,7 +10,7 @@ import {
 // components/landing/Features.jsx
 export default function Features() {
 	return (
-		<section id="features" className="py-20">
+		<section id="features" className="bg-slate-50 py-24">
 			<div className="max-w-7xl mx-auto px-6">
 				<div className="text-center mb-16">
 					<h2 className="text-4xl font-bold text-gray-900 mb-4">

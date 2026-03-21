@@ -2,7 +2,7 @@ import { CheckCircle, Code2, Shield, Users } from "lucide-react";
 
 export default function Roles() {
 	return (
-		<section id="teams" className="bg-white py-20">
+		<section id="teams" className="bg-white py-24 border-y border-slate-100">
 			<div className="max-w-7xl mx-auto px-6">
 				<div className="text-center mb-16">
 					<h2 className="text-4xl font-bold text-gray-900 mb-4">

@@ -9,9 +9,11 @@ import {
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useProjects } from "../../admin/hooks/useProjects";
-import { useGetSubtasks, useUpdateSubtaskStatus } from "../../admin/hooks/useSubtasks";
+import { useGetSubtasks, useUpdateSubtaskStatus, useUpdateSubtaskTime, useAddSubtaskComment } from "../../admin/hooks/useSubtasks";
 import { userStoryService } from "../services/userstory.service";
-import type { IUserStory, SubtaskStatus } from "../../admin/types/types";
+import type { IUserStory, SubtaskStatus, ISubtask } from "../../admin/types/types";
+import CommentSection from "../../admin/components/comment-section";
+import { UserAuth } from "../../auth/store/store";
 
 export default function KanbanBoard() {
 	const [selectedProjectId, setSelectedProjectId] = useState<string>("");
@@ -138,6 +140,7 @@ function Swimlane({ story, columns }: { story: IUserStory, columns: any[] }) {
 	const { data: subtasksRes } = useGetSubtasks(story.id);
 	const subtasks = subtasksRes?.data || [];
 	const updateSubtaskMutation = useUpdateSubtaskStatus(story.id);
+	const updateSubtaskTimeMutation = useUpdateSubtaskTime(story.id);
 	const queryClient = useQueryClient();
 
 	const getPriorityStyle = (priority: string) => {
@@ -239,32 +242,117 @@ function Swimlane({ story, columns }: { story: IUserStory, columns: any[] }) {
 
 							{/* Cards */}
 							{colSubtasks.map((task: any) => (
-								<div
+								<SubtaskCard
 									key={task.id}
-									draggable
-									onDragStart={(e) => onDragStart(e, task.id)}
-									className="bg-white border border-gray-200 p-3.5 rounded-xl shadow-sm cursor-grab active:cursor-grabbing hover:border-indigo-300 hover:shadow-md transition-all group/card"
-								>
-									<p className="text-sm font-semibold text-gray-700 group-hover/card:text-gray-900 transition-colors leading-relaxed">
-										{task.title}
-									</p>
-									<div className="flex justify-between items-center mt-3 pt-2 border-t border-gray-50">
-										<span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">
-											{task.id.slice(-4)}
-										</span>
-										{task.assignedTo && (
-											<div className="w-5 h-5 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-[10px] font-bold text-indigo-700 shadow-sm">
-												{/* Initials or Avatar */}
-												A
-											</div>
-										)}
-									</div>
-								</div>
+									task={task}
+									story={story}
+									onDragStart={onDragStart}
+									updateSubtaskTimeMutation={updateSubtaskTimeMutation}
+								/>
 							))}
 						</div>
 					);
 				})}
 			</div>
+		</div>
+	);
+}
+
+function SubtaskCard({
+	task,
+	story,
+	onDragStart,
+	updateSubtaskTimeMutation,
+}: {
+	task: ISubtask;
+	story: IUserStory;
+	onDragStart: (e: React.DragEvent, id: string) => void;
+	updateSubtaskTimeMutation: any;
+}) {
+	const [showComments, setShowComments] = useState(false);
+	const user = UserAuth((state) => state.user);
+	const addComment = useAddSubtaskComment(story.id);
+
+	return (
+		<div
+			draggable
+			onDragStart={(e) => onDragStart(e, task.id)}
+			className="bg-white border border-gray-200 p-3.5 rounded-xl shadow-sm cursor-grab active:cursor-grabbing hover:border-indigo-300 hover:shadow-md transition-all group/card flex flex-col gap-3"
+		>
+			<p className="text-sm font-semibold text-gray-700 group-hover/card:text-gray-900 transition-colors leading-relaxed">
+				{task.title}
+			</p>
+
+			<div className="flex items-center justify-between">
+				<div className="flex items-center gap-1.5 px-2 py-1 bg-gray-50 border border-gray-200 rounded-lg focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100 transition-all">
+					<Clock size={12} className="text-gray-400" />
+					<input
+						type="number"
+						min="0"
+						step="0.5"
+						className="w-10 text-xs bg-transparent text-gray-700 font-bold focus:outline-none placeholder:text-gray-400"
+						title="Actual Hours"
+						placeholder="0h"
+						defaultValue={task.actualHours || ""}
+						onBlur={(e) => {
+							if (e.target.value !== "") {
+								const newVal = Number(e.target.value);
+								if (newVal !== task.actualHours) {
+									updateSubtaskTimeMutation.mutate({
+										subtaskId: task.id,
+										payload: { actualHours: newVal },
+									});
+								}
+							}
+						}}
+					/>
+				</div>
+				{task.estimatedHours !== undefined && (
+					<span
+						className="text-[10px] text-gray-500 font-medium px-1.5 py-0.5 bg-gray-100 rounded border border-gray-200"
+						title="Estimated Hours"
+					>
+						Est: {task.estimatedHours}h
+					</span>
+				)}
+			</div>
+
+			<div className="flex justify-between items-center pt-2 border-t border-gray-50">
+				<div className="flex items-center gap-2">
+					<span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">
+						{task.id.slice(-4)}
+					</span>
+					<button
+						onClick={() => setShowComments(!showComments)}
+						className="flex items-center gap-1 text-[10px] font-bold text-gray-400 hover:text-indigo-600 transition-colors cursor-pointer"
+					>
+						Comments ({task.comments?.length || 0})
+					</button>
+				</div>
+				{task.assignedTo && (
+					<div className="w-5 h-5 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-[10px] font-bold text-indigo-700 shadow-sm">
+						{/* Initials or Avatar */}A
+					</div>
+				)}
+			</div>
+
+			{showComments && (
+				<div className="pt-2 border-t border-gray-50 cursor-default" onDragStart={(e) => e.preventDefault()} draggable={true}>
+					<CommentSection
+						initialComments={task.comments || []}
+						currentUserName={user?.name}
+						onSubmit={(message, onSuccess) => {
+							addComment.mutate(
+								{ subtaskId: task.id, message },
+								{ onSuccess }
+							);
+						}}
+						isPending={addComment.isPending}
+						isError={addComment.isError}
+						error={addComment.error}
+					/>
+				</div>
+			)}
 		</div>
 	);
 }

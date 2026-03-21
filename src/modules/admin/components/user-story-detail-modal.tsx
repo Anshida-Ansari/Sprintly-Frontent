@@ -21,12 +21,15 @@ import {
 	useDeleteSubtask,
 	useGetSubtasks,
 	useUpdateSubtaskStatus,
+	useAddSubtaskComment,
 } from "../hooks/useSubtasks";
 import {
 	useAssignUserStoryToMember,
 	useUpdateUserStory,
+	useAddComment,
 } from "../hooks/useUserStories";
 import type { ISubtask, IUserStory } from "../types/types";
+import CommentSection from "./comment-section";
 import DeleteConfirmationModal from "./delete-confirmation-modal";
 
 interface UserStoryDetailModalProps {
@@ -41,6 +44,7 @@ export default function UserStoryDetailModal({
 	story,
 }: UserStoryDetailModalProps) {
 	const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
+	const [newSubtaskEstimatedHours, setNewSubtaskEstimatedHours] = useState<number | "">("");
 	const [isEditingDescription, setIsEditingDescription] = useState(false);
 	const [editedDescription, setEditedDescription] = useState(story.description);
 	const [isAssignDropdownOpen, setIsAssignDropdownOpen] = useState(false);
@@ -48,8 +52,10 @@ export default function UserStoryDetailModal({
 
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [subtaskToDelete, setSubtaskToDelete] = useState<string | null>(null);
+	const [expandedComments, setExpandedComments] = useState<Record<string, boolean>>({});
 
 	const user = UserAuth((state) => state.user);
+	const addSubtaskComment = useAddSubtaskComment(story.id);
 	const isAdmin = user?.role === "admin";
 
 	const { data: projectRes } = useGetProject(story?.projectId);
@@ -70,6 +76,7 @@ export default function UserStoryDetailModal({
 	const deleteSubtask = useDeleteSubtask(story.id);
 	const updateStory = useUpdateUserStory();
 	const assignMember = useAssignUserStoryToMember();
+	const addComment = useAddComment(story.id);
 
 	const subtasks = subtasksRes?.data || [];
 	const members = membersRes?.data || [];
@@ -101,9 +108,15 @@ export default function UserStoryDetailModal({
 	const handleCreateSubtask = () => {
 		if (newSubtaskTitle.trim()) {
 			createSubtask.mutate(
-				{ title: newSubtaskTitle },
+				{ 
+					title: newSubtaskTitle,
+					estimatedHours: newSubtaskEstimatedHours === "" ? undefined : Number(newSubtaskEstimatedHours)
+				},
 				{
-					onSuccess: () => setNewSubtaskTitle(""),
+					onSuccess: () => {
+						setNewSubtaskTitle("");
+						setNewSubtaskEstimatedHours("");
+					}
 				},
 			);
 		}
@@ -482,10 +495,8 @@ export default function UserStoryDetailModal({
 									);
 
 									return (
-										<div
-											key={subtask.id}
-											className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-all group border border-transparent hover:border-gray-200"
-										>
+										<div key={subtask.id} className="flex flex-col gap-2">
+											<div className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-all group border border-transparent hover:border-gray-200">
 											{/* Status: Checkbox for Developer, Badge for Admin */}
 											{isAdmin ? (
 												<div
@@ -560,6 +571,28 @@ export default function UserStoryDetailModal({
 															Unassigned
 														</span>
 													)}
+
+													{/* Time Tracking Badges */}
+													{(subtask.estimatedHours !== undefined || subtask.actualHours !== undefined) && (
+														<div className="flex gap-2 ml-auto">
+															{subtask.estimatedHours !== undefined && (
+																<span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium border border-slate-200">
+																	Est: {subtask.estimatedHours}h
+																</span>
+															)}
+															{subtask.actualHours !== undefined && (
+																<span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-medium border border-blue-100">
+																	Act: {subtask.actualHours}h
+																</span>
+															)}
+														</div>
+													)}
+													<button
+														onClick={() => setExpandedComments(prev => ({ ...prev, [subtask.id]: !prev[subtask.id] }))}
+														className="ml-2 text-[10px] font-bold text-gray-400 hover:text-indigo-600 transition-colors uppercase tracking-wider"
+													>
+														Comments ({subtask.comments?.length || 0})
+													</button>
 												</div>
 											</div>
 
@@ -574,8 +607,27 @@ export default function UserStoryDetailModal({
 												</button>
 											)}
 										</div>
-									);
-								})}
+
+										{expandedComments[subtask.id] && (
+											<div className="pl-12 pr-4 pb-2">
+												<CommentSection
+													initialComments={subtask.comments || []}
+													currentUserName={user?.name}
+													onSubmit={(message, onSuccess) => {
+														addSubtaskComment.mutate(
+															{ subtaskId: subtask.id, message },
+															{ onSuccess }
+														);
+													}}
+													isPending={addSubtaskComment.isPending}
+													isError={addSubtaskComment.isError}
+													error={addSubtaskComment.error}
+												/>
+											</div>
+										)}
+									</div>
+								);
+							})}
 
 								{subtasks.length === 0 && (
 									<div className="text-center py-8 text-gray-400 font-bold text-sm">
@@ -596,6 +648,15 @@ export default function UserStoryDetailModal({
 									placeholder="Add a new subtask..."
 									className="flex-1 px-5 py-3 bg-white border-2 border-dashed border-gray-200 rounded-2xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400"
 								/>
+								<input
+									type="number"
+									min="0"
+									step="0.5"
+									value={newSubtaskEstimatedHours}
+									onChange={(e) => setNewSubtaskEstimatedHours(e.target.value ? Number(e.target.value) : "")}
+									placeholder="Est. Hours"
+									className="w-28 px-4 py-3 bg-white border-2 border-dashed border-gray-200 rounded-2xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400"
+								/>
 								<button
 									onClick={handleCreateSubtask}
 									disabled={!newSubtaskTitle.trim() || createSubtask.isPending}
@@ -607,6 +668,18 @@ export default function UserStoryDetailModal({
 							</div>
 						)}
 					</div>
+
+					{/* Comments Section */}
+					<CommentSection
+						initialComments={story.comments || []}
+						currentUserName={user?.name}
+						onSubmit={(message, onSuccess) => {
+							addComment.mutate({ message }, { onSuccess });
+						}}
+						isPending={addComment.isPending}
+						isError={addComment.isError}
+						error={addComment.error}
+					/>
 				</div>
 			</div>
 

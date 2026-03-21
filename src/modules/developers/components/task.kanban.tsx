@@ -22,6 +22,7 @@ interface KanbanBoardProps {
 	tasks: any[];
 	onTaskMove: (taskId: string, newStatus: string) => void;
 	onSubtaskUpdate: (subtaskId: string, status: string) => void;
+	onSubtaskTimeUpdate?: (subtaskId: string, actualHours: number) => void;
 }
 
 const COLUMNS = [
@@ -34,6 +35,7 @@ export function KanbanBoard({
 	tasks,
 	onTaskMove,
 	onSubtaskUpdate,
+	onSubtaskTimeUpdate,
 }: KanbanBoardProps) {
 	const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -152,6 +154,7 @@ export function KanbanBoard({
 											key={task.id}
 											task={task}
 											onSubtaskUpdate={onSubtaskUpdate}
+											onSubtaskTimeUpdate={onSubtaskTimeUpdate}
 										/>
 									))}
 									{stories.length === 0 && (

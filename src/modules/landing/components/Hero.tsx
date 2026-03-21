@@ -6,7 +6,7 @@ export default function Hero() {
 	const navigate = useNavigate();
 
 	return (
-		<section className="max-w-7xl mx-auto px-6 pt-20 pb-32">
+		<section className="max-w-7xl mx-auto px-6 pt-32 pb-24">
 			<div className="grid md:grid-cols-2 gap-12 items-center">
 				<div>
 					<div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium mb-6">

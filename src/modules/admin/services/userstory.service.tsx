@@ -1,5 +1,6 @@
 import api from "../../../lib/axios.user";
 import type {
+	AddCommentPayload,
 	CreateUserStoryPayload,
 	EditUserStoryPayload,
 	GetUserStoriesResponse,
@@ -98,6 +99,17 @@ export const userStoryService = {
 			{
 				developerId,
 			},
+		);
+		return res.data;
+	},
+
+	async addComment(
+		userStoryId: string,
+		payload: AddCommentPayload,
+	): Promise<any> {
+		const res = await api.post(
+			`projects/${userStoryId}/comments`,
+			payload,
 		);
 		return res.data;
 	},

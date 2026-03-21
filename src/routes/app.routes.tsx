@@ -33,7 +33,7 @@ const MyTasksPage = lazy(() => import("../modules/developers/pages/my.tasks"));
 const DeveloperStandup = lazy(() => import("../modules/standup/pages/developer.standup"));
 const DeveloperMeetings = lazy(() => import("../modules/meeting/pages/developer.meetings"));
 const Settings = lazy(() => import("../modules/admin/pages/settings"));
-
+const ProfilePage = lazy(() => import("../modules/profile/pages/profile.page"));
 
 export const router = createBrowserRouter([
 	// PUBLIC
@@ -73,6 +73,7 @@ export const router = createBrowserRouter([
 					{ path: ROUTES.ADMIN.MEETINGS, element: <Meetings /> },
 					{ path: ROUTES.ADMIN.REPORTS, element: <div>Reports</div> },
 					{ path: ROUTES.ADMIN.SETTINGS, element: <Settings /> },
+					{ path: ROUTES.ADMIN.PROFILE, element: <ProfilePage /> },
 				],
 			},
 
@@ -105,7 +106,7 @@ export const router = createBrowserRouter([
 					{ path: ROUTES.DEVELOPER.MEETINGS, element: <DeveloperMeetings /> },
 					{ path: ROUTES.DEVELOPER.MEETING_ROOM, element: <MeetingRoom /> },
 					{ path: ROUTES.DEVELOPER.PERFORMANCE, element: <div>Settings Page</div> },
-					{ path: ROUTES.DEVELOPER.PROFILE, element: <div>Settings Page</div> },
+					{ path: ROUTES.DEVELOPER.PROFILE, element: <ProfilePage /> },
 				],
 			},
 		],

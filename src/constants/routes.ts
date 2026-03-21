@@ -24,6 +24,7 @@ export const ROUTES = {
         TEAM: "team",
         REPORTS: "reports",
         SETTINGS: "settings",
+        PROFILE: "profile",
     },
 
     SUPERADMIN: {
@@ -48,7 +49,7 @@ export const ROUTES = {
         MEETINGS: "meetings",
         MEETING_ROOM: "meeting/:roomId",
         PERFORMANCE: "Performance",
-        PROFILE: "Profile",
+        PROFILE: "profile",
     },
 }
 

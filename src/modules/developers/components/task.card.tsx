@@ -8,6 +8,8 @@ interface SubTask {
 	title: string;
 	status: string;
 	assignedTo: string;
+	estimatedHours?: number;
+	actualHours?: number;
 }
 
 interface UserStory {
@@ -23,9 +25,10 @@ interface UserStory {
 interface TaskCardProps {
 	task: UserStory;
 	onSubtaskUpdate: (subtaskId: string, status: string) => void;
+	onSubtaskTimeUpdate?: (subtaskId: string, actualHours: number) => void;
 }
 
-export function TaskCard({ task, onSubtaskUpdate }: TaskCardProps) {
+export function TaskCard({ task, onSubtaskUpdate, onSubtaskTimeUpdate }: TaskCardProps) {
 	const user = UserAuth((state) => state.user);
 
 	const { attributes, listeners, setNodeRef, transform, transition } =
@@ -109,29 +112,63 @@ export function TaskCard({ task, onSubtaskUpdate }: TaskCardProps) {
 									{subtask.title}
 								</span>
 
-								{isAssignedToMe ? (
-									<select
-										value={subtask.status}
-										onChange={(e) =>
-											onSubtaskUpdate(subtask._id, e.target.value)
-										}
-										className="h-6 text-[10px] px-1 bg-white/[0.05] border border-white/10 rounded text-gray-300 focus:outline-none focus:border-indigo-500"
-									>
-										<option value="pending" className="bg-gray-900">
-											Pending
-										</option>
-										<option value="in-progress" className="bg-gray-900">
-											In Progress
-										</option>
-										<option value="completed" className="bg-gray-900">
-											Completed
-										</option>
-									</select>
-								) : (
-									<span className="text-[10px] font-medium text-gray-500 bg-white/[0.05] px-2 py-0.5 rounded capitalize">
-										{subtask.status}
-									</span>
-								)}
+								<div className="flex items-center gap-2">
+									{subtask.estimatedHours !== undefined && (
+										<span className="text-[9px] text-gray-400 font-mono bg-white/5 px-1.5 py-0.5 rounded border border-white/10" title="Estimated Hours">
+											E: {subtask.estimatedHours}h
+										</span>
+									)}
+
+									{isAssignedToMe ? (
+										<>
+											<input
+												type="number"
+												min="0"
+												step="0.5"
+												className="w-12 h-6 text-[10px] px-1 bg-white/[0.05] border border-white/10 rounded text-gray-300 focus:outline-none focus:border-indigo-500 text-center placeholder:text-gray-600 font-mono"
+												title="Actual Hours"
+												placeholder="A: 0h"
+												defaultValue={subtask.actualHours || ""}
+												onBlur={(e) => {
+													if (e.target.value !== "" && onSubtaskTimeUpdate) {
+														const newVal = Number(e.target.value);
+														if (newVal !== subtask.actualHours) {
+															onSubtaskTimeUpdate(subtask._id, newVal);
+														}
+													}
+												}}
+											/>
+											<select
+												value={subtask.status}
+												onChange={(e) =>
+													onSubtaskUpdate(subtask._id, e.target.value)
+												}
+												className="h-6 text-[10px] px-1 bg-white/[0.05] border border-white/10 rounded text-gray-300 focus:outline-none focus:border-indigo-500"
+											>
+												<option value="pending" className="bg-gray-900">
+													Pending
+												</option>
+												<option value="in-progress" className="bg-gray-900">
+													In Progress
+												</option>
+												<option value="completed" className="bg-gray-900">
+													Completed
+												</option>
+											</select>
+										</>
+									) : (
+										<>
+											{subtask.actualHours !== undefined && (
+												<span className="text-[9px] text-indigo-300 font-mono bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20" title="Actual Hours">
+													A: {subtask.actualHours}h
+												</span>
+											)}
+											<span className="text-[10px] font-medium text-gray-500 bg-white/[0.05] px-2 py-0.5 rounded capitalize">
+												{subtask.status}
+											</span>
+										</>
+									)}
+								</div>
 							</div>
 						);
 					})

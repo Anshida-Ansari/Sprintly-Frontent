@@ -5,7 +5,7 @@ export default function CTA() {
 	const navigate = useNavigate();
 
 	return (
-		<section className="py-20">
+		<section className="bg-white py-24">
 			<div className="max-w-4xl mx-auto px-6 text-center">
 				<div className="bg-gradient-to-br from-indigo-600 to-blue-600 rounded-3xl p-12 shadow-2xl">
 					<h2 className="text-4xl font-bold text-white mb-4">

@@ -74,7 +74,9 @@ export const userStorySchema = z.object({
     status: z.enum(["In pending", "In progress", "In review", "Done"]),
     estimationPoints: z.coerce
         .number()
-        .min(0, "Estimation points must be a positive number"),
+        .refine((val) => [1, 2, 3, 5, 8, 13].includes(val), {
+            message: "Estimation points must be a Fibonacci number (1, 2, 3, 5, 8, 13)",
+        }),
     acceptanceCriteria: z.array(z.string()).optional(),
     acceptanceCriteriaText: z.string().optional(),
 });

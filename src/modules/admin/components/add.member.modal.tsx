@@ -29,7 +29,6 @@ export default function AddMemberModal({
 
     const members = membersRes?.data || [];
 
-    // Filter out members already in the project
     const availableMembers = members.filter(
         (m: any) => !currentMembers.some((cm) => cm.id === m.id || cm._id === m._id)
     );
@@ -39,8 +38,7 @@ export default function AddMemberModal({
             { projectId, memberId },
             {
                 onSuccess: () => {
-                    // Optional: close modal or keep open to add more
-                    // onClose(); 
+                
                 },
             },
         );

@@ -9,6 +9,7 @@ import {
 	Users,
 	Video,
 	Zap,
+	UserCircle,
 } from "lucide-react";
 import { useEffect } from "react";
 import { NavLink, Outlet } from "react-router-dom";
@@ -27,6 +28,7 @@ const sidebarLinks = [
 	{ name: "Team", path: "/admin/team", icon: UserPlus },
 	{ name: "Meetings", path: "/admin/meetings", icon: Video },
 	{ name: "Reports", path: "/admin/reports", icon: BarChart3 },
+	{ name: "Profile", path: "/admin/profile", icon: UserCircle },
 ];
 
 export default function AdminLayout() {

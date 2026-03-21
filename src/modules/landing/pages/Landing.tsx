@@ -8,14 +8,16 @@ import Roles from "../components/Roles";
 
 export default function LandingPage() {
 	return (
-		<>
+		<div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 flex flex-col">
 			<Navbar />
-			<Hero />
-			<About />
-			<Features />
-			<Roles />
-			<CTA />
+			<main className="flex-1">
+				<Hero />
+				<Features />
+				<Roles />
+				<About />
+				<CTA />
+			</main>
 			<Footer />
-		</>
+		</div>
 	);
 }

@@ -14,6 +14,9 @@ const mapSubtask = (s: any) => ({
 	userStoryId: s._userStoryId || s.userStoryId,
 	companyId: s._companyId || s.companyId,
 	assignedTo: s._assignedTo || s.assignedTo,
+	estimatedHours: s._estimatedHours || s.estimatedHours,
+	actualHours: s._actualHours || s.actualHours,
+	comments: s._comments || s.comments || [],
 	createdAt: s._createdAt || s.createdAt,
 	updatedAt: s._updatedAt || s.updatedAt,
 });
@@ -39,6 +42,11 @@ export const subtaskService = {
 		return res.data;
 	},
 
+	async updateSubtaskTime(subtaskId: string, payload: { estimatedHours?: number; actualHours?: number }) {
+		const res = await api.patch(`userstory/${subtaskId}/time`, payload);
+		return res.data;
+	},
+
 	async assignSubtask(subtaskId: string, payload: AssignSubtaskPayload) {
 		const res = await api.patch(
 			`userstory/${subtaskId}/assign-members`,
@@ -49,6 +57,11 @@ export const subtaskService = {
 
 	async deleteSubtask(subtaskId: string) {
 		const res = await api.delete(`userstory/${subtaskId}`);
+		return res.data;
+	},
+
+	async addSubtaskComment(subtaskId: string, payload: { message: string }) {
+		const res = await api.post(`userstory/${subtaskId}/comments`, payload);
 		return res.data;
 	},
 };

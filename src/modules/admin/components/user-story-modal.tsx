@@ -37,7 +37,7 @@ export default function UserStoryModal({
 			description: "",
 			priority: PriorityStatus.MEDIUM,
 			status: UserStoryStatus.IN_PENDING,
-			estimationPoints: 0,
+			estimationPoints: 1,
 			acceptanceCriteria: [],
 			acceptanceCriteriaText: "",
 		},
@@ -50,7 +50,7 @@ export default function UserStoryModal({
 				setValue("description", userStory.description);
 				setValue("priority", userStory.priority);
 				setValue("status", userStory.status);
-				setValue("estimationPoints", userStory.estimationPoints || 0);
+				setValue("estimationPoints", userStory.estimationPoints || 1);
 				setValue("acceptanceCriteria", userStory.acceptanceCriteria || []);
 				setValue(
 					"acceptanceCriteriaText",
@@ -62,7 +62,7 @@ export default function UserStoryModal({
 					description: "",
 					priority: PriorityStatus.MEDIUM,
 					status: UserStoryStatus.IN_PENDING,
-					estimationPoints: 0,
+					estimationPoints: 1,
 					acceptanceCriteria: [],
 					acceptanceCriteriaText: "",
 				});
@@ -183,15 +183,29 @@ export default function UserStoryModal({
 								<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
 									Estimate
 								</label>
-								<input
-									{...register("estimationPoints")}
-									type="number"
-									min={0}
-									className={`w-full px-3 py-2.5 bg-white border ${errors.estimationPoints
-										? "border-red-500"
-										: "border-gray-200"
-										} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium text-gray-900 placeholder:text-gray-400`}
-								/>
+								<div className="relative">
+									<select
+										{...register("estimationPoints")}
+										className={`w-full px-3 py-2.5 bg-white border ${errors.estimationPoints
+											? "border-red-500"
+											: "border-gray-200"
+											} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium text-gray-900 appearance-none cursor-pointer`}
+									>
+										{[1, 2, 3, 5, 8, 13].map((val) => (
+											<option key={val} value={val}>
+												{val}
+											</option>
+										))}
+									</select>
+									<div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 text-xs">
+										▼
+									</div>
+								</div>
+								{errors.estimationPoints && (
+									<p className="text-red-500 text-xs mt-0.5">
+										{errors.estimationPoints.message}
+									</p>
+								)}
 							</div>
 
 							{userStory && (

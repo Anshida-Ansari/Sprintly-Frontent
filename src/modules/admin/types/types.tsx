@@ -120,6 +120,17 @@ export const PriorityStatus = {
 export type PriorityStatus =
 	(typeof PriorityStatus)[keyof typeof PriorityStatus];
 
+export interface IComment {
+	userId: string;
+	userName?: string;
+	message: string;
+	createdAt: string;
+}
+
+export interface AddCommentPayload {
+	message: string;
+}
+
 export interface IUserStory {
 	id: string;
 	projectId: string;
@@ -132,6 +143,7 @@ export interface IUserStory {
 	assignedTo?: string;
 	estimationPoints?: number;
 	acceptanceCriteria?: string[];
+	comments?: IComment[];
 	createdAt: string;
 	updatedAt?: string;
 }
@@ -217,12 +229,21 @@ export interface ISubtask {
 	title: string;
 	status: SubtaskStatus;
 	assignedTo?: string;
+	estimatedHours?: number;
+	actualHours?: number;
+	comments?: IComment[];
 	createdAt: string;
 	updatedAt?: string;
 }
 
 export interface CreateSubtaskPayload {
 	title: string;
+	estimatedHours?: number;
+}
+
+export interface UpdateSubtaskTimePayload {
+	estimatedHours?: number;
+	actualHours?: number;
 }
 
 export interface UpdateSubtaskStatusPayload {

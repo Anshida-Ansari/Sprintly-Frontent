@@ -1,9 +1,13 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { UserAuth } from "../modules/auth/store/store";
+import { useGetMe } from "../modules/auth/hooks/useGetMe";
 
 export default function ProtectedRoutes() {
 	const { user, token, isHydrated } = UserAuth();
 	const location = useLocation();
+
+	// Always sync the latest user data (incl. companyId) from the backend
+	useGetMe();
 
 	if (!isHydrated) {
 		return null;
@@ -12,9 +16,6 @@ export default function ProtectedRoutes() {
 	if (!token || !user) {
 		return <Navigate to="/login" replace />;
 	}
-
-	console.log(token);
-	console.log(user);
 
 	if (location.pathname === "/dashboard") {
 		if (user.role === "admin" || user.role === "lead") {

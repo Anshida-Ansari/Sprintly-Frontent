@@ -54,6 +54,29 @@ export const useUpdateSubtaskStatus = (userStoryId: string) => {
 	});
 };
 
+export const useUpdateSubtaskTime = (userStoryId: string) => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({
+			subtaskId,
+			payload,
+		}: {
+			subtaskId: string;
+			payload: { estimatedHours?: number; actualHours?: number };
+		}) => subtaskService.updateSubtaskTime(subtaskId, payload),
+		onSuccess: (res: any) => {
+			queryClient.invalidateQueries({ queryKey: ["subtasks", userStoryId] });
+			toast.success(res.message || "Subtask time updated");
+		},
+		onError: (error: any) => {
+			toast.error(
+				error.response?.data?.message || "Failed to update subtask time",
+			);
+		},
+	});
+};
+
 export const useAssignSubtask = (userStoryId: string) => {
 	const queryClient = useQueryClient();
 
@@ -86,6 +109,23 @@ export const useDeleteSubtask = (userStoryId: string) => {
 		},
 		onError: (error: any) => {
 			toast.error(error.response?.data?.message || "Failed to delete subtask");
+		},
+	});
+};
+
+export const useAddSubtaskComment = (userStoryId: string) => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: ({ subtaskId, message }: { subtaskId: string; message: string }) =>
+			subtaskService.addSubtaskComment(subtaskId, { message }),
+		onSuccess: (res: any) => {
+			queryClient.invalidateQueries({ queryKey: ["subtasks", userStoryId] });
+			queryClient.invalidateQueries({ queryKey: ["active-sprint-stories"] });
+			toast.success(res.message || "Comment added successfully");
+		},
+		onError: (error: any) => {
+			toast.error(error.response?.data?.message || "Failed to post comment");
 		},
 	});
 };
