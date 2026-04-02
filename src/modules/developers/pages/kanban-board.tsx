@@ -4,16 +4,24 @@ import {
 	Zap,
 	Kanban,
 	Flame,
-	AlertCircle
+	AlertCircle,
+	TrendingUp,
+	TrendingDown,
+	MessageSquare,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useProjects } from "../../admin/hooks/useProjects";
-import { useGetSubtasks, useUpdateSubtaskStatus, useUpdateSubtaskTime, useAddSubtaskComment } from "../../admin/hooks/useSubtasks";
+import { useGetSubtasks, useUpdateSubtaskStatus, useAddSubtaskComment } from "../../admin/hooks/useSubtasks";
+import { useAddComment as useAddStoryComment } from "../../admin/hooks/useUserStories";
+import { useGetMembers } from "../../admin/hooks/useGetmembers";
+import { useGetSprints } from "../../admin/hooks/useSprints";
 import { userStoryService } from "../services/userstory.service";
 import type { IUserStory, SubtaskStatus, ISubtask } from "../../admin/types/types";
 import CommentSection from "../../admin/components/comment-section";
 import { UserAuth } from "../../auth/store/store";
+import { AttachmentButton } from "../../../shared/components/attachment-button";
+import { SecureAttachmentLink } from "../../../shared/components/secure-attachment-link";
 
 export default function KanbanBoard() {
 	const [selectedProjectId, setSelectedProjectId] = useState<string>("");
@@ -22,10 +30,33 @@ export default function KanbanBoard() {
 		queryKey: ["my-user-stories"],
 		queryFn: () => userStoryService.getMyUserStories(),
 	});
+	const { data: membersRes } = useGetMembers({ page: 1, limit: 100 });
+	const { data: sprintsRes } = useGetSprints(selectedProjectId, { page: 1, limit: 100 });
 
 	const projects = projectsRes?.data || [];
 	const allStories = userStoriesRes?.data || [];
-	const activeSprintStories = allStories.filter((s: IUserStory) => s.sprintId);
+	const members = membersRes?.data || [];
+	const sprints = sprintsRes?.data || [];
+
+	const sprintStatusMap = useMemo(() => {
+		const map: Record<string, string> = {};
+		sprints.forEach((s: any) => {
+			const id = s.id || s._id;
+			if (id) map[id] = s.status;
+		});
+		return map;
+	}, [sprints]);
+
+	const activeSprintStories = allStories.filter((s: IUserStory) => 
+		s.sprintId && (!selectedProjectId || s.projectId === selectedProjectId)
+	);
+
+	// Build a userId → name map for resolving old comments and initials
+	const membersMap: Record<string, string> = {};
+	members.forEach((m: any) => {
+		const id = m._id || m.id;
+		if (id && m.name) membersMap[id] = m.name;
+	});
 
 	const columns = [
 		{ id: "In pending", title: "To Do", icon: Clock, color: "gray", status: "In pending" as SubtaskStatus },
@@ -116,7 +147,13 @@ export default function KanbanBoard() {
 
 						<div className="space-y-4">
 							{activeSprintStories.map((story: IUserStory) => (
-								<Swimlane key={story.id} story={story} columns={columns} />
+								<Swimlane 
+									key={story.id} 
+									story={story} 
+									columns={columns} 
+									membersMap={membersMap} 
+									sprintStatusMap={sprintStatusMap}
+								/>
 							))}
 							{activeSprintStories.length === 0 && (
 								<div className="flex flex-col items-center justify-center py-20 bg-gray-50 rounded-3xl border border-gray-100">
@@ -136,12 +173,27 @@ export default function KanbanBoard() {
 	);
 }
 
-function Swimlane({ story, columns }: { story: IUserStory, columns: any[] }) {
+function Swimlane({ 
+	story, 
+	columns, 
+	membersMap, 
+	sprintStatusMap 
+}: { 
+	story: IUserStory, 
+	columns: any[], 
+	membersMap: Record<string, string>,
+	sprintStatusMap: Record<string, string>
+}) {
 	const { data: subtasksRes } = useGetSubtasks(story.id);
 	const subtasks = subtasksRes?.data || [];
 	const updateSubtaskMutation = useUpdateSubtaskStatus(story.id);
-	const updateSubtaskTimeMutation = useUpdateSubtaskTime(story.id);
 	const queryClient = useQueryClient();
+	const [showStoryComments, setShowStoryComments] = useState(false);
+	const user = UserAuth((state) => state.user);
+	const addStoryComment = useAddStoryComment(story.id);
+
+	const sprintStatus = story.sprintId ? sprintStatusMap[story.sprintId] : null;
+	const isSprintActive = sprintStatus === "ACTIVE";
 
 	const getPriorityStyle = (priority: string) => {
 		switch (priority) {
@@ -164,6 +216,8 @@ function Swimlane({ story, columns }: { story: IUserStory, columns: any[] }) {
 
 	const onDrop = (e: React.DragEvent, targetStatus: SubtaskStatus) => {
 		e.preventDefault();
+		if (!isSprintActive) return;
+		
 		const subtaskId = e.dataTransfer.getData("subtaskId");
 		if (subtaskId) {
 			updateSubtaskMutation.mutate(
@@ -200,59 +254,105 @@ function Swimlane({ story, columns }: { story: IUserStory, columns: any[] }) {
 									In Review
 								</span>
 							)}
+							{sprintStatus && (
+								<span className={`inline-flex items-center px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wide ${
+									isSprintActive 
+										? 'bg-emerald-100 text-emerald-900 border-emerald-200' 
+										: 'bg-gray-100 text-gray-500 border-gray-200'
+								}`}>
+									Sprint: {sprintStatus}
+								</span>
+							)}
 						</div>
 						<h4 className="font-bold text-gray-900 text-lg leading-snug tracking-tight">{story.title}</h4>
 					</div>
 				</div>
-				<div className="flex items-center gap-2 text-xs font-bold text-gray-400">
-					<div className="h-1.5 flex-1 bg-gray-100 rounded-full overflow-hidden">
-						<div
-							className="h-full bg-indigo-500 rounded-full transition-all duration-500"
-							style={{ width: `${(subtasks.filter((s: any) => s.status === "Done").length / (subtasks.length || 1)) * 100}%` }}
-						/>
+				<div className="flex flex-col gap-2">
+					<div className="flex items-center gap-2 text-xs font-bold text-gray-400">
+						<div className="h-1.5 flex-1 bg-gray-100 rounded-full overflow-hidden">
+							<div
+								className="h-full bg-indigo-500 rounded-full transition-all duration-500"
+								style={{ width: `${(subtasks.filter((s: any) => s.status === "Done").length / (subtasks.length || 1)) * 100}%` }}
+							/>
+						</div>
+						<span>{subtasks.filter((s: any) => s.status === "Done").length}/{subtasks.length}</span>
 					</div>
-					<span>{subtasks.filter((s: any) => s.status === "Done").length}/{subtasks.length}</span>
+					<button
+						onClick={() => setShowStoryComments(!showStoryComments)}
+						className="flex items-center gap-1.5 text-[10px] font-black text-gray-400 hover:text-indigo-600 uppercase tracking-wider transition-colors"
+					>
+						<MessageSquare size={12} />
+						Story Comments ({story.comments?.length || 0})
+					</button>
 				</div>
 			</div>
 
 			{/* Subtask Columns */}
-			<div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-				{columns.map((col: any) => {
-					const colSubtasks = subtasks.filter((s: any) => s.status === col.status);
+			<div className="md:col-span-3">
+				{showStoryComments && (
+					<div className="mb-6 p-6 bg-white rounded-2xl border border-indigo-100 shadow-sm animate-in slide-in-from-top-2 duration-300">
+						<CommentSection
+							initialComments={story.comments || []}
+							currentUserName={user?.name}
+							membersMap={membersMap}
+							onSubmit={(message, onSuccess) => {
+								addStoryComment.mutate(
+									{ message },
+									{ 
+										onSuccess: () => {
+											onSuccess();
+											queryClient.invalidateQueries({ queryKey: ["my-user-stories"] });
+											queryClient.invalidateQueries({ queryKey: ["user-stories"] });
+											queryClient.invalidateQueries({ queryKey: ["active-sprint-stories"] });
+										}
+									}
+								);
+							}}
+							isPending={addStoryComment.isPending}
+							isError={addStoryComment.isError}
+							error={addStoryComment.error}
+						/>
+					</div>
+				)}
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+					{columns.map((col: any) => {
+						const colSubtasks = subtasks.filter((s: any) => s.status === col.status);
 
-					return (
-						<div
-							key={col.id}
-							onDrop={(e) => onDrop(e, col.status)}
-							onDragOver={allowDrop}
-							className="bg-gray-50/50 border border-gray-100 rounded-2xl p-3 min-h-[140px] flex flex-col gap-3 transition-colors hover:bg-gray-50/80 group/col relative"
-						>
-							{/* Column Mobile Header */}
-							<div className="md:hidden flex items-center gap-2 mb-1 text-gray-400 text-xs font-bold uppercase">
-								<col.icon size={12} />
-								{col.title}
-							</div>
-
-							{/* Dropzone Hint */}
-							{colSubtasks.length === 0 && (
-								<div className="absolute inset-0 flex items-center justify-center text-gray-300 text-xs font-medium opacity-0 group-hover/col:opacity-100 transition-opacity pointer-events-none">
-									Drop here
+						return (
+							<div
+								key={col.id}
+								onDrop={(e) => onDrop(e, col.status)}
+								onDragOver={allowDrop}
+								className="bg-gray-50/50 border border-gray-100 rounded-2xl p-3 min-h-[140px] flex flex-col gap-3 transition-colors hover:bg-gray-50/80 group/col relative"
+							>
+								{/* Column Mobile Header */}
+								<div className="md:hidden flex items-center gap-2 mb-1 text-gray-400 text-xs font-bold uppercase">
+									<col.icon size={12} />
+									{col.title}
 								</div>
-							)}
 
-							{/* Cards */}
-							{colSubtasks.map((task: any) => (
-								<SubtaskCard
-									key={task.id}
-									task={task}
-									story={story}
-									onDragStart={onDragStart}
-									updateSubtaskTimeMutation={updateSubtaskTimeMutation}
-								/>
-							))}
-						</div>
-					);
-				})}
+								{/* Dropzone Hint */}
+								{colSubtasks.length === 0 && (
+									<div className="absolute inset-0 flex items-center justify-center text-gray-300 text-xs font-medium opacity-0 group-hover/col:opacity-100 transition-opacity pointer-events-none">
+										Drop here
+									</div>
+								)}
+
+								{/* Cards */}
+								{colSubtasks.map((task: any) => (
+									<SubtaskCard
+										key={task.id}
+										task={task}
+										story={story}
+										onDragStart={onDragStart}
+										membersMap={membersMap}
+										isSprintActive={isSprintActive}
+									/>
+								))}
+							</div>
+						);
+					})}
+				</div>
 			</div>
 		</div>
 	);
@@ -262,76 +362,101 @@ function SubtaskCard({
 	task,
 	story,
 	onDragStart,
-	updateSubtaskTimeMutation,
+	membersMap,
+	isSprintActive,
 }: {
 	task: ISubtask;
 	story: IUserStory;
 	onDragStart: (e: React.DragEvent, id: string) => void;
-	updateSubtaskTimeMutation: any;
+	membersMap: Record<string, string>;
+	isSprintActive: boolean;
 }) {
 	const [showComments, setShowComments] = useState(false);
 	const user = UserAuth((state) => state.user);
 	const addComment = useAddSubtaskComment(story.id);
 
+	const estH = task.estimatedHours;
+	const actH = task.actualHours;
+	const variance =
+		estH !== undefined && actH !== undefined ? actH - estH : null;
+
 	return (
 		<div
-			draggable
-			onDragStart={(e) => onDragStart(e, task.id)}
-			className="bg-white border border-gray-200 p-3.5 rounded-xl shadow-sm cursor-grab active:cursor-grabbing hover:border-indigo-300 hover:shadow-md transition-all group/card flex flex-col gap-3"
+			draggable={isSprintActive}
+			onDragStart={(e) => isSprintActive && onDragStart(e, task.id)}
+			className={`bg-white border p-3.5 rounded-xl shadow-sm transition-all group/card flex flex-col gap-3 ${
+				isSprintActive 
+					? "cursor-grab active:cursor-grabbing hover:border-indigo-300 hover:shadow-md border-gray-200" 
+					: "opacity-75 cursor-not-allowed border-gray-100 grayscale-[0.5]"
+			}`}
 		>
 			<p className="text-sm font-semibold text-gray-700 group-hover/card:text-gray-900 transition-colors leading-relaxed">
 				{task.title}
 			</p>
 
-			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-1.5 px-2 py-1 bg-gray-50 border border-gray-200 rounded-lg focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100 transition-all">
-					<Clock size={12} className="text-gray-400" />
-					<input
-						type="number"
-						min="0"
-						step="0.5"
-						className="w-10 text-xs bg-transparent text-gray-700 font-bold focus:outline-none placeholder:text-gray-400"
-						title="Actual Hours"
-						placeholder="0h"
-						defaultValue={task.actualHours || ""}
-						onBlur={(e) => {
-							if (e.target.value !== "") {
-								const newVal = Number(e.target.value);
-								if (newVal !== task.actualHours) {
-									updateSubtaskTimeMutation.mutate({
-										subtaskId: task.id,
-										payload: { actualHours: newVal },
-									});
-								}
-							}
-						}}
-					/>
+			{/* Hours display — read-only */}
+			{(estH !== undefined || actH !== undefined) && (
+				<div className="flex flex-wrap items-center gap-1.5">
+					{estH !== undefined && (
+						<span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded">
+							<Clock size={9} />
+							Est: {estH}h
+						</span>
+					)}
+					{actH !== undefined && (
+						<span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-gray-100 text-gray-600 border border-gray-200 rounded">
+							<Clock size={9} />
+							Actual: {actH}h
+						</span>
+					)}
+					{variance !== null && (
+						<span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border ${
+							variance <= 0
+								? "bg-emerald-50 text-emerald-700 border-emerald-200"
+								: "bg-rose-50 text-rose-700 border-rose-200"
+						}`}>
+							{variance <= 0 ? <TrendingDown size={9} /> : <TrendingUp size={9} />}
+							{variance > 0 ? "+" : ""}{variance}h
+						</span>
+					)}
 				</div>
-				{task.estimatedHours !== undefined && (
-					<span
-						className="text-[10px] text-gray-500 font-medium px-1.5 py-0.5 bg-gray-100 rounded border border-gray-200"
-						title="Estimated Hours"
-					>
-						Est: {task.estimatedHours}h
-					</span>
-				)}
-			</div>
+			)}
 
-			<div className="flex justify-between items-center pt-2 border-t border-gray-50">
-				<div className="flex items-center gap-2">
-					<span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">
-						{task.id.slice(-4)}
-					</span>
-					<button
-						onClick={() => setShowComments(!showComments)}
-						className="flex items-center gap-1 text-[10px] font-bold text-gray-400 hover:text-indigo-600 transition-colors cursor-pointer"
-					>
-						Comments ({task.comments?.length || 0})
-					</button>
+			<div className="flex justify-between items-end pt-2 border-t border-gray-50 flex-wrap gap-2">
+				<div className="flex flex-col gap-2">
+					<div className="flex items-center gap-2">
+						<span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">
+							{task.id.slice(-4)}
+						</span>
+						<button
+							onClick={() => setShowComments(!showComments)}
+							className="flex items-center gap-1 text-[10px] font-bold text-gray-400 hover:text-indigo-600 transition-colors cursor-pointer"
+						>
+							Comments ({task.comments?.length || 0})
+						</button>
+						{/* Upload Button */}
+						<AttachmentButton subtaskId={task.id} userStoryId={story.id} variant="icon" />
+					</div>
+					
+					{/* Attachments rendering */}
+					{(task as any).attachments && (task as any).attachments.length > 0 && (
+						<div className="flex flex-wrap gap-1.5 overflow-x-auto pb-1 hide-scrollbar">
+							{(task as any).attachments.map((att: any, idx: number) => (
+								<SecureAttachmentLink 
+									key={idx} 
+									fileUrl={att.fileUrl} 
+									fileName={att.fileName} 
+								/>
+							))}
+						</div>
+					)}
 				</div>
 				{task.assignedTo && (
-					<div className="w-5 h-5 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-[10px] font-bold text-indigo-700 shadow-sm">
-						{/* Initials or Avatar */}A
+					<div 
+						className="px-2 py-0.5 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-[9px] font-bold text-indigo-700 shadow-sm transition-colors hover:bg-indigo-200 shrink-0"
+						title={membersMap[task.assignedTo] || "Assigned"}
+					>
+						{membersMap[task.assignedTo]?.substring(0, 2) || "A"}
 					</div>
 				)}
 			</div>
@@ -341,6 +466,7 @@ function SubtaskCard({
 					<CommentSection
 						initialComments={task.comments || []}
 						currentUserName={user?.name}
+						membersMap={membersMap}
 						onSubmit={(message, onSuccess) => {
 							addComment.mutate(
 								{ subtaskId: task.id, message },

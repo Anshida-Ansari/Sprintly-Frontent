@@ -1,11 +1,11 @@
 import { Loader2, MessageSquare, Send } from "lucide-react";
-import { useState } from "react";
-import { useAddComment } from "../hooks/useUserStories";
+import { useEffect, useState } from "react";
 import type { IComment } from "../types/types";
 
 interface CommentSectionProps {
     initialComments?: IComment[];
     currentUserName?: string;
+    membersMap?: Record<string, string>; // userId → name lookup for resolving old comments
     onSubmit: (message: string, onSuccess: () => void) => void;
     isPending: boolean;
     isError: boolean;
@@ -36,6 +36,7 @@ function getInitials(name: string): string {
 export default function CommentSection({
     initialComments = [],
     currentUserName,
+    membersMap = {},
     onSubmit,
     isPending,
     isError,
@@ -43,6 +44,10 @@ export default function CommentSection({
 }: CommentSectionProps) {
     const [comments, setComments] = useState<IComment[]>(initialComments);
     const [message, setMessage] = useState("");
+
+    useEffect(() => {
+        setComments(initialComments);
+    }, [initialComments]);
 
     const handleSubmit = () => {
         const trimmed = message.trim();
@@ -66,6 +71,13 @@ export default function CommentSection({
         }
     };
 
+    // Resolve display name: userName stored in DB → lookup by userId in membersMap → fallback to userId
+    const resolveName = (comment: IComment): string => {
+        if (comment.userName && comment.userName.trim()) return comment.userName;
+        if (membersMap[comment.userId]) return membersMap[comment.userId];
+        return comment.userId || "Unknown";
+    };
+
     return (
         <div className="space-y-4">
             {/* Section Header */}
@@ -82,7 +94,7 @@ export default function CommentSection({
                     </p>
                 ) : (
                     comments.map((comment, index) => {
-                        const name = comment.userName || comment.userId || "Unknown";
+                        const name = resolveName(comment);
                         return (
                             <div
                                 key={`${comment.userId}-${index}`}

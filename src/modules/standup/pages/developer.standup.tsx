@@ -19,7 +19,6 @@ export default function DeveloperStandupPage() {
 	});
 	const projects = projectsRes?.data || [];
 
-
 	const { data: sprintsRes, isLoading: isLoadingSprints } = useGetSprints(
 		selectedProjectId,
 		{ page: 1, limit: 10, status: "ACTIVE" },
@@ -33,84 +32,70 @@ export default function DeveloperStandupPage() {
 
 	if (!projectId || !sprintId) {
 		return (
-			<div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500 py-12">
-				<div className="flex flex-col gap-2">
-					<div className="flex items-center gap-3 text-indigo-600 mb-2">
-						<MessagesSquare size={20} className="stroke-[2.5]" />
-						<span className="text-xs font-black uppercase tracking-wider">
-							Daily Standup
-						</span>
+			<div className="max-w-4xl mx-auto space-y-10 animate-in fade-in duration-700 py-16 px-6">
+				<div className="text-center space-y-4">
+					<div className="inline-flex items-center justify-center p-4 bg-indigo-50 text-indigo-600 rounded-3xl mb-4 shadow-sm border border-indigo-100">
+						<MessagesSquare size={32} strokeWidth={2} />
 					</div>
-					<h1 className="text-3xl font-black text-gray-900 tracking-tight">
-						Select Project
+					<h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+						Daily Standup
 					</h1>
-					<p className="text-gray-500 font-medium max-w-lg text-lg">
-						Choose a project to view and submit your daily standup updates.
+					<p className="text-gray-500 font-medium max-w-lg mx-auto text-lg leading-relaxed">
+						Keep the team synced. Choose an active project to view and share your daily progress.
 					</p>
 				</div>
 
-				<div className="bg-white p-8 rounded-[32px] border border-gray-200 shadow-sm flex flex-col md:flex-row items-center gap-6 hover:shadow-md transition-shadow">
-					<div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
-						<LayoutGrid size={32} />
-					</div>
-
-					<div className="flex-1 w-full">
-						<div className="relative">
+				<div className="max-w-xl mx-auto bg-white/70 backdrop-blur-md p-8 rounded-[2rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
+					<div className="space-y-6">
+						<label className="text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
+							<LayoutGrid size={16} className="text-indigo-500" />
+							Select Project
+						</label>
+						<div className="relative group">
 							<select
 								value={selectedProjectId}
 								onChange={(e) => setSelectedProjectId(e.target.value)}
-								className="w-full appearance-none bg-white border border-gray-200 rounded-2xl px-6 py-4 pr-12 font-bold text-gray-900 hover:border-indigo-300 transition-all focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 cursor-pointer shadow-sm text-lg"
+								className="w-full appearance-none bg-gray-50/50 border-2 border-transparent rounded-2xl px-6 py-4 text-gray-900 font-bold text-lg cursor-pointer hover:bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 outline-none transition-all duration-300"
 								disabled={isLoadingProjects}
 							>
-								<option value="">Select a project...</option>
+								<option value="" disabled className="text-gray-400 font-medium">Choose a project...</option>
 								{projects.map((p: any) => (
-									<option key={p.id} value={p.id}>
+									<option key={p.id} value={p.id} className="font-medium">
 										{p.name}
 									</option>
 								))}
 							</select>
-							<div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+							<div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-indigo-600 transition-colors">
 								<ChevronRight size={20} className="rotate-90" />
 							</div>
 						</div>
 					</div>
+
+					{selectedProjectId && isLoadingSprints && (
+						<div className="mt-8 flex justify-center">
+							<div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+						</div>
+					)}
+
+					{selectedProjectId && !isLoadingSprints && !activeSprintId && (
+						<div className="mt-8 flex flex-col items-center justify-center p-6 bg-rose-50/50 rounded-2xl border border-rose-100/50 text-center animate-in slide-in-from-top-4 duration-300">
+							<p className="text-rose-600 font-bold mb-1">No active sprint found</p>
+							<p className="text-rose-500/80 text-sm font-medium">
+								Reach out to your project manager to kick off a new sprint.
+							</p>
+						</div>
+					)}
 				</div>
-
-				{selectedProjectId && isLoadingSprints && (
-					<div className="flex justify-center py-12">
-						<div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-					</div>
-				)}
-
-				{selectedProjectId && !isLoadingSprints && !activeSprintId && (
-					<div className="flex flex-col items-center justify-center py-12 bg-rose-50 rounded-[32px] border border-rose-100 text-rose-600 font-bold gap-2">
-						<p>No active sprint found for this project.</p>
-						<p className="text-sm opacity-80">
-							Please contact your project manager to start a sprint.
-						</p>
-					</div>
-				)}
 			</div>
 		);
 	}
 
 	return (
-		<div className="space-y-6 h-[calc(100vh-100px)] flex flex-col">
-			<div className="flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-black text-gray-900 tracking-tight">Daily Standup</h1>
-					<p className="text-gray-500 font-medium">Share your progress with the team</p>
-				</div>
-				{!urlProjectId && (
-					<button
-						onClick={() => setSelectedProjectId("")}
-						className="text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm hover:border-indigo-200"
-					>
-						Switch Project
-					</button>
-				)}
-			</div>
-			<div className="flex-1 min-h-0 bg-white rounded-[32px] border border-gray-200 shadow-sm overflow-hidden">
+		<div className="max-w-5xl mx-auto py-8 px-6 animate-in fade-in duration-500 h-[calc(100vh-4rem)] flex flex-col">
+			<div className="flex-1 min-h-0 bg-white/70 backdrop-blur-md rounded-[2.5rem] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden flex flex-col relative">
+				<div className="absolute top-0 right-0 w-96 h-96 bg-indigo-50/50 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
+				<div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-50/50 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/2" />
+				
 				<StandupChat
 					projectId={projectId}
 					sprintId={sprintId}

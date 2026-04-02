@@ -181,19 +181,25 @@ export default function UserStoryModal({
 
 							<div className="space-y-1.5">
 								<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-									Estimate
+									Story Points
 								</label>
 								<div className="relative">
 									<select
-										{...register("estimationPoints")}
-										className={`w-full px-3 py-2.5 bg-white border ${errors.estimationPoints
+										{...register("estimationPoints", { valueAsNumber: true })} className={`w-full px-3 py-2.5 bg-white border ${errors.estimationPoints
 											? "border-red-500"
 											: "border-gray-200"
 											} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium text-gray-900 appearance-none cursor-pointer`}
 									>
-										{[1, 2, 3, 5, 8, 13].map((val) => (
-											<option key={val} value={val}>
-												{val}
+										{[
+											{ value: 1, label: "1 - Very Easy" },
+											{ value: 2, label: "2 - Easy" },
+											{ value: 3, label: "3 - Medium" },
+											{ value: 5, label: "5 - Moderate" },
+											{ value: 8, label: "8 - Hard" },
+											{ value: 13, label: "13 - Complex" },
+										].map((item) => (
+											<option key={item.value} value={item.value}>
+												{item.label}
 											</option>
 										))}
 									</select>

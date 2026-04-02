@@ -9,10 +9,13 @@ import {
 	Users,
 	Search,
 	X,
+	CheckCircle2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 import { UserAuth } from "../../auth/store/store";
+import { AttachmentButton } from "../../../shared/components/attachment-button";
+import { SecureAttachmentLink } from "../../../shared/components/secure-attachment-link";
 import { useGetMembers } from "../hooks/useGetmembers";
 import { useGetProject } from "../hooks/useGetProject";
 import {
@@ -28,7 +31,7 @@ import {
 	useUpdateUserStory,
 	useAddComment,
 } from "../hooks/useUserStories";
-import type { ISubtask, IUserStory } from "../types/types";
+import { type ISubtask, type IUserStory, UserStoryStatus } from "../types/types";
 import CommentSection from "./comment-section";
 import DeleteConfirmationModal from "./delete-confirmation-modal";
 
@@ -57,6 +60,8 @@ export default function UserStoryDetailModal({
 	const user = UserAuth((state) => state.user);
 	const addSubtaskComment = useAddSubtaskComment(story.id);
 	const isAdmin = user?.role === "admin";
+	const isLead = user?.role === "lead";
+	const isAdminOrLead = isAdmin || isLead;
 
 	const { data: projectRes } = useGetProject(story?.projectId);
 	const project = projectRes?.data;
@@ -80,6 +85,13 @@ export default function UserStoryDetailModal({
 
 	const subtasks = subtasksRes?.data || [];
 	const members = membersRes?.data || [];
+
+	// Build a userId → name map so CommentSection can resolve old comments stored with only userId
+	const membersMap: Record<string, string> = {};
+	members.forEach((m: any) => {
+		const id = m._id || m.id;
+		if (id && m.name) membersMap[id] = m.name;
+	});
 
 	// Filter developers: Must be 'developer' role AND member of the project
 	const projectMemberIds = (project?.members || []).map((pm: any) =>
@@ -185,6 +197,14 @@ export default function UserStoryDetailModal({
 			});
 		}
 	};
+	
+	const handleMarkAsDone = () => {
+		updateStory.mutate({
+			projectId: story.projectId,
+			userStoryId: story.id,
+			data: { status: UserStoryStatus.DONE },
+		});
+	};
 
 	const getPriorityStyle = (priority: string) => {
 		switch (priority) {
@@ -221,6 +241,20 @@ export default function UserStoryDetailModal({
 							<span className="text-gray-500 font-bold">
 								{completedCount}/{totalCount} subtasks completed
 							</span>
+							{isAdminOrLead && story.status === UserStoryStatus.IN_REVIEW && totalCount > 0 && completedCount === totalCount && (
+								<button
+									onClick={handleMarkAsDone}
+									disabled={updateStory.isPending}
+									className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg hover:bg-emerald-100 transition-all text-[10px] font-black uppercase tracking-wider disabled:opacity-50"
+								>
+									{updateStory.isPending ? (
+										<Loader2 size={14} className="animate-spin" />
+									) : (
+										<CheckCircle2 size={14} strokeWidth={3} />
+									)}
+									Mark as Done
+								</button>
+							)}
 							<span className="text-gray-300">•</span>
 							<span className="text-gray-500 font-bold">
 								Role:{" "}
@@ -593,7 +627,21 @@ export default function UserStoryDetailModal({
 													>
 														Comments ({subtask.comments?.length || 0})
 													</button>
+                                                    <AttachmentButton subtaskId={subtask.id} userStoryId={story.id} variant="icon" />
 												</div>
+                                                
+                                                {/* Attachments List */}
+                                                {(subtask as any).attachments && (subtask as any).attachments.length > 0 && (
+                                                    <div className="flex flex-wrap gap-2 mt-2">
+                                                        {(subtask as any).attachments.map((att: any, idx: number) => (
+                                                            <SecureAttachmentLink 
+                                                                key={idx} 
+                                                                fileUrl={att.fileUrl} 
+                                                                fileName={att.fileName} 
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                )}
 											</div>
 
 											{/* Delete Button (Admin Only) */}
@@ -607,12 +655,12 @@ export default function UserStoryDetailModal({
 												</button>
 											)}
 										</div>
-
 										{expandedComments[subtask.id] && (
 											<div className="pl-12 pr-4 pb-2">
 												<CommentSection
 													initialComments={subtask.comments || []}
 													currentUserName={user?.name}
+													membersMap={membersMap}
 													onSubmit={(message, onSuccess) => {
 														addSubtaskComment.mutate(
 															{ subtaskId: subtask.id, message },
@@ -673,6 +721,7 @@ export default function UserStoryDetailModal({
 					<CommentSection
 						initialComments={story.comments || []}
 						currentUserName={user?.name}
+						membersMap={membersMap}
 						onSubmit={(message, onSuccess) => {
 							addComment.mutate({ message }, { onSuccess });
 						}}

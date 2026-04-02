@@ -122,6 +122,7 @@ export const useAddSubtaskComment = (userStoryId: string) => {
 		onSuccess: (res: any) => {
 			queryClient.invalidateQueries({ queryKey: ["subtasks", userStoryId] });
 			queryClient.invalidateQueries({ queryKey: ["active-sprint-stories"] });
+			queryClient.invalidateQueries({ queryKey: ["my-user-stories"] });
 			toast.success(res.message || "Comment added successfully");
 		},
 		onError: (error: any) => {

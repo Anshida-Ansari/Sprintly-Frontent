@@ -13,12 +13,17 @@ const mapUserStory = (s: any) => ({
 	sprintId: s._sprintId || s.sprintId,
 	createdAt: s._createdAt || s.createdAt,
 	updatedAt: s._updatedAt || s.updatedAt,
+	comments: s._comments || s.comments || [],
 	subtasks: (s.subtasks || []).map((st: any) => ({
 		...st,
 		id: st._id || st.id,
 		title: st._title || st.title,
 		status: st._status || st.status,
 		priority: st._priority || st.priority,
+		assignedTo: st._assignedTo || st.assignedTo,
+		estimatedHours: st._estimatedHours ?? st.estimatedHours,
+		actualHours: st._actualHours ?? st.actualHours,
+		comments: st._comments || st.comments || [],
 	})),
 });
 
@@ -45,6 +50,11 @@ export const userStoryService = {
 		if (res.data && res.data.data) {
 			res.data.data = res.data.data.map(mapUserStory);
 		}
+		return res.data;
+	},
+
+	async addComment(userStoryId: string, payload: { message: string }) {
+		const res = await api.post(`projects/${userStoryId}/comments`, payload);
 		return res.data;
 	},
 };

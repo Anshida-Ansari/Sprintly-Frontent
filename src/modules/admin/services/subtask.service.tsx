@@ -17,6 +17,7 @@ const mapSubtask = (s: any) => ({
 	estimatedHours: s._estimatedHours || s.estimatedHours,
 	actualHours: s._actualHours || s.actualHours,
 	comments: s._comments || s.comments || [],
+	attachments: s._attachments || s.attachments || [],
 	createdAt: s._createdAt || s.createdAt,
 	updatedAt: s._updatedAt || s.updatedAt,
 });
@@ -64,4 +65,21 @@ export const subtaskService = {
 		const res = await api.post(`userstory/${subtaskId}/comments`, payload);
 		return res.data;
 	},
+
+	async getUploadUrl(payload: { fileName: string; fileType: string }) {
+		const res = await api.post(`userstory/upload-url`, payload);
+		return res.data;
+	},
+
+	async addAttachment(subtaskId: string, payload: { fileUrl: string; fileName: string }) {
+		const res = await api.post(`userstory/${subtaskId}/attachments`, payload);
+		return res.data;
+	},
+
+	async getDownloadUrl(fileUrl: string) {
+		const res = await api.get(`userstory/download-url`, {
+			params: { fileUrl },
+		});
+		return res.data;
+	}
 };

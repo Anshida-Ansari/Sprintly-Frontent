@@ -4,17 +4,25 @@ import {
 	CheckCircle2,
 	ChevronDown,
 	ChevronRight,
+	Clock,
 	Loader2,
 	Plus,
 	Flame,
 	RefreshCcw,
-	X
+	X,
+	TrendingUp,
+	TrendingDown,
+	KanbanSquare,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { subtaskService } from "../../admin/services/subtask.service";
-import type { SubtaskStatus } from "../../admin/types/types";
 import { userStoryService } from "../services/userstory.service";
+
+import { useGetMembers } from "../../admin/hooks/useGetmembers";
+import { UserAuth } from "../../auth/store/store";
+import CommentSection from "../../admin/components/comment-section";
+import { MessageSquare } from "lucide-react";
 
 export default function MyTasksPage() {
 	const queryClient = useQueryClient();
@@ -22,6 +30,11 @@ export default function MyTasksPage() {
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null);
 	const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
+	const [newSubtaskEstimatedHours, setNewSubtaskEstimatedHours] = useState<string>("");
+
+	// Track per-subtask actual hours input value (keyed by subtaskId)
+	const [actualHoursInputs, setActualHoursInputs] = useState<Record<string, string>>({});
+	const [expandedStoryComments, setExpandedStoryComments] = useState<Record<string, boolean>>({});
 
 	const {
 		data: userStoriesRes,
@@ -33,44 +46,79 @@ export default function MyTasksPage() {
 	});
 
 	const stories = userStoriesRes?.data || [];
+	const { data: membersRes } = useGetMembers({ page: 1, limit: 100 });
+	const members = membersRes?.data || [];
+	const user = UserAuth((state) => state.user);
 
-	const updateSubtaskMutation = useMutation({
+	// Build a userId → name map for resolving old comments and initials
+	const membersMap: Record<string, string> = {};
+	members.forEach((m: any) => {
+		const id = m._id || m.id;
+		if (id && m.name) membersMap[id] = m.name;
+	});
+
+
+
+	const updateSubtaskTimeMutation = useMutation({
 		mutationFn: ({
 			subtaskId,
-			status,
+			payload,
 		}: {
 			subtaskId: string;
-			status: SubtaskStatus;
-		}) => subtaskService.updateSubtaskStatus(subtaskId, status),
+			payload: { actualHours?: number; estimatedHours?: number };
+		}) => subtaskService.updateSubtaskTime(subtaskId, payload),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["my-user-stories"] });
-			toast.success("Subtask updated");
+			toast.success("Hours saved");
 		},
-		onError: () => toast.error("Failed to update subtask"),
+		onError: () => toast.error("Failed to save hours"),
 	});
 
 	const createSubtaskMutation = useMutation({
-		mutationFn: ({ userStoryId, title }: { userStoryId: string; title: string }) =>
-			subtaskService.createSubtask(userStoryId, { title }),
+		mutationFn: ({
+			userStoryId,
+			title,
+			estimatedHours,
+		}: {
+			userStoryId: string;
+			title: string;
+			estimatedHours: number;
+		}) =>
+			subtaskService.createSubtask(userStoryId, { title, estimatedHours }),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["my-user-stories"] });
 			toast.success("Subtask created");
 			setIsCreateModalOpen(false);
 			setNewSubtaskTitle("");
+			setNewSubtaskEstimatedHours("");
 			setSelectedStoryId(null);
 		},
 		onError: () => toast.error("Failed to create subtask"),
 	});
 
-	const handleSubtaskUpdate = (subtaskId: string, currentStatus: SubtaskStatus) => {
+	const handleActualHoursBlur = (subtaskId: string) => {
+		const raw = actualHoursInputs[subtaskId];
+		if (raw === undefined || raw === "") return;
+		const val = Number(raw);
+		if (!isNaN(val) && val >= 0) {
+			updateSubtaskTimeMutation.mutate({
+				subtaskId,
+				payload: { actualHours: val },
+			});
+		}
+	};
 
-		let nextStatus: SubtaskStatus = "In pending";
-		if (currentStatus === "In pending") nextStatus = "In progress";
-		else if (currentStatus === "In progress") nextStatus = "Done";
+	const isCreateValid =
+		newSubtaskTitle.trim() !== "" &&
+		newSubtaskEstimatedHours !== "" &&
+		Number(newSubtaskEstimatedHours) > 0;
 
-		updateSubtaskMutation.mutate({
-			subtaskId,
-			status: nextStatus,
+	const handleCreate = () => {
+		if (!selectedStoryId || !isCreateValid) return;
+		createSubtaskMutation.mutate({
+			userStoryId: selectedStoryId,
+			title: newSubtaskTitle,
+			estimatedHours: Number(newSubtaskEstimatedHours),
 		});
 	};
 
@@ -143,7 +191,6 @@ export default function MyTasksPage() {
 						const totalCount = subtasks.length;
 						const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 						const isExpanded = expandedStories.includes(story.id);
-
 						const isReview = story.status === "In review";
 
 						return (
@@ -199,6 +246,19 @@ export default function MyTasksPage() {
 									<button
 										onClick={(e) => {
 											e.stopPropagation();
+											setExpandedStoryComments(prev => ({
+												...prev,
+												[story.id]: !prev[story.id]
+											}));
+										}}
+										className="ml-2 p-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-colors font-bold text-xs flex items-center gap-2"
+									>
+										<MessageSquare size={16} />
+										<span className="hidden sm:inline">Comments ({story.comments?.length || 0})</span>
+									</button>
+									<button
+										onClick={(e) => {
+											e.stopPropagation();
 											openCreateModal(story.id);
 										}}
 										className="ml-2 p-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-colors font-bold text-xs flex items-center gap-2"
@@ -210,36 +270,147 @@ export default function MyTasksPage() {
 
 								{/* Body / Subtasks */}
 								{isExpanded && (
-									<div className="border-t border-gray-100 bg-gray-50/50 p-4 pl-16 space-y-2">
+									<div className="border-t border-gray-100 bg-gray-50/50 p-4 pl-16 space-y-4">
+										{/* Story Comments Section */}
+										{expandedStoryComments[story.id] && (
+											<div className="bg-white p-6 rounded-2xl border border-indigo-100 shadow-sm mb-4 animate-in slide-in-from-top-2">
+												<CommentSection
+													initialComments={story.comments || []}
+													currentUserName={user?.name}
+													membersMap={membersMap}
+													onSubmit={(message, onSuccess) => {
+														// We need a way to pass the storyId to the mutation
+														// Since useAddStoryComment returns a mutation object
+														// we can use it directly if we handle the ID correctly
+														userStoryService.addComment(story.id, { message })
+															.then(() => {
+																onSuccess();
+																queryClient.invalidateQueries({ queryKey: ["my-user-stories"] });
+																queryClient.invalidateQueries({ queryKey: ["user-stories"] });
+																queryClient.invalidateQueries({ queryKey: ["subtasks", story.id] });
+																toast.success("Comment added");
+															})
+															.catch(() => toast.error("Failed to add comment"));
+													}}
+													isPending={false} // Managed locally for now to avoid hook-in-loop
+													isError={false}
+													error={null}
+												/>
+											</div>
+										)}
+
+										<div className="flex items-center gap-1.5 text-[10px] text-gray-400 font-medium mb-2">
+											<KanbanSquare size={11} />
+											<span>Move subtasks in the Kanban board to update their status</span>
+										</div>
 										{subtasks.length > 0 ? (
-											subtasks.map((subtask: any) => (
-												<div
-													key={subtask.id}
-													onClick={() => handleSubtaskUpdate(subtask.id, subtask.status)}
-													className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-xl hover:border-indigo-300 transition-colors cursor-pointer group"
-												>
-													<div className={`
-                                                        w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors
-                                                        ${subtask.status === 'Done' ? 'bg-emerald-500 border-emerald-500' :
-															subtask.status === 'In progress' ? 'border-indigo-500 border-dashed' : 'border-gray-300'}
-                                                    `}>
-														{subtask.status === 'Done' && <CheckCircle2 size={12} className="text-white" />}
-														{subtask.status === 'In progress' && <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />}
+											subtasks.map((subtask: any) => {
+												const isDone = subtask.status === "Done";
+												const estH = subtask.estimatedHours as number | undefined;
+												const actH = subtask.actualHours as number | undefined;
+												// For actual hours: prefer local input state, then server value
+												const localActual = actualHoursInputs[subtask.id];
+												const displayActual = actH;
+												const variance =
+													isDone && estH !== undefined && displayActual !== undefined
+														? displayActual - estH
+														: null;
+
+												return (
+													<div
+														key={subtask.id}
+														className="bg-white border border-gray-200 rounded-xl transition-colors"
+													>
+														{/* Main row — status is read-only, controlled via Kanban */}
+														<div className="flex items-center gap-3 p-3">
+															<div className={`
+                                                                w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0
+                                                                ${subtask.status === 'Done' ? 'bg-emerald-500 border-emerald-500' :
+																	subtask.status === 'In progress' ? 'border-indigo-400 border-dashed' : 'border-gray-300'}
+                                                            `}>
+																{subtask.status === 'Done' && <CheckCircle2 size={12} className="text-white" />}
+																{subtask.status === 'In progress' && <div className="w-2 h-2 bg-indigo-400 rounded-full" />}
+															</div>
+
+															<span className={`text-sm font-medium transition-colors flex-1 min-w-0 ${subtask.status === 'Done' ? 'text-gray-400 line-through' : 'text-gray-700'}`}>
+																{subtask.title}
+															</span>
+
+															{/* Hours info (right side of title) */}
+															<div className="flex items-center gap-2 ml-auto flex-shrink-0">
+																{estH !== undefined && (
+																	<span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded">
+																		<Clock size={10} />
+																		Est: {estH}h
+																	</span>
+																)}
+
+																{/* Variance badge — only when done and both values known */}
+																{variance !== null && (
+																	<span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border ${variance <= 0
+																		? "bg-emerald-50 text-emerald-700 border-emerald-200"
+																		: "bg-rose-50 text-rose-700 border-rose-200"
+																		}`}>
+																		{variance <= 0 ? <TrendingDown size={10} /> : <TrendingUp size={10} />}
+																		{variance > 0 ? "+" : ""}{variance}h
+																	</span>
+																)}
+															</div>
+
+															<span className={`
+                                                                text-[10px] font-bold uppercase px-2 py-0.5 rounded border ml-2 flex-shrink-0
+                                                                ${subtask.status === 'Done' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+																	subtask.status === 'In progress' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' : 'bg-gray-100 text-gray-500 border-gray-200'}
+                                                            `}>
+																{subtask.status}
+															</span>
+														</div>
+
+														{/* Actual Hours row — only when status is Done */}
+														{isDone && (
+															<div className="px-3 pb-3 flex items-center gap-3 border-t border-gray-50 pt-2">
+																<Clock size={12} className="text-gray-400 flex-shrink-0" />
+																<span className="text-xs font-bold text-gray-500 flex-shrink-0">Actual Hours</span>
+																<input
+																	type="number"
+																	min="0"
+																	step="0.5"
+																	placeholder="Enter actual hours…"
+																	value={
+																		localActual !== undefined
+																			? localActual
+																			: actH !== undefined
+																				? String(actH)
+																				: ""
+																	}
+																	onClick={e => e.stopPropagation()}
+																	onChange={e =>
+																		setActualHoursInputs(prev => ({
+																			...prev,
+																			[subtask.id]: e.target.value,
+																		}))
+																	}
+																	onBlur={() => handleActualHoursBlur(subtask.id)}
+																	onKeyDown={e => {
+																		if (e.key === "Enter") {
+																			(e.target as HTMLInputElement).blur();
+																		}
+																	}}
+																	className="w-36 px-3 py-1.5 text-xs font-medium bg-gray-50 border border-gray-200 rounded-lg focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all"
+																/>
+																{actH !== undefined && (
+																	<span className="text-xs text-gray-400 font-medium">
+																		Saved: {actH}h
+																	</span>
+																)}
+																{updateSubtaskTimeMutation.isPending && (
+																	<Loader2 size={12} className="animate-spin text-indigo-400" />
+																)}
+															</div>
+														)}
 													</div>
-
-													<span className={`text-sm font-medium transition-colors flex-1 ${subtask.status === 'Done' ? 'text-gray-400 line-through' : 'text-gray-700'}`}>
-														{subtask.title}
-													</span>
-
-													<span className={`
-                                                        text-[10px] font-bold uppercase px-2 py-0.5 rounded border
-                                                        ${subtask.status === 'Done' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-															subtask.status === 'In progress' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' : 'bg-gray-100 text-gray-500 border-gray-200'}
-                                                    `}>
-														{subtask.status}
-													</span>
-												</div>
-											))
+												);
+											})
 										) : (
 											<div className="text-sm text-gray-400 italic py-2">
 												No subtasks yet. Click "Add Subtask" to get started.
@@ -259,35 +430,72 @@ export default function MyTasksPage() {
 					<div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl animate-in zoom-in-95">
 						<div className="flex justify-between items-center mb-6">
 							<h3 className="text-xl font-bold text-gray-900">Create Subtask</h3>
-							<button onClick={() => setIsCreateModalOpen(false)} className="text-gray-400 hover:text-gray-900">
+							<button
+								onClick={() => {
+									setIsCreateModalOpen(false);
+									setNewSubtaskTitle("");
+									setNewSubtaskEstimatedHours("");
+								}}
+								className="text-gray-400 hover:text-gray-900"
+							>
 								<X size={20} />
 							</button>
 						</div>
 
 						<div className="space-y-4">
+							{/* Title */}
 							<div>
-								<label className="block text-sm font-bold text-gray-700 mb-1">Title</label>
+								<label className="block text-sm font-bold text-gray-700 mb-1">
+									Title <span className="text-rose-500">*</span>
+								</label>
 								<input
 									type="text"
 									value={newSubtaskTitle}
 									onChange={(e) => setNewSubtaskTitle(e.target.value)}
 									placeholder="What needs to be done?"
 									autoFocus
-									className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:outline-none transition-colors font-medium"
-									onKeyDown={(e) => e.key === "Enter" && selectedStoryId && newSubtaskTitle.trim() && createSubtaskMutation.mutate({ userStoryId: selectedStoryId, title: newSubtaskTitle })}
+									className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-colors font-medium"
+									onKeyDown={(e) => e.key === "Enter" && isCreateValid && handleCreate()}
 								/>
+							</div>
+
+							{/* Estimated Hours */}
+							<div>
+								<label className="block text-sm font-bold text-gray-700 mb-1">
+									Estimated Hours <span className="text-rose-500">*</span>
+								</label>
+								<div className="relative">
+									<Clock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+									<input
+										type="number"
+										min="0.5"
+										step="0.5"
+										value={newSubtaskEstimatedHours}
+										onChange={(e) => setNewSubtaskEstimatedHours(e.target.value)}
+										placeholder="e.g. 4"
+										className="w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-colors font-medium"
+										onKeyDown={(e) => e.key === "Enter" && isCreateValid && handleCreate()}
+									/>
+								</div>
+								<p className="text-xs text-gray-400 mt-1">
+									How many hours do you estimate this subtask will take?
+								</p>
 							</div>
 
 							<div className="flex gap-3 pt-2">
 								<button
-									onClick={() => setIsCreateModalOpen(false)}
+									onClick={() => {
+										setIsCreateModalOpen(false);
+										setNewSubtaskTitle("");
+										setNewSubtaskEstimatedHours("");
+									}}
 									className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors"
 								>
 									Cancel
 								</button>
 								<button
-									onClick={() => selectedStoryId && createSubtaskMutation.mutate({ userStoryId: selectedStoryId, title: newSubtaskTitle })}
-									disabled={!newSubtaskTitle.trim() || createSubtaskMutation.isPending}
+									onClick={handleCreate}
+									disabled={!isCreateValid || createSubtaskMutation.isPending}
 									className="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 								>
 									{createSubtaskMutation.isPending ? <Loader2 size={18} className="animate-spin mx-auto" /> : "Create Subtask"}

@@ -21,6 +21,7 @@ const mapUserStory = (s: any) => ({
 	acceptanceCriteria: s._acceptanceCriteria || s.acceptanceCriteria || [],
 	createdAt: s._createdAt || s.createdAt,
 	updatedAt: s._updatedAt || s.updatedAt,
+	comments: s._comments || s.comments || [],
 	subtasks: (s.subtasks || []).map((st: any) => ({
 		...st,
 		id: st._id || st.id,

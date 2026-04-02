@@ -117,9 +117,14 @@ export const useAssignUserStoryToMember = () => {
 };
 
 export const useAddComment = (userStoryId: string) => {
+	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (payload: AddCommentPayload) =>
 			userStoryService.addComment(userStoryId, payload),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["user-stories"] });
+			queryClient.invalidateQueries({ queryKey: ["my-user-stories"] });
+		},
 		onError: (error: any) => {
 			toast.error(
 				error.response?.data?.message || "Failed to post comment",

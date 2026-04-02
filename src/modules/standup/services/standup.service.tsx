@@ -14,9 +14,9 @@ export const standupService = {
 		return res.data;
 	},
 
-	list: async (projectId: string, sprintId: string) => {
+	list: async (projectId: string, sprintId: string, date?: string) => {
 		const res = await api.get(
-			`/project/sprint/${projectId}/${sprintId}/standups`,
+			`/project/sprint/${projectId}/${sprintId}/standups${date ? `?date=${date}` : ""}`,
 		);
 		return res.data;
 	},

@@ -2,6 +2,8 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { CalendarIcon, GripVertical } from "lucide-react";
 import { UserAuth } from "../../auth/store/store";
+import { AttachmentButton } from "../../../shared/components/attachment-button";
+import { SecureAttachmentLink } from "../../../shared/components/secure-attachment-link";
 
 interface SubTask {
 	_id: string;
@@ -10,6 +12,7 @@ interface SubTask {
 	assignedTo: string;
 	estimatedHours?: number;
 	actualHours?: number;
+	attachments?: Array<{ fileUrl: string; fileName: string }>;
 }
 
 interface UserStory {
@@ -106,69 +109,86 @@ export function TaskCard({ task, onSubtaskUpdate, onSubtaskTimeUpdate }: TaskCar
 						return (
 							<div
 								key={subtask._id}
-								className="flex items-center justify-between bg-black/20 p-2 rounded-lg border border-white/5"
+								className="flex flex-col bg-black/20 p-2 rounded-lg border border-white/5"
 							>
-								<span className="truncate flex-1 font-medium text-xs text-gray-300 mr-2">
-									{subtask.title}
-								</span>
+								<div className="flex items-center justify-between w-full">
+									<span className="truncate flex-1 font-medium text-xs text-gray-300 mr-2">
+										{subtask.title}
+									</span>
 
-								<div className="flex items-center gap-2">
-									{subtask.estimatedHours !== undefined && (
-										<span className="text-[9px] text-gray-400 font-mono bg-white/5 px-1.5 py-0.5 rounded border border-white/10" title="Estimated Hours">
-											E: {subtask.estimatedHours}h
-										</span>
-									)}
-
-									{isAssignedToMe ? (
-										<>
-											<input
-												type="number"
-												min="0"
-												step="0.5"
-												className="w-12 h-6 text-[10px] px-1 bg-white/[0.05] border border-white/10 rounded text-gray-300 focus:outline-none focus:border-indigo-500 text-center placeholder:text-gray-600 font-mono"
-												title="Actual Hours"
-												placeholder="A: 0h"
-												defaultValue={subtask.actualHours || ""}
-												onBlur={(e) => {
-													if (e.target.value !== "" && onSubtaskTimeUpdate) {
-														const newVal = Number(e.target.value);
-														if (newVal !== subtask.actualHours) {
-															onSubtaskTimeUpdate(subtask._id, newVal);
-														}
-													}
-												}}
-											/>
-											<select
-												value={subtask.status}
-												onChange={(e) =>
-													onSubtaskUpdate(subtask._id, e.target.value)
-												}
-												className="h-6 text-[10px] px-1 bg-white/[0.05] border border-white/10 rounded text-gray-300 focus:outline-none focus:border-indigo-500"
-											>
-												<option value="pending" className="bg-gray-900">
-													Pending
-												</option>
-												<option value="in-progress" className="bg-gray-900">
-													In Progress
-												</option>
-												<option value="completed" className="bg-gray-900">
-													Completed
-												</option>
-											</select>
-										</>
-									) : (
-										<>
-											{subtask.actualHours !== undefined && (
-												<span className="text-[9px] text-indigo-300 font-mono bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20" title="Actual Hours">
-													A: {subtask.actualHours}h
-												</span>
-											)}
-											<span className="text-[10px] font-medium text-gray-500 bg-white/[0.05] px-2 py-0.5 rounded capitalize">
-												{subtask.status}
+									<div className="flex items-center gap-2">
+										{subtask.estimatedHours !== undefined && (
+											<span className="text-[9px] text-gray-400 font-mono bg-white/5 px-1.5 py-0.5 rounded border border-white/10" title="Estimated Hours">
+												E: {subtask.estimatedHours}h
 											</span>
-										</>
-									)}
+										)}
+
+										{isAssignedToMe ? (
+											<>
+												<input
+													type="number"
+													min="0"
+													step="0.5"
+													className="w-12 h-6 text-[10px] px-1 bg-white/[0.05] border border-white/10 rounded text-gray-300 focus:outline-none focus:border-indigo-500 text-center placeholder:text-gray-600 font-mono"
+													title="Actual Hours"
+													placeholder="A: 0h"
+													defaultValue={subtask.actualHours || ""}
+													onBlur={(e) => {
+														if (e.target.value !== "" && onSubtaskTimeUpdate) {
+															const newVal = Number(e.target.value);
+															if (newVal !== subtask.actualHours) {
+																onSubtaskTimeUpdate(subtask._id, newVal);
+															}
+														}
+													}}
+												/>
+												<select
+													value={subtask.status}
+													onChange={(e) =>
+														onSubtaskUpdate(subtask._id, e.target.value)
+													}
+													className="h-6 text-[10px] px-1 bg-white/[0.05] border border-white/10 rounded text-gray-300 focus:outline-none focus:border-indigo-500"
+												>
+													<option value="pending" className="bg-gray-900">
+														Pending
+													</option>
+													<option value="in-progress" className="bg-gray-900">
+														In Progress
+													</option>
+													<option value="completed" className="bg-gray-900">
+														Completed
+													</option>
+												</select>
+											</>
+										) : (
+											<>
+												{subtask.actualHours !== undefined && (
+													<span className="text-[9px] text-indigo-300 font-mono bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20" title="Actual Hours">
+														A: {subtask.actualHours}h
+													</span>
+												)}
+												<span className="text-[10px] font-medium text-gray-500 bg-white/[0.05] px-2 py-0.5 rounded capitalize">
+													{subtask.status}
+												</span>
+											</>
+										)}
+										{/* Upload Button */}
+										<AttachmentButton subtaskId={subtask._id} userStoryId={task.id} variant="icon" />
+									</div>
 								</div>
+                                
+                                {/* Render Attachment Links using Secure Links */}
+                                {subtask.attachments && subtask.attachments.length > 0 && (
+                                    <div className="flex flex-wrap gap-1.5 mt-2 overflow-x-auto pb-1 hide-scrollbar">
+                                        {subtask.attachments.map((att, idx) => (
+                                            <SecureAttachmentLink 
+                                                key={idx} 
+                                                fileUrl={att.fileUrl} 
+                                                fileName={att.fileName} 
+                                            />
+                                        ))}
+                                    </div>
+                                )}
 							</div>
 						);
 					})
