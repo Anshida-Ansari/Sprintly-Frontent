@@ -1,14 +1,13 @@
 import {
 	ArrowUpRight,
-	Bell,
 	ChevronRight,
 	Clock,
 	FolderOpen,
 	Play,
 	Plus,
 	RefreshCw,
-	Trophy,
 	Zap,
+	Video,
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +17,10 @@ import InviteMemberModal from "../components/invite.modal";
 import { useDashboardStats } from "../hooks/useDashboardStats";
 import { useInviteMember } from "../hooks/useInviteMember";
 import { buildPath, ROUTES } from "../../../constants/routes";
+import { useProjects } from "../hooks/useProjects";
+import { useGetSprints } from "../hooks/useSprints";
+import { useSprintBurndown } from "../../../shared/hooks/useBurndown";
+import { BurnDownChart } from "../../../shared/components/charts/BurnDownChart";
 
 export default function AdminDashboard() {
 	const navigate = useNavigate();
@@ -25,6 +28,17 @@ export default function AdminDashboard() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const { mutate: inviteMember, isPending } = useInviteMember();
 	const { data: statsRes } = useDashboardStats();
+
+	const { data: projectsData } = useProjects({ page: 1, limit: 1 });
+	const currentProject = projectsData?.data?.[0];
+
+	const { data: sprintsData } = useGetSprints(
+		currentProject?.id || "",
+		{ page: 1, limit: 1, status: "ACTIVE" as any }
+	);
+	const activeSprint = sprintsData?.data?.[0];
+
+	const { data: burndownData, isLoading: burndownLoading } = useSprintBurndown(activeSprint?.id || null);
 
 	const handleInvite = (data: { name: string; email: string; role: string }) => {
 		inviteMember(data, {
@@ -78,15 +92,13 @@ export default function AdminDashboard() {
 						</div>
 						<div className="pr-4">
 							<p className="text-[10px] font-bold text-gray-400 uppercase leading-none">
-								Sprint 12
+								Active Projects
 							</p>
-							<p className="text-sm font-bold text-gray-900">4 Days Left</p>
+							<p className="text-sm font-bold text-gray-900">
+								{dashboardStats?.activeProjects || 0} Running
+							</p>
 						</div>
 					</div>
-					<button className="p-3 bg-white border border-gray-200 rounded-2xl text-gray-500 hover:text-indigo-600 transition-colors relative shadow-sm">
-						<Bell size={22} />
-						<span className="absolute top-3 right-3 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white"></span>
-					</button>
 				</div>
 			</div>
 
@@ -134,14 +146,16 @@ export default function AdminDashboard() {
 					</div>
 				))}
 
-				<div className="bg-gradient-to-br from-amber-50 to-orange-100 p-6 rounded-3xl border border-orange-200 shadow-sm">
+				<div className="bg-gradient-to-br from-amber-50 to-orange-100 p-6 rounded-3xl border border-orange-200 shadow-sm hover:translate-y-[-4px] transition-all duration-300">
 					<div className="bg-white w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-sm">
-						<Trophy size={24} className="text-orange-500" />
+						<Video size={24} className="text-orange-500" />
 					</div>
 					<p className="text-xs font-bold text-orange-500 uppercase tracking-widest leading-none mb-1">
-						Top Member
+						Meeting Stats
 					</p>
-					<h3 className="text-xl font-black text-gray-900">Sarah Chen</h3>
+					<h3 className="text-3xl font-black text-gray-900 pt-1">
+						{dashboardStats?.totalMeetings || 0}
+					</h3>
 				</div>
 			</div>
 
@@ -156,50 +170,43 @@ export default function AdminDashboard() {
 					</div>
 					<div className="space-y-6">
 						{/* Dynamic Activity List */}
-						{[
-							{
-								user: "Alice",
-								action: "pushed to main",
-								time: "2m ago",
-								color: "bg-blue-500",
-							},
-							{
-								user: "Bob",
-								action: "closed Task #44",
-								time: "15m ago",
-								color: "bg-emerald-500",
-							},
-							{
-								user: "Sarah",
-								action: "created User Story",
-								time: "1h ago",
-								color: "bg-purple-500",
-							},
-						].map((item, i) => (
-							<div
-								key={i}
-								className="flex items-center gap-4 group cursor-pointer"
-							>
-								<div
-									className={`${item.color} w-10 h-10 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-sm group-hover:scale-110 transition-transform`}
-								>
-									{item.user[0]}
-								</div>
-								<div className="flex-1">
-									<p className="text-gray-700 text-sm">
-										<span className="font-bold text-gray-900">{item.user}</span>{" "}
-										{item.action}
-									</p>
-									<p className="text-[11px] font-bold text-gray-400 mt-0.5">
-										{item.time}
-									</p>
-								</div>
-								<ChevronRight
-									size={18}
-									className="text-gray-300 opacity-0 group-hover:opacity-100 transition-all mr-2"
-								/>
+						{dashboardStats?.liveActivity?.length > 0 ? (
+							dashboardStats.liveActivity.slice(0, 5).map((item: any, i: number) => {
+								const colors = ["bg-blue-500", "bg-emerald-500", "bg-purple-500", "bg-orange-500", "bg-indigo-500"];
+								const colorClass = colors[i % colors.length];
+								return (
+									<div
+										key={item.id}
+										className="flex items-center gap-4 group cursor-pointer"
+									>
+										<div
+											className={`${colorClass} w-10 h-10 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-sm group-hover:scale-110 transition-transform uppercase`}
+										>
+											ST
+										</div>
+										<div className="flex-1">
+											<p className="text-gray-700 text-sm">
+												<span className="font-bold text-gray-900">
+													{item.title}
+												</span>{" "}
+												- {item.status}
+											</p>
+											<p className="text-[11px] font-bold text-gray-400 mt-0.5">
+												{new Date(item.updatedAt || item.createdAt).toLocaleDateString()}
+											</p>
+										</div>
+										<ChevronRight
+											size={18}
+											className="text-gray-300 opacity-0 group-hover:opacity-100 transition-all mr-2"
+										/>
+									</div>
+								);
+							})
+						) : (
+							<div className="text-center py-8">
+								<p className="text-gray-400 font-medium text-sm">No recent activity detected in the workspace.</p>
 							</div>
-						))}
+						)}
 					</div>
 				</div>
 
@@ -239,22 +246,38 @@ export default function AdminDashboard() {
 
 					<div className="mt-8 p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
 						<p className="text-xs font-bold text-indigo-600 uppercase mb-1">
-							Weekly Goal
+							Task Progress
 						</p>
 						<div className="flex justify-between items-end">
-							<p className="text-sm font-bold text-gray-900">8/10 Tasks</p>
-							<p className="text-xs font-bold text-indigo-600">80%</p>
+							<p className="text-sm font-bold text-gray-900">
+								{dashboardStats?.subTasksByStatus?.completed || 0}/{dashboardStats?.totalSubTasks || 0} Tasks
+							</p>
+							<p className="text-xs font-bold text-indigo-600">
+								{dashboardStats?.totalSubTasks ? Math.round(((dashboardStats?.subTasksByStatus?.completed || 0) / dashboardStats?.totalSubTasks) * 100) : 0}%
+							</p>
 						</div>
-						<div className="w-full bg-indigo-200 h-1.5 rounded-full mt-2">
+						<div className="w-full bg-indigo-200 h-1.5 rounded-full mt-2 overflow-hidden">
 							<div
-								className="bg-indigo-600 h-full rounded-full"
-								style={{ width: "80%" }}
+								className="bg-indigo-600 h-full rounded-full transition-all duration-500"
+								style={{ width: `${dashboardStats?.totalSubTasks ? Math.round(((dashboardStats?.subTasksByStatus?.completed || 0) / dashboardStats?.totalSubTasks) * 100) : 0}%` }}
 							></div>
 						</div>
 					</div>
 				</div>
 			</div>
 
+			{/* 5. Team Performance & Burn Down Section */}
+			{currentProject && activeSprint && (
+				<div className="mt-8">
+					<BurnDownChart 
+						data={burndownData || []} 
+						isLoading={burndownLoading}
+						title={`${currentProject.name} : ${activeSprint.name} - Team Performance`}
+						description="Track the entire team's logged hours against estimated subtasks for this sprint."
+					/>
+				</div>
+			)}
+			
 			<InviteMemberModal
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}

@@ -17,6 +17,8 @@ const AdminLayout = lazy(() => import("../shared/layouts/admin.layout"));
 const SuperAdminLayout = lazy(() => import("../shared/layouts/superadmin.layout"));
 const SuperAdminCompanyPage = lazy(() => import("../modules/superadmin/pages/superadmin.companies"));
 const SuperAdminCompanyDetail = lazy(() => import("../modules/superadmin/pages/superadmin.companies.detail"));
+const SuperAdminLogs = lazy(() => import("../modules/superadmin/pages/superadmin.logs"));
+const SuperAdminSettings = lazy(() => import("../modules/superadmin/pages/superadmin.settings"));
 const MemberAccept = lazy(() => import("../modules/auth/pages/setPassword"));
 const DeveloperLayout = lazy(() => import("../shared/layouts/developer.layout"));
 const DashboardPage = lazy(() => import("../modules/developers/pages/developers.dashboard"));
@@ -29,11 +31,14 @@ const SprintsPage = lazy(() => import("../modules/admin/pages/sprints"));
 const SprintPlanning = lazy(() => import("../modules/admin/pages/sprint-planning"));
 const Meetings = lazy(() => import("../modules/admin/pages/meetings"));
 const MeetingRoom = lazy(() => import("../modules/meeting/pages/MeetingRoom"));
+const MeetingHistory = lazy(() => import("../modules/meeting/pages/MeetingHistory"));
 const MyTasksPage = lazy(() => import("../modules/developers/pages/my.tasks"));
 const DeveloperStandup = lazy(() => import("../modules/standup/pages/developer.standup"));
 const DeveloperMeetings = lazy(() => import("../modules/meeting/pages/developer.meetings"));
 const Settings = lazy(() => import("../modules/admin/pages/settings"));
 const ProfilePage = lazy(() => import("../modules/profile/pages/profile.page"));
+const DeveloperWorkLogs = lazy(() => import("../modules/developers/pages/worklogs"));
+const AdminWorkLogs = lazy(() => import("../modules/admin/pages/worklogs"));
 
 export const router = createBrowserRouter([
 	// PUBLIC
@@ -68,12 +73,13 @@ export const router = createBrowserRouter([
 					{ path: ROUTES.ADMIN.SPRINTS, element: <SprintsPage /> },
 					{ path: ROUTES.ADMIN.SPRINT_PLANNING, element: <SprintPlanning /> },
 					{ path: ROUTES.ADMIN.USER_STORIES, element: <UserStoriesPage /> },
-					{ path: ROUTES.ADMIN.MEETING_ROOM, element: <MeetingRoom /> },
 					{ path: ROUTES.ADMIN.TEAM, element: <div>Team</div> },
 					{ path: ROUTES.ADMIN.MEETINGS, element: <Meetings /> },
+					{ path: "meetings/history", element: <MeetingHistory /> },
 					{ path: ROUTES.ADMIN.REPORTS, element: <div>Reports</div> },
 					{ path: ROUTES.ADMIN.SETTINGS, element: <Settings /> },
 					{ path: ROUTES.ADMIN.PROFILE, element: <ProfilePage /> },
+					{ path: ROUTES.ADMIN.WORKLOGS, element: <AdminWorkLogs /> },
 				],
 			},
 
@@ -85,9 +91,8 @@ export const router = createBrowserRouter([
 					{ path: ROUTES.SUPERADMIN.DASHBOARD, element: <SuperAdminDashboard /> },
 					{ path: ROUTES.SUPERADMIN.COMPANIES, element: <SuperAdminCompanyPage /> },
 					{ path: ROUTES.SUPERADMIN.COMPANY_DETAIL, element: <SuperAdminCompanyDetail /> },
-					{ path: ROUTES.SUPERADMIN.LOGS, element: <div>Active Logs</div> },
-					{ path: ROUTES.SUPERADMIN.SUBSCRIPTIONS, element: <div>Subscription Plans</div> },
-					{ path: ROUTES.SUPERADMIN.SETTINGS, element: <div>Settings</div> },
+					{ path: ROUTES.SUPERADMIN.LOGS, element: <SuperAdminLogs /> },
+					{ path: ROUTES.SUPERADMIN.SETTINGS, element: <SuperAdminSettings /> },
 				],
 			},
 
@@ -104,11 +109,12 @@ export const router = createBrowserRouter([
 					{ path: ROUTES.DEVELOPER.SPRINTS, element: <div>Sprints Page</div> },
 					{ path: ROUTES.DEVELOPER.STANDUPS, element: <DeveloperStandup /> },
 					{ path: ROUTES.DEVELOPER.MEETINGS, element: <DeveloperMeetings /> },
-					{ path: ROUTES.DEVELOPER.MEETING_ROOM, element: <MeetingRoom /> },
-					{ path: ROUTES.DEVELOPER.PERFORMANCE, element: <div>Settings Page</div> },
+					{ path: "meetings/history", element: <MeetingHistory /> },
 					{ path: ROUTES.DEVELOPER.PROFILE, element: <ProfilePage /> },
+					{ path: ROUTES.DEVELOPER.WORKLOGS, element: <DeveloperWorkLogs /> },
 				],
 			},
+			{ path: "/meeting/:roomId", element: <MeetingRoom /> },
 		],
 	},
 ]);

@@ -23,4 +23,9 @@ export const meetingService = {
 		const res = await api.patch(`meeting/${meetingId}/status`, { status });
 		return res.data;
 	},
+
+	async getMeetingHistory(projectId: string): Promise<any> {
+		const res = await api.get(`meeting/history/${projectId}`);
+		return res.data;
+	},
 };

@@ -8,10 +8,12 @@ import {
 	Video,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useMeetings } from "../../admin/hooks/useMeetings";
 import { useProjects } from "../../admin/hooks/useProjects";
 
 export default function DeveloperMeetings() {
+	const navigate = useNavigate();
 	const [selectedProjectId, setSelectedProjectId] = useState<string>("");
 	const { data: projectsRes } = useProjects({ page: 1, limit: 100 });
 	const { meetings, isLoading } = useMeetings(selectedProjectId);
@@ -35,6 +37,13 @@ export default function DeveloperMeetings() {
 						Scheduled syncs for your projects
 					</p>
 				</div>
+				<button
+					onClick={() => navigate("history")}
+					className="flex items-center gap-3 bg-white hover:bg-gray-50 text-gray-900 px-8 py-4 rounded-2xl font-black border-2 border-gray-100 shadow-sm transition-all active:scale-95"
+				>
+					<Clock size={24} className="text-indigo-600" />
+					<span>View History</span>
+				</button>
 			</div>
 
 			{/* Filters & Search */}
@@ -136,16 +145,25 @@ export default function DeveloperMeetings() {
 							</div>
 
 							<button
+								disabled={meeting.status === "COMPLETED" || meeting.status === "CANCELLED" || meeting.status === "SCHEDULED"}
 								onClick={() =>
-									(window.location.href = `/developers/meeting/${meeting.roomId}`)
+									(window.location.href = `/meeting/${meeting.roomId}`)
 								}
-								className="mt-8 w-full py-4 bg-gray-900 group-hover:bg-indigo-600 text-white rounded-2xl font-black transition-all flex items-center justify-center gap-3"
+								className={`mt-8 w-full py-4 rounded-2xl font-black transition-all flex items-center justify-center gap-3 ${
+									meeting.status === "COMPLETED" || meeting.status === "CANCELLED"
+										? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+										: meeting.status === "SCHEDULED"
+											? "bg-indigo-50 text-indigo-400 cursor-not-allowed"
+											: "bg-gray-900 group-hover:bg-indigo-600 text-white"
+								}`}
 							>
-								Join Meeting
-								<ArrowUpRight
-									size={20}
-									className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
-								/>
+								{meeting.status === "COMPLETED" ? "Meeting Ended" : meeting.status === "CANCELLED" ? "Meeting Cancelled" : meeting.status === "SCHEDULED" ? "Waiting for Host" : "Join Meeting"}
+								{meeting.status === "ONGOING" && (
+									<ArrowUpRight
+										size={20}
+										className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+									/>
+								)}
 							</button>
 						</div>
 					))

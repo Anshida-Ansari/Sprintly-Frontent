@@ -16,4 +16,8 @@ export const companyService = {
 		const res = await api.get(`superadmin/company/${companyId}`);
 		return res.data;
 	},
+	async getDashboardStats() {
+		const res = await api.get("/superadmin/dashboard/stats");
+		return res.data;
+	},
 };

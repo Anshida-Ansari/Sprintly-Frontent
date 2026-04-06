@@ -15,6 +15,12 @@ export function useMeetings(projectId?: string) {
 		enabled: !!projectId,
 	});
 
+	const historyQuery = useQuery({
+		queryKey: ["meeting-history", projectId],
+		queryFn: () => meetingService.getMeetingHistory(projectId!),
+		enabled: !!projectId,
+	});
+
 	const scheduleMutation = useMutation({
 		mutationFn: (payload: ScheduleMeetingPayload) =>
 			meetingService.scheduleMeeting(payload),
@@ -31,7 +37,9 @@ export function useMeetings(projectId?: string) {
 
 	return {
 		meetings: meetingsQuery.data?.data || [],
+		history: historyQuery.data?.data || [],
 		isLoading: meetingsQuery.isLoading,
+		isLoadingHistory: historyQuery.isLoading,
 		scheduleMeeting: scheduleMutation.mutate,
 		isScheduling: scheduleMutation.isPending,
 	};

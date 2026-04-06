@@ -1,25 +1,26 @@
 import {
 	Activity,
-	Bell,
 	Building2,
-	CreditCard,
 	LayoutDashboard,
 	LogOut,
 	Settings,
 } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useLogout } from "../hooks/useLogout";
+import { useSocketNotifications } from "../hooks/useSocketNotifications";
+import { NotificationBell } from "../components/notifications/NotificationBell";
 
 const sidebarLinks = [
 	{ name: "Dashboard", path: "/superadmin/dashboard", icon: LayoutDashboard },
 	{ name: "Companies", path: "/superadmin/companies", icon: Building2 },
 	{ name: "Logs", path: "/superadmin/logs", icon: Activity },
-	{ name: "Plans", path: "/superadmin/subscriptions", icon: CreditCard },
 	{ name: "Settings", path: "/superadmin/settings", icon: Settings },
 ];
 
 export default function SuperAdminLayout() {
 	const logout = useLogout();
+	useSocketNotifications();
+
 	return (
 		<div className="min-h-screen bg-[#F8FAFC]">
 			{/* Top Navbar */}
@@ -53,9 +54,8 @@ export default function SuperAdminLayout() {
 					</div>
 
 					<div className="flex items-center gap-4">
-						<button className="p-2 text-gray-400 hover:text-gray-600">
-							<Bell size={20} />
-						</button>
+						<NotificationBell />
+                        
 						<div className="h-8 w-px bg-gray-200 mx-2" />
 						<button
 							onClick={logout}

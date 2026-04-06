@@ -10,13 +10,13 @@ import {
 	Video,
 	Zap,
 	UserCircle,
+	Clock,
 } from "lucide-react";
-import { useEffect } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import { toast } from "sonner";
-import { socket } from "../../lib/socket";
 import { UserAuth } from "../../modules/auth/store/store";
 import { useLogout } from "../hooks/useLogout";
+import { useSocketNotifications } from "../hooks/useSocketNotifications";
+import { DashboardHeader } from "../components/layout/DashboardHeader";
 
 const sidebarLinks = [
 	{ name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
@@ -29,33 +29,13 @@ const sidebarLinks = [
 	{ name: "Meetings", path: "/admin/meetings", icon: Video },
 	{ name: "Reports", path: "/admin/reports", icon: BarChart3 },
 	{ name: "Profile", path: "/admin/profile", icon: UserCircle },
+	{ name: "Work Logs", path: "/admin/worklogs", icon: Clock },
 ];
 
 export default function AdminLayout() {
 	const logout = useLogout();
 	const user = UserAuth((state) => state.user);
-
-	useEffect(() => {
-		if (user?.id) {
-			socket.connect();
-			socket.emit("register-user", user.id);
-
-			socket.on(
-				"meeting-scheduled",
-				(data: { title: string; date: string }) => {
-					toast.info(`New Meeting: ${data.title}`, {
-						description: `Scheduled for ${new Date(data.date).toLocaleString()}`,
-						duration: 5000,
-					});
-				},
-			);
-
-			return () => {
-				socket.off("meeting-scheduled");
-				socket.disconnect();
-			};
-		}
-	}, [user?.id]);
+	useSocketNotifications();
 
 	return (
 		<div className="flex min-h-screen bg-[#FDFDFF]">
@@ -128,6 +108,7 @@ export default function AdminLayout() {
 
 			{/* Main Content */}
 			<main className="flex-1 p-8 lg:p-12 overflow-y-auto">
+				<DashboardHeader title="Admin Dashboard" />
 				<Outlet />
 			</main>
 		</div>

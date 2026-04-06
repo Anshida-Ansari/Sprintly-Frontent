@@ -1,5 +1,4 @@
 import {
-	BarChart3,
 	Box,
 	CheckSquare,
 	Kanban,
@@ -10,9 +9,12 @@ import {
 	UserCircle,
 	Video,
 	Zap,
+	Clock,
 } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useLogout } from "../hooks/useLogout";
+import { useSocketNotifications } from "../hooks/useSocketNotifications";
+import { DashboardHeader } from "../components/layout/DashboardHeader";
 
 const sidebarLinks = [
 	{ name: "Dashboard", path: "/developers/dashboard", icon: LayoutDashboard },
@@ -22,12 +24,14 @@ const sidebarLinks = [
 	{ name: "Sprints", path: "/developers/sprints", icon: Zap },
 	{ name: "Standups", path: "/developers/standups", icon: MessagesSquare },
 	{ name: "Meetings", path: "/developers/meetings", icon: Video },
-	{ name: "Performance", path: "/developers/performance", icon: BarChart3 },
 	{ name: "Profile", path: "/developers/profile", icon: UserCircle },
+	{ name: "Work Logs", path: "/developers/worklogs", icon: Clock },
 ];
 
 export default function DeveloperLayout() {
 	const logout = useLogout();
+	useSocketNotifications();
+    
 	return (
 		<div className="flex min-h-screen bg-slate-50 text-gray-600 font-sans selection:bg-indigo-100">
 			{/* Sidebar */}
@@ -99,6 +103,7 @@ export default function DeveloperLayout() {
 			{/* Main Stage */}
 			<main className="flex-1 overflow-y-auto relative">
 				<div className="p-8 lg:p-12 relative z-10 max-w-[1600px] mx-auto">
+                    <DashboardHeader title="Developer Portal" />
 					<Outlet />
 				</div>
 			</main>

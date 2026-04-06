@@ -180,9 +180,9 @@ export default function SprintPlanningPage() {
 												<span className="text-[10px] text-gray-400 font-medium">
 													{story.id.slice(-4).toUpperCase()}
 												</span>
-												{story.assignedTo && (
+												{story.assignedTo && (Array.isArray(story.assignedTo) ? story.assignedTo.length > 0 : !!story.assignedTo) && (
 													<div className="w-4 h-4 rounded-full bg-indigo-100 flex items-center justify-center text-[8px] font-bold text-indigo-600">
-														1
+														{Array.isArray(story.assignedTo) ? story.assignedTo.length : 1}
 													</div>
 												)}
 											</div>
@@ -324,11 +324,11 @@ export default function SprintPlanningPage() {
 															>
 																{story.status}
 															</span>
-															{story.assignedTo ? (
+															{story.assignedTo && (Array.isArray(story.assignedTo) ? story.assignedTo.length > 0 : !!story.assignedTo) ? (
 																<div className="flex -space-x-1">
-																	{/* Single Assignee Avatar */}
+																	{/* Single/Multiple Assignee Avatar */}
 																	<div className="w-6 h-6 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-indigo-600">
-																		1
+																		{Array.isArray(story.assignedTo) ? story.assignedTo.length : 1}
 																	</div>
 																</div>
 															) : (

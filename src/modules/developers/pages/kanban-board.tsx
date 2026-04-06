@@ -265,6 +265,31 @@ function Swimlane({
 							)}
 						</div>
 						<h4 className="font-bold text-gray-900 text-lg leading-snug tracking-tight">{story.title}</h4>
+
+						{/* Story Points */}
+						{(story as any).estimationPoints && (
+							<div className="flex items-center gap-2">
+								<span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Points</span>
+								<span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-black">
+									{(story as any).estimationPoints}
+								</span>
+							</div>
+						)}
+
+						{/* Acceptance Criteria */}
+						{(story as any).acceptanceCriteria && (story as any).acceptanceCriteria.length > 0 && (
+							<div className="mt-1">
+								<p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Acceptance Criteria</p>
+								<ul className="space-y-1">
+									{(story as any).acceptanceCriteria.map((c: string, i: number) => (
+										<li key={i} className="flex items-start gap-1.5 text-xs text-gray-500">
+											<CheckCircle2 size={11} className="text-emerald-500 mt-0.5 flex-shrink-0" />
+											<span>{c}</span>
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
 					</div>
 				</div>
 				<div className="flex flex-col gap-2">
@@ -377,8 +402,8 @@ function SubtaskCard({
 
 	const estH = task.estimatedHours;
 	const actH = task.actualHours;
-	const variance =
-		estH !== undefined && actH !== undefined ? actH - estH : null;
+	const rawVariance = estH !== undefined && actH !== undefined ? actH - estH : null;
+	const variance = rawVariance !== null ? parseFloat(rawVariance.toFixed(2)) : null;
 
 	return (
 		<div
@@ -406,7 +431,7 @@ function SubtaskCard({
 					{actH !== undefined && (
 						<span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-gray-100 text-gray-600 border border-gray-200 rounded">
 							<Clock size={9} />
-							Actual: {actH}h
+							Actual: {parseFloat(actH.toFixed(2))}h
 						</span>
 					)}
 					{variance !== null && (

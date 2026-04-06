@@ -9,5 +9,6 @@ export const useTodayStandup = (projectId: string, sprintId: string) => {
 			return res.data;
 		},
 		enabled: !!projectId && !!sprintId,
+		retry: false, // Don't retry if not found
 	});
 };

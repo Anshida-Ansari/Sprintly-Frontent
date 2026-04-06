@@ -1,5 +1,3 @@
-// Force update
-
 import {
 	ArrowUpRight,
 	Calendar,
@@ -11,17 +9,33 @@ import {
 	Video,
 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ScheduleMeetingModal from "../components/schedule-meeting-modal";
 import { useMeetings } from "../hooks/useMeetings";
 import { useProjects } from "../hooks/useProjects";
+import { meetingService } from "../services/meeting.service";
 
 export default function Meetings() {
+	const navigate = useNavigate();
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedProjectId, setSelectedProjectId] = useState<string>("");
 	const { data: projectsRes } = useProjects({ page: 1, limit: 100 });
 	const { meetings, isLoading } = useMeetings(selectedProjectId);
 
 	const projects = projectsRes?.data || [];
+
+	const handleActionClick = async (meeting: any) => {
+		if (meeting.status === "COMPLETED" || meeting.status === "CANCELLED") return;
+		
+		if (meeting.status === "SCHEDULED") {
+			try {
+				await meetingService.updateMeetingStatus(meeting.roomId, "ONGOING");
+			} catch (err) {
+				console.error("Failed to start meeting:", err);
+			}
+		}
+		window.location.href = `/meeting/${meeting.roomId}`;
+	};
 
 	return (
 		<div className="p-8 max-w-[1600px] mx-auto min-h-screen bg-gray-50/50">
@@ -35,13 +49,22 @@ export default function Meetings() {
 						Manage and schedule your team syncs
 					</p>
 				</div>
-				<button
-					onClick={() => setIsModalOpen(true)}
-					className="flex items-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-indigo-200 transition-all active:scale-95"
-				>
-					<Plus size={24} />
-					<span>Schedule Meeting</span>
-				</button>
+				<div className="flex gap-4">
+					<button
+						onClick={() => setIsModalOpen(true)}
+						className="flex items-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-indigo-200 transition-all active:scale-95"
+					>
+						<Plus size={24} />
+						<span>Schedule Meeting</span>
+					</button>
+					<button
+						onClick={() => navigate("history")}
+						className="flex items-center gap-3 bg-white hover:bg-gray-50 text-gray-900 px-8 py-4 rounded-2xl font-black border-2 border-gray-100 shadow-sm transition-all active:scale-95"
+					>
+						<Clock size={24} className="text-indigo-600" />
+						<span>View History</span>
+					</button>
+				</div>
 			</div>
 
 			{/* Filters & Search */}
@@ -129,16 +152,21 @@ export default function Meetings() {
 							</div>
 
 							<button
-								onClick={() =>
-									(window.location.href = `/admin/meeting/${meeting.roomId}`)
-								}
-								className="mt-8 w-full py-4 bg-gray-900 group-hover:bg-indigo-600 text-white rounded-2xl font-black transition-all flex items-center justify-center gap-3"
+								disabled={meeting.status === "COMPLETED" || meeting.status === "CANCELLED"}
+								onClick={() => handleActionClick(meeting)}
+								className={`mt-8 w-full py-4 rounded-2xl font-black transition-all flex items-center justify-center gap-3 ${
+									meeting.status === "COMPLETED" || meeting.status === "CANCELLED"
+										? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+										: meeting.status === "SCHEDULED" ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20" : "bg-gray-900 group-hover:bg-indigo-600 text-white"
+								}`}
 							>
-								Join Meeting
-								<ArrowUpRight
-									size={20}
-									className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
-								/>
+								{meeting.status === "COMPLETED" ? "Meeting Ended" : meeting.status === "CANCELLED" ? "Meeting Cancelled" : meeting.status === "SCHEDULED" ? "Start Meeting" : "Join Meeting"}
+								{meeting.status !== "COMPLETED" && meeting.status !== "CANCELLED" && (
+									<ArrowUpRight
+										size={20}
+										className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+									/>
+								)}
 							</button>
 						</div>
 					))
@@ -164,3 +192,4 @@ export default function Meetings() {
 		</div>
 	);
 }
+

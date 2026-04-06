@@ -397,9 +397,10 @@ export default function UserStoryDetailModal({
 						</h3>
 
 						<div className="flex items-center gap-3">
-							{story.assignedTo ? (
+							{story.assignedTo && (Array.isArray(story.assignedTo) ? story.assignedTo.length > 0 : !!story.assignedTo) ? (
 								(() => {
-									const member = members.find((m: any) => m._id === story.assignedTo || m.id === story.assignedTo);
+									const assignedId = Array.isArray(story.assignedTo) ? story.assignedTo[0] : story.assignedTo;
+									const member = members.find((m: any) => m._id === assignedId || m.id === assignedId);
 									return member ? (
 										<div
 											key={member._id}

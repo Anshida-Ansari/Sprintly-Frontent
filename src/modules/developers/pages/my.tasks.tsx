@@ -303,6 +303,36 @@ export default function MyTasksPage() {
 											<KanbanSquare size={11} />
 											<span>Move subtasks in the Kanban board to update their status</span>
 										</div>
+										{/* Story Details: Points & Acceptance Criteria */}
+										<div className="bg-white border border-gray-100 rounded-2xl p-4 mb-4">
+											<div className="flex flex-wrap items-start gap-4">
+												{/* Story Points */}
+												{story.estimationPoints && (
+													<div className="flex items-center gap-2">
+														<span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Story Points</span>
+														<span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-black">
+															{story.estimationPoints}
+														</span>
+													</div>
+												)}
+
+												{/* Acceptance Criteria */}
+												{story.acceptanceCriteria && story.acceptanceCriteria.length > 0 && (
+													<div className="flex-1 min-w-0">
+														<p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Acceptance Criteria</p>
+														<ul className="space-y-1">
+															{story.acceptanceCriteria.map((criterion: string, i: number) => (
+																<li key={i} className="flex items-start gap-2 text-xs text-gray-600">
+																	<CheckCircle2 size={12} className="text-emerald-500 mt-0.5 flex-shrink-0" />
+																	<span>{criterion}</span>
+																</li>
+															))}
+														</ul>
+													</div>
+												)}
+											</div>
+										</div>
+
 										{subtasks.length > 0 ? (
 											subtasks.map((subtask: any) => {
 												const isDone = subtask.status === "Done";
@@ -311,10 +341,11 @@ export default function MyTasksPage() {
 												// For actual hours: prefer local input state, then server value
 												const localActual = actualHoursInputs[subtask.id];
 												const displayActual = actH;
-												const variance =
+												const rawVariance =
 													isDone && estH !== undefined && displayActual !== undefined
 														? displayActual - estH
 														: null;
+												const variance = rawVariance !== null ? parseFloat(rawVariance.toFixed(2)) : null;
 
 												return (
 													<div
@@ -380,7 +411,7 @@ export default function MyTasksPage() {
 																		localActual !== undefined
 																			? localActual
 																			: actH !== undefined
-																				? String(actH)
+																				? String(parseFloat(actH.toFixed(2)))
 																				: ""
 																	}
 																	onClick={e => e.stopPropagation()}
@@ -400,7 +431,7 @@ export default function MyTasksPage() {
 																/>
 																{actH !== undefined && (
 																	<span className="text-xs text-gray-400 font-medium">
-																		Saved: {actH}h
+																		Saved: {parseFloat(actH.toFixed(2))}h
 																	</span>
 																)}
 																{updateSubtaskTimeMutation.isPending && (
