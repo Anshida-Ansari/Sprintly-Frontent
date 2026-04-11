@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import ProtectedRoutes from "./protected.route";
 import { ROUTES } from "../constants/routes";
+import { RootErrorElement } from "../shared/components/RootErrorElement";
 
 const Login = lazy(() => import("../modules/auth/pages/login"));
 const Register = lazy(() => import("../modules/auth/pages/register"));
@@ -45,6 +46,7 @@ export const router = createBrowserRouter([
 	{
 		path: ROUTES.PUBLIC.ROOT,
 		element: <App />,
+		errorElement: <RootErrorElement />,
 		children: [
 			{ index: true, element: <LandingPage /> },
 			{ path: ROUTES.PUBLIC.REGISTER.replace("/", ""), element: <Register /> },
@@ -60,6 +62,7 @@ export const router = createBrowserRouter([
 	// PROTECTED
 	{
 		element: <ProtectedRoutes />,
+		errorElement: <RootErrorElement />,
 		children: [
 			// ADMIN
 			{

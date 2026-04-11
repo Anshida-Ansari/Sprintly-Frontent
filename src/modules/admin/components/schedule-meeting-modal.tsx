@@ -1,4 +1,4 @@
-import { ArrowRight, Calendar, Check, ChevronDown, Loader2, Users, Video, X } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Loader2, Users, Video, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useGetProject } from "../hooks/useGetProject";
@@ -144,15 +144,30 @@ export default function ScheduleMeetingModal({
 						</div>
 
 						{/* Date Selection */}
-						<div className={`group relative bg-slate-50 border-2 ${errors.date ? 'border-red-500' : 'border-transparent group-hover:border-slate-200'} rounded-2xl p-3 focus-within:bg-white focus-within:border-${errors.date ? 'red' : 'blue'}-600 focus-within:shadow-lg focus-within:shadow-blue-500/10 transition-all duration-300`}>
-							<p className={`text-[10px] font-black uppercase tracking-widest ${errors.date ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1 ml-1`}>
-								Date & Time
-							</p>
-							<input
-								type="datetime-local"
-								{...register("date", { required: "Date is required" })}
-								className="w-full bg-transparent outline-none font-bold text-base text-slate-900 placeholder:text-slate-300"
-							/>
+						<div className="space-y-1">
+							<div className={`group relative bg-slate-50 border-2 ${errors.date ? 'border-red-500' : 'border-transparent group-hover:border-slate-200'} rounded-2xl p-3 focus-within:bg-white focus-within:border-${errors.date ? 'red' : 'blue'}-600 focus-within:shadow-lg focus-within:shadow-blue-500/10 transition-all duration-300`}>
+								<p className={`text-[10px] font-black uppercase tracking-widest ${errors.date ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1 ml-1`}>
+									Date & Time
+								</p>
+								<input
+									type="datetime-local"
+									{...register("date", {
+										required: "Date is required",
+										validate: (value) => {
+											const selectedDate = new Date(value);
+											const now = new Date();
+											return selectedDate > now || "Date must be in the future";
+										}
+									})}
+									min={new Date().toISOString().slice(0, 16)}
+									className="w-full bg-transparent outline-none font-bold text-base text-slate-900 placeholder:text-slate-300"
+								/>
+							</div>
+							{errors.date && (
+								<p className="ml-1 text-[10px] font-bold text-red-500 uppercase tracking-tight">
+									{errors.date.message}
+								</p>
+							)}
 						</div>
 					</div>
 

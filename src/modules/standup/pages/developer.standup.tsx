@@ -12,7 +12,7 @@ import {
 	AlertCircle,
 	MessagesSquare
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useProjects } from "../../admin/hooks/useProjects";
 import { useGetSprints } from "../../admin/hooks/useSprints";
