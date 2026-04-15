@@ -20,6 +20,9 @@ const SuperAdminCompanyPage = lazy(() => import("../modules/superadmin/pages/sup
 const SuperAdminCompanyDetail = lazy(() => import("../modules/superadmin/pages/superadmin.companies.detail"));
 const SuperAdminLogs = lazy(() => import("../modules/superadmin/pages/superadmin.logs"));
 const SuperAdminSettings = lazy(() => import("../modules/superadmin/pages/superadmin.settings"));
+const SuperAdminSubscriptions = lazy(() => import("../modules/superadmin/pages/superadmin.subscriptions"));
+const SuperAdminAnalytics = lazy(() => import("../modules/superadmin/pages/superadmin.analytics"));
+const SuperAdminReports = lazy(() => import("../modules/superadmin/pages/superadmin.reports"));
 const MemberAccept = lazy(() => import("../modules/auth/pages/setPassword"));
 const DeveloperLayout = lazy(() => import("../shared/layouts/developer.layout"));
 const DashboardPage = lazy(() => import("../modules/developers/pages/developers.dashboard"));
@@ -95,6 +98,9 @@ export const router = createBrowserRouter([
 					{ path: ROUTES.SUPERADMIN.COMPANIES, element: <SuperAdminCompanyPage /> },
 					{ path: ROUTES.SUPERADMIN.COMPANY_DETAIL, element: <SuperAdminCompanyDetail /> },
 					{ path: ROUTES.SUPERADMIN.LOGS, element: <SuperAdminLogs /> },
+					{ path: ROUTES.SUPERADMIN.SUBSCRIPTIONS, element: <SuperAdminSubscriptions /> },
+					{ path: ROUTES.SUPERADMIN.ANALYTICS, element: <SuperAdminAnalytics /> },
+					{ path: ROUTES.SUPERADMIN.REPORTS, element: <SuperAdminReports /> },
 					{ path: ROUTES.SUPERADMIN.SETTINGS, element: <SuperAdminSettings /> },
 				],
 			},

@@ -35,6 +35,8 @@ export const ROUTES = {
         COMPANY_DETAIL: "companies/:companyId",
         LOGS: "logs",
         SUBSCRIPTIONS: "subscriptions",
+        ANALYTICS: "analytics",
+        REPORTS: "reports",
         SETTINGS: "settings",
     },
 

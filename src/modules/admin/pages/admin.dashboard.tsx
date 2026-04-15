@@ -8,6 +8,9 @@ import {
 	RefreshCw,
 	Zap,
 	Video,
+	Crown,
+	AlertTriangle,
+	CalendarClock,
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -159,7 +162,108 @@ export default function AdminDashboard() {
 				</div>
 			</div>
 
-			{/* 4. Activity & Actions Area */}
+			{/* Subscription Status Banner */}
+			{(() => {
+				const plan = dashboardStats?.companyPlan ?? "free";
+				const isPro = plan.toLowerCase() === "pro";
+				const limit = dashboardStats?.projectLimit ?? 2;
+				const used = dashboardStats?.activeProjects ?? 0;
+				const usagePct = limit === -1 ? 0 : Math.min(Math.round((used / limit) * 100), 100);
+				const endDate = dashboardStats?.subscriptionEndDate
+					? new Date(dashboardStats.subscriptionEndDate)
+					: null;
+				const daysLeft = endDate
+					? Math.ceil((endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+					: null;
+				const nearLimit = limit !== -1 && used >= limit;
+				const expiringSoon = daysLeft !== null && daysLeft <= 7;
+
+				return (
+					<div className={`rounded-3xl border p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 ${
+						isPro
+							? "bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-100"
+							: "bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200"
+					}`}>
+						{/* Left: Plan Info */}
+						<div className="flex items-center gap-4">
+							<div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm ${
+								isPro ? "bg-indigo-600" : "bg-amber-500"
+							}`}>
+								<Crown size={22} className="text-white" />
+							</div>
+							<div>
+								<div className="flex items-center gap-2 mb-0.5">
+									<p className="text-lg font-black text-gray-900">
+										{isPro ? "Pro Plan" : "Free Plan"}
+									</p>
+									<span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+										isPro
+											? "bg-indigo-100 text-indigo-700"
+											: "bg-amber-100 text-amber-700"
+									}`}>
+										{isPro ? "Active" : "Limited"}
+									</span>
+								</div>
+								{isPro && endDate && (
+									<p className={`text-xs font-semibold flex items-center gap-1 ${
+										expiringSoon ? "text-rose-500" : "text-gray-500"
+									}`}>
+										{expiringSoon ? <AlertTriangle size={12} /> : <CalendarClock size={12} />}
+										{expiringSoon
+											? `Expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"}!`
+											: `Renews on ${endDate.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}`}
+										{dashboardStats?.autoRenew
+											? " • Auto-renew ON"
+											: " • Auto-renew OFF"}
+									</p>
+								)}
+								{!isPro && (
+									<p className="text-xs text-gray-500 font-medium">
+										Upgrade to Pro for unlimited projects & more.
+									</p>
+								)}
+							</div>
+						</div>
+
+						{/* Middle: Project Usage */}
+						<div className="flex-1 min-w-[180px] max-w-xs">
+							<div className="flex justify-between items-center mb-1.5">
+								<p className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+									Project Usage
+								</p>
+								<p className={`text-xs font-bold ${nearLimit ? "text-rose-600" : "text-gray-700"}`}>
+									{used} / {limit === -1 ? "∞" : limit}
+								</p>
+							</div>
+							<div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+								<div
+									className={`h-full rounded-full transition-all duration-500 ${
+										nearLimit ? "bg-rose-500" : isPro ? "bg-indigo-500" : "bg-amber-500"
+									}`}
+									style={{ width: limit === -1 ? "10%" : `${usagePct}%` }}
+								/>
+							</div>
+							{nearLimit && !isPro && (
+								<p className="text-[10px] font-bold text-rose-500 mt-1 flex items-center gap-1">
+									<AlertTriangle size={10} /> Project limit reached
+								</p>
+							)}
+						</div>
+
+						{/* Right: CTA */}
+						{!isPro && (
+							<button
+								onClick={() => navigate(buildPath.admin(ROUTES.ADMIN.SETTINGS))}
+								className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl transition-all shadow-sm whitespace-nowrap"
+							>
+								<Zap size={15} fill="currentColor" /> Upgrade to Pro
+							</button>
+						)}
+					</div>
+				);
+			})()}
+
+
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 				<div className="lg:col-span-2 bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm">
 					<div className="flex items-center justify-between mb-8">

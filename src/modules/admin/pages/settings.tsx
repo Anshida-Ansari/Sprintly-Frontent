@@ -1,11 +1,13 @@
-import { Github, Link2, Settings as SettingsIcon, X, CheckCircle2, AlertCircle } from "lucide-react";
+import { Github, Link2, Settings as SettingsIcon, X, CheckCircle2, AlertCircle, Zap, CreditCard, ChevronRight } from "lucide-react";
 import { useGitHubStatus } from "../hooks/useGitHubStatus";
+import { useSubscriptionStatus } from "../hooks/useSubscription";
 import { useDisconnectGitHub } from "../hooks/useDisconnectGitHub";
 import { githubService } from "../services/github.service";
 import { useState } from "react";
 
 export default function Settings() {
     const { data: githubStatus, isLoading } = useGitHubStatus();
+    const { data: subscription } = useSubscriptionStatus();
     const disconnectMutation = useDisconnectGitHub();
     const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
 
@@ -159,11 +161,115 @@ export default function Settings() {
                             </div>
                         </div>
 
-                        {/* Placeholder for future integrations */}
-                        <div className="mt-4 p-6 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl text-center">
-                            <p className="text-sm text-gray-500">
-                                More integrations coming soon...
-                            </p>
+                    </div>
+
+                    {/* Subscription Section */}
+                    <div className="pt-8 border-t border-gray-100">
+                        <div className="flex items-center gap-2 mb-6">
+                            <Zap size={20} className="text-gray-700" />
+                            <h2 className="text-xl font-bold text-gray-900">Billing & Subscription</h2>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Current Plan Card */}
+                            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                                <div className="p-6">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`p-2 rounded-xl ${subscription?.data?.currentPlan === 'PRO' ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-600'}`}>
+                                                <CreditCard size={20} />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Current Plan</p>
+                                                <h3 className="text-xl font-black text-gray-900">{subscription?.data?.currentPlan || 'FREE'} Plan</h3>
+                                            </div>
+                                        </div>
+                                        {subscription?.data?.currentPlan === 'PRO' ? (
+                                            <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-black rounded-full uppercase tracking-tight">Active</span>
+                                        ) : (
+                                            <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-black rounded-full uppercase tracking-tight">Free Tier</span>
+                                        )}
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <div className="flex justify-between text-sm font-bold mb-2">
+                                                <span className="text-gray-600">Project Usage</span>
+                                                <span className="text-gray-900">
+                                                    {subscription?.data?.projectCount} / {subscription?.data?.projectLimit === -1 ? '∞' : subscription?.data?.projectLimit}
+                                                </span>
+                                            </div>
+                                            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                                <div 
+                                                    className={`h-full transition-all duration-1000 ${subscription?.data?.isLimitReached ? 'bg-orange-500' : 'bg-indigo-600'}`}
+                                                    style={{ width: `${Math.min(((subscription?.data?.projectCount || 0) / (subscription?.data?.projectLimit === -1 ? (subscription?.data?.projectCount || 1) : (subscription?.data?.projectLimit || 1))) * 100, 100)}%` }}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {subscription?.data?.currentPlan === 'FREE' && (
+                                            <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
+                                                <p className="text-xs text-indigo-700 font-medium leading-relaxed">
+                                                    You're currently limited to 2 projects. Upgrade to Pro for unlimited project creation and advanced team features.
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Plan Details / Renewal Card */}
+                            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                                <div className="p-6 h-full flex flex-col">
+                                    <h4 className="font-bold text-gray-900 mb-4 tracking-tight">Plan Benefits</h4>
+                                    <ul className="space-y-3 flex-1">
+                                        {[
+                                            { text: 'Unlimited Projects', active: subscription?.data?.currentPlan === 'PRO' },
+                                            { text: 'Priority Support', active: subscription?.data?.currentPlan === 'PRO' },
+                                            { text: 'Advanced Analytics', active: subscription?.data?.currentPlan === 'PRO' },
+                                            { text: 'Basic Project Management', active: true },
+                                        ].map((benefit, i) => (
+                                            <li key={i} className="flex items-center gap-2 text-sm">
+                                                <div className={`w-1.5 h-1.5 rounded-full ${benefit.active ? 'bg-indigo-600' : 'bg-gray-300'}`} />
+                                                <span className={benefit.active ? 'text-gray-900 font-medium' : 'text-gray-400'}>{benefit.text}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    
+                                    <div className="mt-6 pt-6 border-t border-gray-100 flex-1 flex flex-col justify-end">
+                                        {subscription?.data?.currentPlan === 'PRO' ? (
+                                            <div className="space-y-4">
+                                                <div className="flex items-center justify-between text-sm">
+                                                    <span className="text-gray-500 font-medium">Auto-renewal Status</span>
+                                                    <span className="text-emerald-600 font-bold flex items-center gap-1.5">
+                                                        <CheckCircle2 size={14} />
+                                                        Enabled
+                                                    </span>
+                                                </div>
+                                                {subscription?.data?.subscriptionEndDate && (
+                                                    <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-xs font-bold text-gray-500 uppercase tracking-tight">Next Billing Date</span>
+                                                            <span className="text-sm font-black text-gray-900">
+                                                                {new Date(subscription.data.subscriptionEndDate).toLocaleDateString("en-US", {
+                                                                    month: "short",
+                                                                    day: "numeric",
+                                                                    year: "numeric"
+                                                                })}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <button className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-indigo-50 text-indigo-600 rounded-xl transition-all group">
+                                                <span className="text-sm font-bold">Compare all plans</span>
+                                                <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -1,9 +1,12 @@
 import {
 	Activity,
 	Building2,
+	CreditCard,
 	LayoutDashboard,
 	LogOut,
 	Settings,
+	BarChart3,
+	ClipboardList,
 } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useLogout } from "../hooks/useLogout";
@@ -13,6 +16,9 @@ import { NotificationBell } from "../components/notifications/NotificationBell";
 const sidebarLinks = [
 	{ name: "Dashboard", path: "/superadmin/dashboard", icon: LayoutDashboard },
 	{ name: "Companies", path: "/superadmin/companies", icon: Building2 },
+	{ name: "Analytics", path: "/superadmin/analytics", icon: BarChart3 },
+	{ name: "Reports", path: "/superadmin/reports", icon: ClipboardList },
+	{ name: "Subscriptions", path: "/superadmin/subscriptions", icon: CreditCard },
 	{ name: "Logs", path: "/superadmin/logs", icon: Activity },
 	{ name: "Settings", path: "/superadmin/settings", icon: Settings },
 ];

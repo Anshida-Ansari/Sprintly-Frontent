@@ -20,7 +20,7 @@ export function useWebRTC(roomId: string, userId: string, userName: string) {
 	const [remoteCameraOff, setRemoteCameraOff] = useState<Record<string, boolean>>({});
 	const [isScreenSharing, setIsScreenSharing] = useState(false);
 	const [messages, setMessages] = useState<any[]>([]);
-	const [activeSpeaker, setActiveSpeaker] = useState<string | null>(null);
+	const [activeSpeaker] = useState<string | null>(null);
 	const [isMeetingEnded, setIsMeetingEnded] = useState(false);
 
 	const peers = useRef<Record<string, PeerConnection>>({});

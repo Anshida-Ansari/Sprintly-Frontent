@@ -4,13 +4,9 @@ import {
     Plus, 
     Calendar, 
     FileText, 
-    Subtitles, 
     Loader2, 
-    CheckCircle2, 
-    AlertCircle,
     ArrowRight,
     Search,
-    Filter,
     Layout
 } from "lucide-react";
 import { useState, useMemo } from "react";
@@ -33,7 +29,7 @@ export default function WorkLogsPage() {
     const [searchTerm, setSearchTerm] = useState("");
 
 
-    const { data: tasksRes, isLoading: tasksLoading } = useQuery({
+    const { data: tasksRes } = useQuery({
         queryKey: ["my-tasks-for-worklog"],
         queryFn: () => userStoryService.getMyUserStories(),
     });

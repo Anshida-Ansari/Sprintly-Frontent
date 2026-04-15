@@ -1,11 +1,14 @@
-import { LayoutGrid, Plus } from "lucide-react";
-import { useState } from "react";
+import { LayoutGrid, Plus, AlertCircle, Zap, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import CreateProjectModal from "../components/create.project.modal";
 import EditProjectModal from "../components/edit.project.modal";
+import UpgradeModal from "../components/UpgradeModal";
 import ProjectCard from "../components/project.card";
 import { useCreateProject } from "../hooks/useCreateProject";
 import { useEditProject } from "../hooks/useEditProject";
 import { useProjects } from "../hooks/useProjects";
+import { useSubscriptionStatus, useVerifyStripeSession } from "../hooks/useSubscription";
 import type {
 	CreateProjectPayload,
 	EditProjectPayload,
@@ -19,7 +22,12 @@ interface ProjectsProps {
 export default function Projects({ isReadOnly = false }: ProjectsProps) {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 	const [editingProject, setEditingProject] = useState<IProject | null>(null);
+
+	const [searchParams] = useSearchParams();
+	const sessionId = searchParams.get("session_id");
+	const { mutate: verifySession, isPending: isVerifying } = useVerifyStripeSession();
 
 	const { mutate: createProject, isPending: isCreating } = useCreateProject();
 	const { mutate: updateProject, isPending: isUpdating } = useEditProject();
@@ -27,16 +35,34 @@ export default function Projects({ isReadOnly = false }: ProjectsProps) {
 	const [page, setPage] = useState(1);
 	const limit = 6;
 
+	useEffect(() => {
+		if (sessionId) {
+			verifySession(sessionId);
+		}
+	}, [sessionId, verifySession]);
+
 	const {
 		data: projectData,
 		isLoading,
 		isPlaceholderData,
 	} = useProjects({ page, limit });
 
+	const { data: subscription } = useSubscriptionStatus();
+	const isLimitReached = subscription?.data?.isLimitReached || false;
+	const currentPlan = subscription?.data?.currentPlan || "FREE";
+
 	const handleCreateProject = (data: CreateProjectPayload) => {
 		createProject(data, {
 			onSuccess: () => setIsModalOpen(false),
 		});
+	};
+
+	const handleOpenCreateModal = () => {
+		if (isLimitReached) {
+			setIsUpgradeModalOpen(true);
+		} else {
+			setIsModalOpen(true);
+		}
 	};
 
 	const handleEditProject = (data: EditProjectPayload) => {
@@ -97,6 +123,46 @@ export default function Projects({ isReadOnly = false }: ProjectsProps) {
 
 	return (
 		<div className="max-w-7xl mx-auto space-y-8 h-[calc(100vh-100px)] flex flex-col">
+			{/* Verification Loading Overlay */}
+			{isVerifying && (
+				<div className="fixed inset-0 z-[100] bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300">
+					<div className="flex flex-col items-center gap-4 text-center">
+						<div className="p-4 bg-indigo-100 rounded-px animate-bounce">
+							<Zap size={48} className="text-indigo-600 fill-indigo-600" />
+						</div>
+						<h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+							Verifying your Upgrade
+							<Loader2 className="animate-spin text-indigo-600" size={24} />
+						</h2>
+						<p className="text-gray-500 font-medium max-w-xs">
+							Hang tight! We're confirming your payment with Stripe...
+						</p>
+					</div>
+				</div>
+			)}
+
+			{/* Subscription Limit Warning */}
+			{!isReadOnly && isLimitReached && currentPlan === "FREE" && (
+				<div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-4 flex items-center justify-between shadow-sm animate-in slide-in-from-top duration-500">
+					<div className="flex items-center gap-4">
+						<div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm">
+							<AlertCircle className="text-amber-500" size={24} />
+						</div>
+						<div>
+							<h4 className="font-black text-gray-900 tracking-tight">You’ve reached your free limit</h4>
+							<p className="text-gray-500 text-sm font-medium">Upgrade to Pro to create unlimited projects and unlock advanced features.</p>
+						</div>
+					</div>
+					<button 
+						onClick={() => setIsUpgradeModalOpen(true)}
+						className="px-6 py-2.5 bg-gray-900 text-white rounded-2xl font-bold hover:bg-gray-800 transition shadow-lg shadow-gray-200 flex items-center gap-2 text-sm"
+					>
+						<Zap size={16} className="fill-white" />
+						Upgrade Now
+					</button>
+				</div>
+			)}
+
 			{/* Header */}
 			<div className="flex flex-col md:flex-row md:items-center justify-between gap-4 flex-shrink-0">
 				<div>
@@ -115,7 +181,7 @@ export default function Projects({ isReadOnly = false }: ProjectsProps) {
 
 					{!isReadOnly && (
 						<button
-							onClick={() => setIsModalOpen(true)}
+							onClick={handleOpenCreateModal}
 							className="px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 flex items-center gap-2"
 						>
 							<Plus size={20} />
@@ -196,6 +262,12 @@ export default function Projects({ isReadOnly = false }: ProjectsProps) {
 				project={editingProject}
 				isLoading={isUpdating}
 			/>
+
+			<UpgradeModal 
+				isOpen={isUpgradeModalOpen}
+				onClose={() => setIsUpgradeModalOpen(false)}
+			/>
 		</div>
 	);
 }
+

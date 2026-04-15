@@ -30,7 +30,7 @@ export default function UserStoryModal({
 		formState: { errors },
 		reset,
 		setValue,
-	} = useForm<UserStoryFormData>({
+	} = useForm<any>({
 		resolver: zodResolver(userStorySchema),
 		defaultValues: {
 			title: "",
@@ -75,7 +75,7 @@ export default function UserStoryModal({
 	const handleFormSubmit = (data: UserStoryFormData) => {
 		// Convert text area back to array for acceptance criteria
 		const criteriaArray = data.acceptanceCriteriaText
-			? data.acceptanceCriteriaText.split("\n").filter((line) => line.trim() !== "")
+			? data.acceptanceCriteriaText.split("\n").filter((line: string) => line.trim() !== "")
 			: [];
 
 		const payload = {
@@ -117,7 +117,7 @@ export default function UserStoryModal({
 				<div className="overflow-y-auto p-6 custom-scrollbar flex-1">
 					<form
 						id="user-story-form"
-						onSubmit={handleSubmit(handleFormSubmit)}
+						onSubmit={handleSubmit(handleFormSubmit as any)}
 						className="space-y-5"
 						noValidate
 					>
