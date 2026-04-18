@@ -36,7 +36,7 @@ interface SprintRowProps {
 	isReadOnly?: boolean;
 }
 
-function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, onViewBurndown, isProcessing, isReadOnly = false }: SprintRowProps) {
+function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, onViewBurndown, isProcessing }: SprintRowProps) {
 	const isActive = sprint.status === "ACTIVE";
 	const isCompleted = sprint.status === "COMPLETED";
 

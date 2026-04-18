@@ -4,19 +4,14 @@ import {
 	CheckCircle2,
 	Clock,
 } from "lucide-react";
-import { useState } from "react";
 import type { Standup } from "../types/standup.types";
 
 interface StandupCardProps {
 	standup: Standup;
-	projectId: string;
-	sprintId: string;
 }
 
 export const StandupCard = ({
 	standup,
-	projectId,
-	sprintId,
 }: StandupCardProps) => {
 
 	return (

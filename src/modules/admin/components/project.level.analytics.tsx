@@ -9,8 +9,6 @@ import {
     PieChart, 
     Pie, 
     Cell, 
-    LineChart, 
-    Line,
     AreaChart,
     Area,
     Legend
@@ -53,10 +51,9 @@ export function ProjectLevelAnalytics({ projectId }: ProjectLevelAnalyticsProps)
         tasksOverTime = [], 
         userProductivity = [], 
         sprintAnalytics = [], 
-        storyCompletionTrend = [],
         overallHealth = { totalStories: 0, completedStories: 0, totalEstimation: 0 },
         overdueCount = 0
-    } = analytics;
+    } =  analytics;
 
     const healthPercentage = overallHealth.totalStories > 0 
         ? Math.round((overallHealth.completedStories / overallHealth.totalStories) * 100) 
@@ -153,7 +150,7 @@ export function ProjectLevelAnalytics({ projectId }: ProjectLevelAnalyticsProps)
                                     dataKey="count"
                                     nameKey="_id"
                                 >
-                                    {taskDistribution.map((entry: any, index: number) => (
+                                    {taskDistribution.map((index: number) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
                                     ))}
                                 </Pie>

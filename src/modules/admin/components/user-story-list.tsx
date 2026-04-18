@@ -35,7 +35,7 @@ interface UserStoryListProps {
 
 export default function UserStoryList({
 	projectId,
-	showHeader = true,
+	// showHeader = true,
 	members = [],
 	isReadOnly = false,
 }: UserStoryListProps) {
@@ -142,12 +142,12 @@ export default function UserStoryList({
 		: 0;
 
 	// Helper to get assignee details
-	const getAssigneeDetails = (assigneeId?: string) => {
-		if (!assigneeId) return null;
-		// Return only the first assignee for the list view to keep it clean
-		const member = members.find(m => m.id === assigneeId || m._id === assigneeId);
-		return member;
-	};
+	// const getAssigneeDetails = (assigneeId?: string) => {
+	// 	if (!assigneeId) return null;
+	// 	// Return only the first assignee for the list view to keep it clean
+	// 	const member = members.find(m => m.id === assigneeId || m._id === assigneeId);
+	// 	return member;
+	// };
 
 	return (
 		<div className="space-y-4">

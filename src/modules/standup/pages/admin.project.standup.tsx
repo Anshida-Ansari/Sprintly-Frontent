@@ -3,7 +3,7 @@ import { useProjects } from "../../admin/hooks/useProjects";
 import { useGetProject } from "../../admin/hooks/useGetProject";
 import { useGetSprints } from "../../admin/hooks/useSprints";
 import { useListStandups } from "../hooks/useListStandup";
-import { Calendar, Filter, LayoutGrid, Search, User, MoreHorizontal, ArrowUpRight, MessageSquare, AlertCircle, ChevronRight, Target, Clock, Zap, CheckCircle2, AlertTriangle, ArrowRight } from "lucide-react";
+import { Calendar, Filter, LayoutGrid, User, MoreHorizontal, MessageSquare, AlertCircle, Target, Clock, Zap, CheckCircle2, AlertTriangle, ArrowRight } from "lucide-react";
 
 export default function AdminProjectStandupPage() {
     const todayStr = new Date().toISOString().split("T")[0];
@@ -60,7 +60,7 @@ export default function AdminProjectStandupPage() {
     const submissionStats = useMemo(() => {
         if (!projectMembers.length) return { submitted: 0, total: 0 };
         return {
-            submitted: teamStandups.filter(t => t.isSubmitted).length,
+            submitted: teamStandups.filter((t: any) => t.isSubmitted).length,
             total: projectMembers.length
         };
     }, [teamStandups, projectMembers]);
@@ -147,7 +147,7 @@ export default function AdminProjectStandupPage() {
                     </div>
                 ) : teamStandups.length > 0 ? (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
-                        {teamStandups.map(({ member, standup, isSubmitted }) => (
+                        {teamStandups.map(({ member, standup, isSubmitted }: any) => (
                             <div 
                                 key={member.id || member._id}
                                 className={`group bg-white rounded-[2.5rem] border p-1 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-100/30 ${isSubmitted ? 'border-gray-100 hover:border-indigo-200' : 'border-dashed border-gray-200 opacity-60 hover:opacity-100'}`}
@@ -218,7 +218,7 @@ export default function AdminProjectStandupPage() {
                 ) : (
                     <div className="flex-1 bg-white/70 backdrop-blur-xl rounded-[2.5rem] border border-gray-100 flex flex-col items-center justify-center py-20 text-center animate-in fade-in zoom-in-95 duration-500">
                         <div className="w-24 h-24 bg-gray-50 rounded-[2.5rem] flex items-center justify-center mb-8 border border-gray-100">
-                            <Users size={40} className="text-gray-200" />
+                            <User size={40} className="text-gray-200" />
                         </div>
                         <h3 className="text-2xl font-black text-gray-900 mb-2">No Members Joined</h3>
                         <p className="text-gray-400 font-medium max-w-sm mx-auto">

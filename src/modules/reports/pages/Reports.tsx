@@ -8,7 +8,6 @@ import {
     Calendar, 
     Filter,
     FolderOpen,
-    Search
 } from "lucide-react";
 import { PaginatedTable } from "../../../shared/components/PaginatedTable";
 import { 

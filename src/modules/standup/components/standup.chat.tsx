@@ -217,8 +217,6 @@ export const StandupChat = ({
 							<StandupCard
 								key={standup._id}
 								standup={standup}
-								projectId={projectId}
-								sprintId={sprintId}
 							/>
 						))
 					) : (

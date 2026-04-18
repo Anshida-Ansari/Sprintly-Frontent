@@ -39,8 +39,7 @@ export default function AdminLayout() {
 	const location = useLocation();
 	useSocketNotifications();
 
-	const currentLink = sidebarLinks.find(link => location.pathname === link.path);
-	const pageTitle = currentLink ? currentLink.name : "Admin Dashboard";
+
 
 	return (
 		<div className="flex min-h-screen bg-[#FDFDFF]">

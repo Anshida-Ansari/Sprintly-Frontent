@@ -1,7 +1,6 @@
 import {
 	ArrowUpRight,
 	ChevronRight,
-	Clock,
 	FolderOpen,
 	Play,
 	Plus,
@@ -25,8 +24,7 @@ import InviteMemberModal from "../components/invite.modal";
 import { useDashboardStats } from "../hooks/useDashboardStats";
 import { useInviteMember } from "../hooks/useInviteMember";
 import { buildPath, ROUTES } from "../../../constants/routes";
-import { useProjects } from "../hooks/useProjects";
-import { useGetSprints } from "../hooks/useSprints";
+
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 
 export default function AdminDashboard() {
@@ -35,18 +33,6 @@ export default function AdminDashboard() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const { mutate: inviteMember, isPending } = useInviteMember();
 	const { data: statsRes } = useDashboardStats();
-
-	const { data: projectsData } = useProjects({ page: 1, limit: 1 });
-	const currentProject = projectsData?.data?.[0];
-
-	const { data: sprintsData } = useGetSprints(
-		currentProject?.id || "",
-		{ page: 1, limit: 1, status: "ACTIVE" as any }
-	);
-	const activeSprintFromHook = sprintsData?.data?.[0];
-
-
-
 	const handleInvite = (data: { name: string; email: string; role: string }) => {
 		inviteMember(data, {
 			onSuccess: () => setIsModalOpen(false),
@@ -99,7 +85,7 @@ export default function AdminDashboard() {
 		{ name: "Completed", value: dashboardStats?.userStoriesByStatus?.done || 0, color: "#10b981" },
 	].filter(d => d.value > 0);
 
-	const COLORS = ["#94a3b8", "#6366f1", "#10b981"];
+	// const COLORS = ["#94a3b8", "#6366f1", "#10b981"];
 
 	return (
 		<div className="max-w-7xl mx-auto space-y-8">

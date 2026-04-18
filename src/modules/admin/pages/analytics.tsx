@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { 
-    BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, 
+    BarChart, Bar, PieChart, Pie, Cell, 
     XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
-    AreaChart, Area
+
 } from "recharts";
 import { 
-    TrendingUp, Clock, Activity, Users, Target, CheckCircle2, 
-    AlertCircle, Filter, ChevronDown, Rocket, Zap, BarChart3
+    Users, Target, CheckCircle2, 
+    AlertCircle, Filter, ChevronDown,  Zap, BarChart3
 } from "lucide-react";
 import { useAnalytics } from "../hooks/useAnalytics";
 import { useProjects } from "../hooks/useProjects";
@@ -29,7 +29,6 @@ export default function Analytics() {
 
     const { 
         taskDistribution = [], 
-        tasksOverTime = [], 
         userProductivity = [], 
         overallHealth = { totalStories: 0, completedStories: 0, totalEstimation: 0 },
         overdueCount = 0 
@@ -125,8 +124,8 @@ export default function Analytics() {
                                     dataKey="count"
                                     nameKey="_id"
                                 >
-                                    {taskDistribution.map((_, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} cornerRadius={8} />
+                                    {taskDistribution.map((_item: any, index: number) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
                                 <Tooltip />

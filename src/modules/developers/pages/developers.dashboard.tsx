@@ -21,6 +21,7 @@ export default function DashboardPage() {
 	const navigate = useNavigate();
 	const user = UserAuth((state) => state.user);
 	const [date, setDate] = useState(new Date());
+	const [burndownType, setBurndownType] = useState<"hours" | "points">("hours");
 
 	const { data: projectsData } = useProjects({ page: 1, limit: 1 });
 	const currentProject = projectsData?.data?.[0];
@@ -34,7 +35,7 @@ export default function DashboardPage() {
 	);
 	const activeSprint = sprintsData?.data?.[0];
 
-	const { data: burndownData, isLoading: burndownLoading } = useUserBurndown(activeSprint?.id || null);
+	const { data: burndownData, isLoading: burndownLoading } = useUserBurndown(activeSprint?.id || null, burndownType);
 
 	useEffect(() => {
 		const timer = setInterval(() => setDate(new Date()), 60000);
@@ -298,10 +299,12 @@ export default function DashboardPage() {
 			{currentProject && activeSprint && (
 				<div className="mt-8">
 					<BurnDownChart 
-						data={burndownData || []} 
+						data={burndownData || null} 
 						isLoading={burndownLoading}
 						title={`${activeSprint.name} - Sprint Progress`}
 						description="Track your personal logged hours against estimated subtasks for this sprint."
+						type={burndownType}
+						onTypeChange={setBurndownType}
 					/>
 				</div>
 			)}

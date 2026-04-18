@@ -1,4 +1,4 @@
-import { Check, Rocket, Shield, Zap, X, Sparkles } from "lucide-react";
+import { Check,  Shield, Zap, X, Sparkles } from "lucide-react";
 import { useCreateStripeSession, useUpgradeSubscription } from "../hooks/useSubscription";
 
 interface UpgradeModalProps {

@@ -33,8 +33,7 @@ export default function DeveloperLayout() {
 	const location = useLocation();
 	useSocketNotifications();
 
-	const currentLink = sidebarLinks.find(link => location.pathname === link.path);
-	const pageTitle = currentLink ? currentLink.name : "Developer Portal";
+
     
 	return (
 		<div className="flex min-h-screen bg-slate-50 text-gray-600 font-sans selection:bg-indigo-100">

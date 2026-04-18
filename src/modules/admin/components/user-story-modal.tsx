@@ -133,7 +133,7 @@ export default function UserStoryModal({
 							/>
 							{errors.title && (
 								<p className="text-red-500 text-xs mt-0.5">
-									{errors.title.message}
+									{String(errors.title.message)}
 								</p>
 							)}
 						</div>
@@ -151,7 +151,7 @@ export default function UserStoryModal({
 							/>
 							{errors.description && (
 								<p className="text-red-500 text-xs mt-0.5">
-									{errors.description.message}
+									{String(errors.description.message)}
 								</p>
 							)}
 						</div>
@@ -208,7 +208,7 @@ export default function UserStoryModal({
 								</div>
 								{errors.estimationPoints && (
 									<p className="text-red-500 text-xs mt-0.5">
-										{errors.estimationPoints.message}
+										{String(errors.estimationPoints.message)}
 									</p>
 								)}
 							</div>
