@@ -12,7 +12,7 @@ import {
 	UserCircle,
 	Clock,
 } from "lucide-react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { UserAuth } from "../../modules/auth/store/store";
 import { useLogout } from "../hooks/useLogout";
 import { useSocketNotifications } from "../hooks/useSocketNotifications";
@@ -28,6 +28,7 @@ const sidebarLinks = [
 	{ name: "Team", path: "/admin/team", icon: UserPlus },
 	{ name: "Meetings", path: "/admin/meetings", icon: Video },
 	{ name: "Reports", path: "/admin/reports", icon: BarChart3 },
+	{ name: "Analytics", path: "/admin/analytics", icon: BarChart3 },
 	{ name: "Profile", path: "/admin/profile", icon: UserCircle },
 	{ name: "Work Logs", path: "/admin/worklogs", icon: Clock },
 ];
@@ -35,7 +36,11 @@ const sidebarLinks = [
 export default function AdminLayout() {
 	const logout = useLogout();
 	const user = UserAuth((state) => state.user);
+	const location = useLocation();
 	useSocketNotifications();
+
+	const currentLink = sidebarLinks.find(link => location.pathname === link.path);
+	const pageTitle = currentLink ? currentLink.name : "Admin Dashboard";
 
 	return (
 		<div className="flex min-h-screen bg-[#FDFDFF]">
@@ -108,7 +113,7 @@ export default function AdminLayout() {
 
 			{/* Main Content */}
 			<main className="flex-1 p-8 lg:p-12 overflow-y-auto">
-				<DashboardHeader title="Admin Dashboard" />
+				<DashboardHeader title={location.pathname === "/admin/dashboard" ? "Admin Dashboard" : undefined} />
 				<Outlet />
 			</main>
 		</div>

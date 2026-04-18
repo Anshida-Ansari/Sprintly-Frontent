@@ -3,12 +3,8 @@ import {
 	AlertCircle,
 	CheckCircle2,
 	Clock,
-	Loader2,
-	MessageCircle,
-	Send,
 } from "lucide-react";
 import { useState } from "react";
-import { useAddComment } from "../hooks/useAddCommnet";
 import type { Standup } from "../types/standup.types";
 
 interface StandupCardProps {
@@ -22,7 +18,6 @@ export const StandupCard = ({
 	projectId,
 	sprintId,
 }: StandupCardProps) => {
-	const [isExpanded, setIsExpanded] = useState(false);
 
 	return (
 		<div className="bg-white rounded-[1.5rem] border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 overflow-hidden group">
@@ -87,109 +82,9 @@ export const StandupCard = ({
 						</div>
 					</div>
 
-					{/* Actions Area - Highly Compact */}
-					<div className="mt-6 flex items-center justify-between border-t border-gray-50 pt-4">
-						<button 
-							onClick={() => setIsExpanded(!isExpanded)}
-							className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all ${
-								isExpanded ? 'text-indigo-600' : 'text-gray-400 hover:text-indigo-600'
-							}`}
-						>
-							<MessageCircle size={12} />
-							{standup.comments && standup.comments.length > 0 
-								? `${standup.comments.length} Threads` 
-								: "Discuss"}
-						</button>
-						
-						<div className="flex -space-x-1">
-							<div className="w-5 h-5 rounded-full border border-white bg-indigo-100 flex items-center justify-center text-[8px] font-black text-indigo-600 shadow-sm">
-								{standup.user.name.charAt(0)}
-							</div>
-						</div>
-					</div>
-
-					{isExpanded && (
-						<div className="mt-4 space-y-4 animate-in slide-in-from-top-1 fade-in duration-300">
-							{standup.comments && standup.comments.length > 0 && (
-								<div className="space-y-4 relative pl-3 border-l border-gray-100">
-									{standup.comments.map((comment) => (
-										<div key={comment._id} className="flex gap-3 relative">
-											<div className="w-7 h-7 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 font-black text-[10px] shrink-0">
-												{comment.user.name.charAt(0).toUpperCase()}
-											</div>
-											<div className="flex-1 bg-gray-50/50 p-3 rounded-xl border border-gray-100/50">
-												<div className="flex items-center gap-2 mb-0.5">
-													<span className="font-black text-gray-900 text-[11px]">
-														{comment.user.name.split(" ")[0]}
-													</span>
-													<span className="text-[9px] font-bold text-gray-400">
-														{format(new Date(comment.createdAt), "h:mm a")}
-													</span>
-												</div>
-												<p className="text-gray-600 text-[11px] font-medium leading-snug">{comment.message}</p>
-											</div>
-										</div>
-									))}
-								</div>
-							)}
-
-							<CommentInput
-								projectId={projectId}
-								sprintId={sprintId}
-								standupId={standup._id}
-							/>
-						</div>
-					)}
 				</div>
 			</div>
 		</div>
 	);
 };
 
-function CommentInput({
-	projectId,
-	sprintId,
-	standupId,
-}: {
-	projectId: string;
-	sprintId: string;
-	standupId: string;
-}) {
-	const [message, setMessage] = useState("");
-	const { mutate, isPending } = useAddComment(projectId, sprintId);
-
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!message.trim()) return;
-
-		mutate(
-			{ standupId, message },
-			{
-				onSuccess: () => setMessage(""),
-			},
-		);
-	};
-
-	return (
-		<form onSubmit={handleSubmit} className="relative mt-4">
-			<input
-				type="text"
-				value={message}
-				onChange={(e) => setMessage(e.target.value)}
-				placeholder="Share your thoughts..."
-				className="w-full bg-gray-50 border border-gray-100 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 rounded-xl py-3.5 pl-5 pr-12 text-sm font-bold text-gray-700 transition-all outline-none shadow-sm"
-			/>
-			<button
-				type="submit"
-				disabled={!message.trim() || isPending}
-				className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all disabled:opacity-30"
-			>
-				{isPending ? (
-					<Loader2 size={18} className="animate-spin" />
-				) : (
-					<Send size={18} />
-				)}
-			</button>
-		</form>
-	);
-}

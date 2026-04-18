@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "../../../constants/api-endpoints.constants";
 import api from "../../../lib/axios.user";
 import type { GetUserStoriesResponse } from "../../admin/types/types";
 
@@ -31,7 +32,7 @@ export const userStoryService = {
 	async getActiveSprintStories(
 		projectId: string,
 	): Promise<GetUserStoriesResponse> {
-		const res = await api.get(`projects/${projectId}/user-stories?limit=100`);
+		const res = await api.get(`${API_ENDPOINTS.ADMIN.USERSTORY.LIST(projectId)}?limit=100`);
 
 		if (res.data && res.data.data) {
 			res.data.data = res.data.data.map(mapUserStory);
@@ -41,12 +42,12 @@ export const userStoryService = {
 	},
 
 	async updateUserStoryStatus(userStoryId: string, status: string) {
-		const res = await api.patch(`userstory/${userStoryId}/status`, { status });
+		const res = await api.patch(API_ENDPOINTS.DEVELOPER.UPDATE_USERSTORY_STATUS(userStoryId), { status });
 		return res.data;
 	},
 
 	async getMyUserStories(): Promise<GetUserStoriesResponse> {
-		const res = await api.get("projects/my-tasks");
+		const res = await api.get(API_ENDPOINTS.DEVELOPER.MY_TASKS);
 		if (res.data && res.data.data) {
 			res.data.data = res.data.data.map(mapUserStory);
 		}
@@ -54,7 +55,7 @@ export const userStoryService = {
 	},
 
 	async addComment(userStoryId: string, payload: { message: string }) {
-		const res = await api.post(`projects/${userStoryId}/comments`, payload);
+		const res = await api.post(API_ENDPOINTS.DEVELOPER.ADD_COMMENT(userStoryId), payload);
 		return res.data;
 	},
 };

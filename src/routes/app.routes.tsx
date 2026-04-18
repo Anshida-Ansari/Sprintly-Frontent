@@ -43,6 +43,8 @@ const Settings = lazy(() => import("../modules/admin/pages/settings"));
 const ProfilePage = lazy(() => import("../modules/profile/pages/profile.page"));
 const DeveloperWorkLogs = lazy(() => import("../modules/developers/pages/worklogs"));
 const AdminWorkLogs = lazy(() => import("../modules/admin/pages/worklogs"));
+const Reports = lazy(() => import("../modules/reports/pages/Reports"));
+const AnalyticsPage = lazy(() => import("../modules/admin/pages/analytics"));
 
 export const router = createBrowserRouter([
 	// PUBLIC
@@ -82,7 +84,8 @@ export const router = createBrowserRouter([
 					{ path: ROUTES.ADMIN.TEAM, element: <div>Team</div> },
 					{ path: ROUTES.ADMIN.MEETINGS, element: <Meetings /> },
 					{ path: "meetings/history", element: <MeetingHistory /> },
-					{ path: ROUTES.ADMIN.REPORTS, element: <div>Reports</div> },
+					{ path: ROUTES.ADMIN.REPORTS, element: <Reports /> },
+					{ path: ROUTES.ADMIN.ANALYTICS, element: <AnalyticsPage /> },
 					{ path: ROUTES.ADMIN.SETTINGS, element: <Settings /> },
 					{ path: ROUTES.ADMIN.PROFILE, element: <ProfilePage /> },
 					{ path: ROUTES.ADMIN.WORKLOGS, element: <AdminWorkLogs /> },

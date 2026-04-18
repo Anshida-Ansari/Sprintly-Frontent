@@ -179,9 +179,13 @@ function SprintOverview({ projectId, onSprintFound }: { projectId: string; onSpr
 				<div className="w-20 h-20 bg-gray-50 rounded-[2rem] flex items-center justify-center mx-auto border border-gray-100 shadow-inner">
 					<Target className="w-10 h-10 text-gray-200" />
 				</div>
-                <div className="space-y-2">
-				    <h3 className="font-black text-gray-900 text-xl tracking-tight">Focusing Mode</h3>
-				    <p className="text-gray-400 text-sm font-medium leading-relaxed px-4">Wait for the project admin to start a new sprint cycle to see active goals. </p>
+                <div className="space-y-4">
+				    <h3 className="font-black text-gray-900 text-xl tracking-tight leading-tight">Sync Locked</h3>
+				    <p className="text-gray-400 text-sm font-medium leading-relaxed px-4">
+                        Standups are currently **Sprint-Based**. 
+                        <br /><br />
+                        Wait for your project lead to start an active sprint cycle to post your daily updates.
+                    </p>
                 </div>
 			</div>
 		);

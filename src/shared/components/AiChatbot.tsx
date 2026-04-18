@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import { useLocation, matchPath } from "react-router-dom";
 import { aiService } from "../service/ai.service";
 
 
@@ -77,8 +78,20 @@ export const AiChatbot: React.FC = () => {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const getProjectIdFromUrl = () => {
+    const patterns = ["/admin/projects/:projectId", "/developers/projects/:projectId"];
+    for (const pattern of patterns) {
+      const match = matchPath({ path: pattern, end: false }, location.pathname);
+      if (match?.params.projectId) {
+        return match.params.projectId;
+      }
+    }
+    return undefined;
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -103,9 +116,10 @@ export const AiChatbot: React.FC = () => {
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setLoading(true);
+    const projectId = getProjectIdFromUrl();
 
     try {
-      const reply = await aiService.chat(trimmed);
+      const reply = await aiService.chat(trimmed, projectId);
       const botMsg: Message = {
         id: uid(),
         role: "assistant",

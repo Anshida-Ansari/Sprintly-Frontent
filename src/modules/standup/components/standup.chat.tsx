@@ -101,6 +101,18 @@ export const StandupChat = ({
 							<ChevronRight size={18} />
 						</button>
 
+						{selectedDate !== todayStr && (
+							<button
+								onClick={() => {
+									setSelectedDate(todayStr);
+									setCurrentMonth(new Date());
+								}}
+								className="ml-2 px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100 transition-all border border-indigo-100/50"
+							>
+								Today
+							</button>
+						)}
+
 						{/* Custom Premium Calendar Dropdown */}
 						{showCalendar && (
 							<div className="absolute top-full left-0 mt-4 bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-5 z-[100] w-72 animate-in zoom-in-95 duration-200 origin-top">
@@ -163,7 +175,7 @@ export const StandupChat = ({
 					</div>
 				</div>
 
-				{userRole === "developer" && !showForm && (
+				{userRole === "developer" && !showForm && selectedDate === todayStr && !!sprintId && (
 					<button
 						onClick={() => setShowForm(true)}
 						className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95"

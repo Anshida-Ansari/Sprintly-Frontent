@@ -8,8 +8,9 @@ import {
 	TrendingUp,
 	TrendingDown,
 	MessageSquare,
+	X,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useProjects } from "../../admin/hooks/useProjects";
 import { useGetSubtasks, useUpdateSubtaskStatus, useAddSubtaskComment } from "../../admin/hooks/useSubtasks";
@@ -25,6 +26,7 @@ import { SecureAttachmentLink } from "../../../shared/components/secure-attachme
 
 export default function KanbanBoard() {
 	const [selectedProjectId, setSelectedProjectId] = useState<string>("");
+	const [selectedSprintId, setSelectedSprintId] = useState<string>("");
 	const { data: projectsRes } = useProjects({ limit: 100 });
 	const { data: userStoriesRes, isLoading } = useQuery({
 		queryKey: ["my-user-stories"],
@@ -38,6 +40,21 @@ export default function KanbanBoard() {
 	const members = membersRes?.data || [];
 	const sprints = sprintsRes?.data || [];
 
+	useEffect(() => {
+		if (sprints.length > 0) {
+			const activeSprint = sprints.find((s: any) => s.status === "ACTIVE");
+			if (activeSprint) {
+				setSelectedSprintId(activeSprint.id || (activeSprint as any)._id);
+			} else if (!selectedSprintId) {
+				// Only clear if no sprint is selected and no active sprint found
+				// Or if we want to default to the first one? Let's stay with the first active or empty
+				setSelectedSprintId("");
+			}
+		} else {
+			setSelectedSprintId("");
+		}
+	}, [sprints]);
+
 	const sprintStatusMap = useMemo(() => {
 		const map: Record<string, string> = {};
 		sprints.forEach((s: any) => {
@@ -48,7 +65,9 @@ export default function KanbanBoard() {
 	}, [sprints]);
 
 	const activeSprintStories = allStories.filter((s: IUserStory) => 
-		s.sprintId && (!selectedProjectId || s.projectId === selectedProjectId)
+		s.sprintId && 
+		(!selectedProjectId || s.projectId === selectedProjectId) &&
+		(!selectedSprintId || s.sprintId === selectedSprintId)
 	);
 
 	// Build a userId → name map for resolving old comments and initials
@@ -86,24 +105,52 @@ export default function KanbanBoard() {
 						</div>
 					</div>
 
-					{/* Project Selector */}
-					<div className="relative w-full md:w-72">
-						<select
-							value={selectedProjectId}
-							onChange={(e) => setSelectedProjectId(e.target.value)}
-							className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 font-bold text-gray-900 hover:border-indigo-300 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 cursor-pointer shadow-sm text-sm"
-						>
-							<option value="">Select Project...</option>
-							{projects.map((p: any) => (
-								<option key={p.id} value={p.id}>
-									{p.name}
-								</option>
-							))}
-						</select>
-						<div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-							<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-								<path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-							</svg>
+					{/* Selectors */}
+					<div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+						{/* Project Selector */}
+						<div className="relative w-full md:w-64">
+							<select
+								value={selectedProjectId}
+								onChange={(e) => {
+									setSelectedProjectId(e.target.value);
+									setSelectedSprintId(""); // Reset sprint when project changes
+								}}
+								className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 font-bold text-gray-900 hover:border-indigo-300 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 cursor-pointer shadow-sm text-sm"
+							>
+								<option value="">Select Project...</option>
+								{projects.map((p: any) => (
+									<option key={p.id} value={p.id}>
+										{p.name}
+									</option>
+								))}
+							</select>
+							<div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+								<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+								</svg>
+							</div>
+						</div>
+
+						{/* Sprint Selector */}
+						<div className="relative w-full md:w-64">
+							<select
+								value={selectedSprintId}
+								onChange={(e) => setSelectedSprintId(e.target.value)}
+								disabled={!selectedProjectId}
+								className={`w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 font-bold text-gray-900 hover:border-indigo-300 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 cursor-pointer shadow-sm text-sm ${!selectedProjectId ? 'opacity-50 cursor-not-allowed' : ''}`}
+							>
+								<option value="">All Sprints</option>
+								{sprints.map((s: any) => (
+									<option key={s.id || s._id} value={s.id || s._id}>
+										{s.name} {s.status === "ACTIVE" ? "(Active)" : ""}
+									</option>
+								))}
+							</select>
+							<div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+								<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+								</svg>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -396,7 +443,120 @@ function SubtaskCard({
 	membersMap: Record<string, string>;
 	isSprintActive: boolean;
 }) {
-	const [showComments, setShowComments] = useState(false);
+	const [isModalOpen, setIsModalOpen] = useState(false);
+
+	const estH = task.estimatedHours;
+	const actH = task.actualHours;
+	const rawVariance = estH !== undefined && actH !== undefined ? actH - estH : null;
+	const variance = rawVariance !== null ? parseFloat(rawVariance.toFixed(2)) : null;
+
+	return (
+		<>
+			<div
+				draggable={isSprintActive}
+				onDragStart={(e) => isSprintActive && onDragStart(e, task.id)}
+				onClick={() => setIsModalOpen(true)}
+				className={`bg-white border p-3.5 rounded-xl shadow-sm transition-all group/card flex flex-col gap-3 ${
+					isSprintActive 
+						? "cursor-grab active:cursor-grabbing hover:border-indigo-300 hover:shadow-md border-gray-200" 
+						: "opacity-75 cursor-not-allowed border-gray-100 grayscale-[0.5]"
+				}`}
+			>
+				<p className="text-sm font-semibold text-gray-700 group-hover/card:text-gray-900 transition-colors leading-relaxed">
+					{task.title}
+				</p>
+
+				{/* Hours display — read-only */}
+				{(estH !== undefined || actH !== undefined) && (
+					<div className="flex flex-wrap items-center gap-1.5">
+						{estH !== undefined && (
+							<span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded">
+								<Clock size={9} />
+								Est: {estH}h
+							</span>
+						)}
+						{actH !== undefined && (
+							<span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-gray-100 text-gray-600 border border-gray-200 rounded">
+								<Clock size={9} />
+								Actual: {parseFloat(actH.toFixed(2))}h
+							</span>
+						)}
+						{variance !== null && (
+							<span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border ${
+								variance <= 0
+									? "bg-emerald-50 text-emerald-700 border-emerald-200"
+									: "bg-rose-50 text-rose-700 border-rose-200"
+							}`}>
+								{variance <= 0 ? <TrendingDown size={9} /> : <TrendingUp size={9} />}
+								{variance > 0 ? "+" : ""}{variance}h
+							</span>
+						)}
+					</div>
+				)}
+
+				<div className="flex justify-between items-end pt-2 border-t border-gray-50 flex-wrap gap-2">
+					<div className="flex flex-col gap-2">
+						<div className="flex items-center gap-2">
+							<span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">
+								{task.id.slice(-4)}
+							</span>
+							<div className="flex items-center gap-1 text-[10px] font-bold text-gray-400 group-hover/card:text-indigo-500 transition-colors">
+								<MessageSquare size={11} />
+								({task.comments?.length || 0})
+							</div>
+							{/* Upload Button wrapped to stop propagation */}
+							<div onClick={(e) => e.stopPropagation()}>
+								<AttachmentButton subtaskId={task.id} userStoryId={story.id} variant="icon" />
+							</div>
+						</div>
+						
+						{/* Attachments rendering */}
+						{(task as any).attachments && (task as any).attachments.length > 0 && (
+							<div className="flex flex-wrap gap-1.5 overflow-x-auto pb-1 hide-scrollbar" onClick={(e) => e.stopPropagation()}>
+								{(task as any).attachments.map((att: any, idx: number) => (
+									<SecureAttachmentLink 
+										key={idx} 
+										fileUrl={att.fileUrl} 
+										fileName={att.fileName} 
+									/>
+								))}
+							</div>
+						)}
+					</div>
+					{task.assignedTo && (
+						<div 
+							className="px-2 py-0.5 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-[9px] font-bold text-indigo-700 shadow-sm transition-colors hover:bg-indigo-200 shrink-0"
+							title={membersMap[task.assignedTo] || "Assigned"}
+						>
+							{membersMap[task.assignedTo]?.substring(0, 2) || "A"}
+						</div>
+					)}
+				</div>
+			</div>
+
+			{isModalOpen && (
+				<SubtaskModal
+					task={task}
+					story={story}
+					membersMap={membersMap}
+					onClose={() => setIsModalOpen(false)}
+				/>
+			)}
+		</>
+	);
+}
+
+function SubtaskModal({
+	task,
+	story,
+	membersMap,
+	onClose,
+}: {
+	task: ISubtask;
+	story: IUserStory;
+	membersMap: Record<string, string>;
+	onClose: () => void;
+}) {
 	const user = UserAuth((state) => state.user);
 	const addComment = useAddSubtaskComment(story.id);
 
@@ -406,104 +566,130 @@ function SubtaskCard({
 	const variance = rawVariance !== null ? parseFloat(rawVariance.toFixed(2)) : null;
 
 	return (
-		<div
-			draggable={isSprintActive}
-			onDragStart={(e) => isSprintActive && onDragStart(e, task.id)}
-			className={`bg-white border p-3.5 rounded-xl shadow-sm transition-all group/card flex flex-col gap-3 ${
-				isSprintActive 
-					? "cursor-grab active:cursor-grabbing hover:border-indigo-300 hover:shadow-md border-gray-200" 
-					: "opacity-75 cursor-not-allowed border-gray-100 grayscale-[0.5]"
-			}`}
-		>
-			<p className="text-sm font-semibold text-gray-700 group-hover/card:text-gray-900 transition-colors leading-relaxed">
-				{task.title}
-			</p>
-
-			{/* Hours display — read-only */}
-			{(estH !== undefined || actH !== undefined) && (
-				<div className="flex flex-wrap items-center gap-1.5">
-					{estH !== undefined && (
-						<span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-100 rounded">
-							<Clock size={9} />
-							Est: {estH}h
-						</span>
-					)}
-					{actH !== undefined && (
-						<span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-gray-100 text-gray-600 border border-gray-200 rounded">
-							<Clock size={9} />
-							Actual: {parseFloat(actH.toFixed(2))}h
-						</span>
-					)}
-					{variance !== null && (
-						<span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border ${
-							variance <= 0
-								? "bg-emerald-50 text-emerald-700 border-emerald-200"
-								: "bg-rose-50 text-rose-700 border-rose-200"
-						}`}>
-							{variance <= 0 ? <TrendingDown size={9} /> : <TrendingUp size={9} />}
-							{variance > 0 ? "+" : ""}{variance}h
-						</span>
-					)}
-				</div>
-			)}
-
-			<div className="flex justify-between items-end pt-2 border-t border-gray-50 flex-wrap gap-2">
-				<div className="flex flex-col gap-2">
-					<div className="flex items-center gap-2">
-						<span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">
-							{task.id.slice(-4)}
-						</span>
-						<button
-							onClick={() => setShowComments(!showComments)}
-							className="flex items-center gap-1 text-[10px] font-bold text-gray-400 hover:text-indigo-600 transition-colors cursor-pointer"
-						>
-							Comments ({task.comments?.length || 0})
-						</button>
-						{/* Upload Button */}
-						<AttachmentButton subtaskId={task.id} userStoryId={story.id} variant="icon" />
-					</div>
-					
-					{/* Attachments rendering */}
-					{(task as any).attachments && (task as any).attachments.length > 0 && (
-						<div className="flex flex-wrap gap-1.5 overflow-x-auto pb-1 hide-scrollbar">
-							{(task as any).attachments.map((att: any, idx: number) => (
-								<SecureAttachmentLink 
-									key={idx} 
-									fileUrl={att.fileUrl} 
-									fileName={att.fileName} 
-								/>
-							))}
+		<div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+			{/* Overlay */}
+			<div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
+			
+			<div className="relative w-full max-w-2xl max-h-[90vh] bg-white rounded-3xl shadow-2xl flex flex-col animate-in fade-in zoom-in duration-200">
+				{/* Modal Header */}
+				<div className="flex items-center justify-between p-6 border-b border-gray-100">
+					<div>
+						<div className="flex items-center gap-3 mb-1">
+							<span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+								{task.id.slice(-4)}
+							</span>
+							<span className="px-2.5 py-1 rounded-lg bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-wide">
+								{task.status}
+							</span>
 						</div>
-					)}
-				</div>
-				{task.assignedTo && (
-					<div 
-						className="px-2 py-0.5 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-[9px] font-bold text-indigo-700 shadow-sm transition-colors hover:bg-indigo-200 shrink-0"
-						title={membersMap[task.assignedTo] || "Assigned"}
-					>
-						{membersMap[task.assignedTo]?.substring(0, 2) || "A"}
+						<h2 className="text-xl font-bold text-gray-900 leading-tight">
+							{task.title}
+						</h2>
 					</div>
-				)}
-			</div>
-
-			{showComments && (
-				<div className="pt-2 border-t border-gray-50 cursor-default" onDragStart={(e) => e.preventDefault()} draggable={true}>
-					<CommentSection
-						initialComments={task.comments || []}
-						currentUserName={user?.name}
-						membersMap={membersMap}
-						onSubmit={(message, onSuccess) => {
-							addComment.mutate(
-								{ subtaskId: task.id, message },
-								{ onSuccess }
-							);
-						}}
-						isPending={addComment.isPending}
-						isError={addComment.isError}
-						error={addComment.error}
-					/>
+					<button
+						onClick={onClose}
+						className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+					>
+						<X size={20} />
+					</button>
 				</div>
-			)}
+				
+				{/* Modal Body (Scrollable) */}
+				<div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+					{/* Hours and Assignee Section */}
+					<div className="flex flex-wrap gap-6">
+						<div className="space-y-2">
+							<h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Assignee</h4>
+							<div className="flex items-center gap-2">
+								{task.assignedTo ? (
+									<div className="flex items-center gap-2">
+										<div className="w-8 h-8 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-xs font-bold text-indigo-700 shadow-sm shrink-0">
+											{membersMap[task.assignedTo]?.substring(0, 2) || "A"}
+										</div>
+										<span className="text-sm font-medium text-gray-700">
+											{membersMap[task.assignedTo] || "Unknown"}
+										</span>
+									</div>
+								) : (
+									<span className="text-sm text-gray-500 italic">Unassigned</span>
+								)}
+							</div>
+						</div>
+
+						{(estH !== undefined || actH !== undefined) && (
+							<div className="space-y-2">
+								<h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Time Tracking</h4>
+								<div className="flex flex-wrap items-center gap-2">
+									{estH !== undefined && (
+										<span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-100 rounded-lg">
+											<Clock size={12} />
+											Est: {estH}h
+										</span>
+									)}
+									{actH !== undefined && (
+										<span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 bg-gray-50 text-gray-700 border border-gray-200 rounded-lg">
+											<Clock size={12} />
+											Actual: {parseFloat(actH.toFixed(2))}h
+										</span>
+									)}
+									{variance !== null && (
+										<span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg border ${
+											variance <= 0
+												? "bg-emerald-50 text-emerald-700 border-emerald-200"
+												: "bg-rose-50 text-rose-700 border-rose-200"
+										}`}>
+											{variance <= 0 ? <TrendingDown size={12} /> : <TrendingUp size={12} />}
+											{variance > 0 ? "+" : ""}{variance}h
+										</span>
+									)}
+								</div>
+							</div>
+						)}
+					</div>
+
+					{/* Attachments Section */}
+					<div className="space-y-3">
+						<div className="flex items-center justify-between">
+							<h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Attachments</h4>
+							<AttachmentButton subtaskId={task.id} userStoryId={story.id} variant="icon" />
+						</div>
+						{(task as any).attachments && (task as any).attachments.length > 0 ? (
+							<div className="flex flex-wrap gap-2">
+								{(task as any).attachments.map((att: any, idx: number) => (
+									<SecureAttachmentLink 
+										key={idx} 
+										fileUrl={att.fileUrl} 
+										fileName={att.fileName} 
+									/>
+								))}
+							</div>
+						) : (
+							<p className="text-sm text-gray-400 italic">No attachments</p>
+						)}
+					</div>
+
+					{/* Comments Section */}
+					<div className="space-y-3 border-t border-gray-100 pt-6">
+						<h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Comments ({task.comments?.length || 0})</h4>
+						<div className="bg-gray-50/50 rounded-2xl p-4 border border-gray-100">
+							<CommentSection
+								initialComments={task.comments || []}
+								currentUserName={user?.name}
+								membersMap={membersMap}
+								onSubmit={(message, onSuccess) => {
+									addComment.mutate(
+										{ subtaskId: task.id, message },
+										{ onSuccess }
+									);
+								}}
+								isPending={addComment.isPending}
+								isError={addComment.isError}
+								error={addComment.error}
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 }

@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "../../../constants/api-endpoints.constants";
 import api from "../../../lib/axios.user";
 
 export interface GitHubStatusResponse {
@@ -10,17 +11,17 @@ export interface GitHubStatusResponse {
 
 export const githubService = {
     async initiateConnection(): Promise<{ authUrl: string }> {
-        const res = await api.get("/github/auth/initiate");
+        const res = await api.get(API_ENDPOINTS.GITHUB.AUTH_INITIATE);
         return res.data;
     },
 
     async getStatus(): Promise<GitHubStatusResponse> {
-        const res = await api.get("/github/status");
+        const res = await api.get(API_ENDPOINTS.GITHUB.STATUS);
         return res.data;
     },
 
     async disconnect(): Promise<{ success: boolean }> {
-        const res = await api.post("/github/disconnect");
+        const res = await api.post(API_ENDPOINTS.GITHUB.DISCONNECT);
         return res.data;
     },
 };

@@ -1,5 +1,6 @@
 import { Loader2, X } from "lucide-react";
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -73,7 +74,6 @@ export default function UserStoryModal({
 	if (!isOpen) return null;
 
 	const handleFormSubmit = (data: UserStoryFormData) => {
-		// Convert text area back to array for acceptance criteria
 		const criteriaArray = data.acceptanceCriteriaText
 			? data.acceptanceCriteriaText.split("\n").filter((line: string) => line.trim() !== "")
 			: [];
@@ -83,22 +83,21 @@ export default function UserStoryModal({
 			acceptanceCriteria: criteriaArray,
 		};
 
-		// Remove helper field
 		delete (payload as any).acceptanceCriteriaText;
 
 		onSubmit(payload);
 	};
 
-	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-			{/* Backdrop */}
-			<div
-				className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity"
-				onClick={onClose}
-			/>
-
+	const modalContent = (
+		<div 
+			className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+			onClick={onClose}
+		>
 			{/* Modal Panel */}
-			<div className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 border border-gray-100">
+			<div 
+				className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 border border-gray-100"
+				onClick={(e) => e.stopPropagation()}
+			>
 
 				{/* Header */}
 				<div className="px-6 py-4 flex justify-between items-center border-b border-gray-100 shrink-0">
@@ -274,4 +273,6 @@ export default function UserStoryModal({
 			</div>
 		</div>
 	);
+
+	return createPortal(modalContent, document.body);
 }

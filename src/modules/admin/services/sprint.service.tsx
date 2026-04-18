@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "../../../constants/api-endpoints.constants";
 import api from "../../../lib/axios.user";
 import type {
 	CreateSprintPayload,
@@ -22,7 +23,7 @@ const mapSprint = (s: any) => ({
 
 export const sprintService = {
 	async createSprint(projectId: string, payload: CreateSprintPayload) {
-		const res = await api.post(`/project/${projectId}/sprints`, payload);
+		const res = await api.post(API_ENDPOINTS.ADMIN.SPRINT.CREATE(projectId), payload);
 		return res.data;
 	},
 
@@ -42,7 +43,7 @@ export const sprintService = {
 		if (params.status) searchParams.append("status", params.status);
 
 		const res = await api.get(
-			`/project/${projectId}/sprints?${searchParams.toString()}`,
+			`${API_ENDPOINTS.ADMIN.SPRINT.LIST(projectId)}?${searchParams.toString()}`,
 		);
 
 		if (res.data && res.data.data) {
@@ -58,24 +59,24 @@ export const sprintService = {
 		payload: EditSprintPayload,
 	) {
 		const res = await api.patch(
-			`/project/${projectId}/sprints/${sprintId}`,
+			API_ENDPOINTS.ADMIN.SPRINT.EDIT(projectId, sprintId),
 			payload,
 		);
 		return res.data;
 	},
 
 	async startSprint(sprintId: string) {
-		const res = await api.patch(`/project/${sprintId}/start`);
+		const res = await api.patch(API_ENDPOINTS.ADMIN.SPRINT.START(sprintId));
 		return res.data;
 	},
 
 	async completeSprint(sprintId: string) {
-		const res = await api.patch(`/project/${sprintId}/complete`);
+		const res = await api.patch(API_ENDPOINTS.ADMIN.SPRINT.COMPLETE(sprintId));
 		return res.data;
 	},
 
 	async deleteSprint(sprintId: string) {
-		const res = await api.patch(`/project/${sprintId}/delete`);
+		const res = await api.patch(API_ENDPOINTS.ADMIN.SPRINT.DELETE(sprintId));
 		return res.data;
 	},
 };

@@ -65,6 +65,11 @@ export interface IProject {
 	members: IMember[];
 	createdAt: string;
 	updatedAt: string;
+	analytics?: {
+		totalStories: number;
+		completedStories: number;
+		progressPercentage: number;
+	};
 }
 
 export interface GetProjectsResponse {

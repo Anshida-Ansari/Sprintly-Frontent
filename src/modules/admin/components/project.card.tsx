@@ -50,9 +50,31 @@ export default function ProjectCard({
 			<h3 className="font-bold text-gray-900 text-lg mb-2 line-clamp-1 group-hover:text-indigo-600 transition-colors">
 				{project.name}
 			</h3>
-			<p className="text-gray-500 text-sm mb-6 line-clamp-2 h-10">
+			<p className="text-gray-500 text-sm mb-4 line-clamp-2 h-10">
 				{project.description}
 			</p>
+
+			{/* Project Analytics Summary */}
+			{project.analytics && (
+				<div className="mb-6 space-y-2">
+					<div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
+						<span>Progress</span>
+						<span className="text-indigo-600">{Math.round(project.analytics.progressPercentage)}%</span>
+					</div>
+					<div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
+						<div 
+							className="h-full bg-indigo-500 transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(99,102,241,0.4)]" 
+							style={{ width: `${project.analytics.progressPercentage}%` }}
+						/>
+					</div>
+					<div className="flex justify-between items-center text-[10px] font-bold text-gray-500">
+						<span>{project.analytics.completedStories} / {project.analytics.totalStories} Stories</span>
+						{project.analytics.totalStories > 0 && (
+							<span>{project.analytics.totalStories - project.analytics.completedStories} Remaining</span>
+						)}
+					</div>
+				</div>
+			)}
 
 			<div className="flex items-center justify-between pt-4 border-t border-gray-50">
 				<div className="flex -space-x-2 overflow-hidden">

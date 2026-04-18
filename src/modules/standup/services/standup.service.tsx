@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "../../../constants/api-endpoints.constants";
 import api from "../../../lib/axios.user";
 import type { SubmitStandupPayload } from "../types/standup.types";
 
@@ -7,23 +8,27 @@ export const standupService = {
 		sprintId: string,
 		data: SubmitStandupPayload,
 	) => {
+		const base = API_ENDPOINTS.STANDUP.BASE(projectId, sprintId);
 		const res = await api.post(
-			`/project/sprint/${projectId}/${sprintId}/standups`,
+			API_ENDPOINTS.STANDUP.SUBMIT(base),
 			data,
 		);
 		return res.data;
 	},
 
 	list: async (projectId: string, sprintId: string, date?: string) => {
+		const base = API_ENDPOINTS.STANDUP.BASE(projectId, sprintId);
 		const res = await api.get(
-			`/project/sprint/${projectId}/${sprintId}/standups${date ? `?date=${date}` : ""}`,
+			API_ENDPOINTS.STANDUP.LIST(base),
+			{ params: { date } }
 		);
 		return res.data;
 	},
 
 	today: async (projectId: string, sprintId: string) => {
+		const base = API_ENDPOINTS.STANDUP.BASE(projectId, sprintId);
 		const res = await api.post(
-			`/project/sprint/${projectId}/${sprintId}/standups/today`,
+			API_ENDPOINTS.STANDUP.TODAY(base),
 		);
 		return res.data;
 	},
@@ -34,8 +39,9 @@ export const standupService = {
 		standupId: string,
 		message: string,
 	) => {
+		const base = API_ENDPOINTS.STANDUP.BASE(projectId, sprintId);
 		const res = await api.post(
-			`/project/sprint/${projectId}/${sprintId}/standups/${standupId}/comments`,
+			API_ENDPOINTS.STANDUP.ADD_COMMENT(base, standupId),
 			{
 				message,
 			},

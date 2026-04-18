@@ -10,6 +10,8 @@ import {
 	Plus,
 	ScrollText,
 	Users,
+	BarChart3,
+	PieChart
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -19,6 +21,8 @@ import AddMemberModal from "../components/add.member.modal";
 import EditProjectModal from "../components/edit.project.modal";
 import SprintList from "../components/sprint.list";
 import UserStoryList from "../components/user-story-list";
+import { ProjectLevelReports } from "../components/project.level.reports";
+import { ProjectLevelAnalytics } from "../components/project.level.analytics";
 import { useEditProject } from "../hooks/useEditProject";
 import { useGetProject } from "../hooks/useGetProject";
 import type { EditProjectPayload, IMember } from "../types/types";
@@ -36,7 +40,7 @@ export default function ProjectDetail({ isReadOnly = false }: ProjectDetailProps
 	const { mutate: updateProject, isPending: isUpdating } = useEditProject();
 	const user = UserAuth((state) => state.user);
 	const [activeTab, setActiveTab] = useState<
-		"overview" | "stories" | "sprints" | "standups"
+		"overview" | "stories" | "sprints" | "standups" | "reports" | "analytics"
 	>("overview");
 
 	const project = projectResponse?.data;
@@ -201,6 +205,8 @@ export default function ProjectDetail({ isReadOnly = false }: ProjectDetailProps
 							{ id: "stories", label: "User Stories", icon: ScrollText },
 							{ id: "sprints", label: "Sprints", icon: PlayCircle },
 							{ id: "standups", label: "Standups", icon: CheckCircle2 },
+							{ id: "reports", label: "Reports", icon: BarChart3 },
+							{ id: "analytics", label: "Analytics", icon: PieChart },
 						].map((tab) => (
 							<button
 								key={tab.id}
@@ -378,6 +384,16 @@ export default function ProjectDetail({ isReadOnly = false }: ProjectDetailProps
 								userRole={isReadOnly ? "developer" : "admin"}
 							/>
 						</div>
+					</div>
+				)}
+				{activeTab === "reports" && (
+					<div className="animate-in slide-in-from-right-4 duration-500">
+						<ProjectLevelReports projectId={projectId || ""} />
+					</div>
+				)}
+				{activeTab === "analytics" && (
+					<div className="animate-in slide-in-from-right-4 duration-500">
+						<ProjectLevelAnalytics projectId={projectId || ""} />
 					</div>
 				)}
 			</div>

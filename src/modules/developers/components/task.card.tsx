@@ -22,6 +22,7 @@ interface UserStory {
 	priority: string;
 	createdAt: string;
 	subtasks?: SubTask[];
+	assignedTo?: string | string[];
 	status: string;
 }
 
@@ -104,7 +105,7 @@ export function TaskCard({ task, onSubtaskUpdate, onSubtaskTimeUpdate }: TaskCar
 				</p>
 				{task.subtasks && task.subtasks.length > 0 ? (
 					task.subtasks.map((subtask) => {
-						const isAssignedToMe = subtask.assignedTo === myId;
+						const isAssignedToMe = subtask.assignedTo === myId || (Array.isArray(task.assignedTo) ? task.assignedTo.includes(myId || "") : task.assignedTo === myId);
 
 						return (
 							<div

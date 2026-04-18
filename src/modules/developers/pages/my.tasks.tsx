@@ -69,6 +69,7 @@ export default function MyTasksPage() {
 		}) => subtaskService.updateSubtaskTime(subtaskId, payload),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["my-user-stories"] });
+			queryClient.invalidateQueries({ queryKey: ["subtasks"] });
 			toast.success("Hours saved");
 		},
 		onError: () => toast.error("Failed to save hours"),
@@ -85,8 +86,9 @@ export default function MyTasksPage() {
 			estimatedHours: number;
 		}) =>
 			subtaskService.createSubtask(userStoryId, { title, estimatedHours }),
-		onSuccess: () => {
+		onSuccess: (_, variables) => {
 			queryClient.invalidateQueries({ queryKey: ["my-user-stories"] });
+			queryClient.invalidateQueries({ queryKey: ["subtasks", variables.userStoryId] });
 			toast.success("Subtask created");
 			setIsCreateModalOpen(false);
 			setNewSubtaskTitle("");

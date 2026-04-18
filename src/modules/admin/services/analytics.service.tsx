@@ -1,12 +1,22 @@
+import { API_ENDPOINTS } from "../../../constants/api-endpoints.constants";
 import api from "../../../lib/axios.user";
-import type { BurnDownDataPoint } from "../../../shared/components/charts/BurnDownChart";
 
-export const getSprintBurndown = async (sprintId: string): Promise<BurnDownDataPoint[]> => {
-	const response = await api.get(`/analytics/burndown/sprint/${sprintId}`);
+export interface BurndownResponse {
+	labels: string[];
+	ideal: number[];
+	actual: number[];
+}
+
+export const getSprintBurndown = async (sprintId: string, type: "hours" | "points" = "hours"): Promise<BurndownResponse> => {
+	const response = await api.get(API_ENDPOINTS.ADMIN.ANALYTICS.SPRINT_BURNDOWN(sprintId), {
+		params: { type }
+	});
 	return response.data.data;
 };
 
-export const getUserBurndown = async (sprintId: string): Promise<BurnDownDataPoint[]> => {
-	const response = await api.get(`/analytics/burndown/user/${sprintId}`);
+export const getUserBurndown = async (sprintId: string, type: "hours" | "points" = "hours"): Promise<BurndownResponse> => {
+	const response = await api.get(API_ENDPOINTS.ADMIN.ANALYTICS.USER_BURNDOWN(sprintId), {
+		params: { type }
+	});
 	return response.data.data;
 };

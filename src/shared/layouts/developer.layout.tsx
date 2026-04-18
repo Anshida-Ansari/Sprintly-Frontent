@@ -11,7 +11,7 @@ import {
 	Zap,
 	Clock,
 } from "lucide-react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useLogout } from "../hooks/useLogout";
 import { useSocketNotifications } from "../hooks/useSocketNotifications";
 import { DashboardHeader } from "../components/layout/DashboardHeader";
@@ -30,7 +30,11 @@ const sidebarLinks = [
 
 export default function DeveloperLayout() {
 	const logout = useLogout();
+	const location = useLocation();
 	useSocketNotifications();
+
+	const currentLink = sidebarLinks.find(link => location.pathname === link.path);
+	const pageTitle = currentLink ? currentLink.name : "Developer Portal";
     
 	return (
 		<div className="flex min-h-screen bg-slate-50 text-gray-600 font-sans selection:bg-indigo-100">
@@ -103,7 +107,7 @@ export default function DeveloperLayout() {
 			{/* Main Stage */}
 			<main className="flex-1 overflow-y-auto relative">
 				<div className="p-8 lg:p-12 relative z-10 max-w-[1600px] mx-auto">
-                    <DashboardHeader title="Developer Portal" />
+                    <DashboardHeader title={location.pathname === "/developers/dashboard" ? "Developer Portal" : undefined} />
 					<Outlet />
 				</div>
 			</main>

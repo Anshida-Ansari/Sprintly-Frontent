@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "../../constants/api-endpoints.constants";
 import api from "../../lib/axios.user";
 
 export interface AiChatResponse {
@@ -5,10 +6,10 @@ export interface AiChatResponse {
 }
 
 export const aiService = {
-  chat: async (message: string): Promise<string> => {
+  chat: async (message: string, projectId?: string): Promise<string> => {
     const response = await api.post<{ success: boolean; data: AiChatResponse }>(
-      "/ai/chat",
-      { message },
+      API_ENDPOINTS.SHARED.AI_CHAT,
+      { message, projectId },
     );
     return response.data.data.reply;
   },

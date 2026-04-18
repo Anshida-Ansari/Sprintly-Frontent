@@ -10,8 +10,11 @@ import {
 	Search,
 	X,
 	CheckCircle2,
+	Clock,
+	Zap,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 import { UserAuth } from "../../auth/store/store";
 import { AttachmentButton } from "../../../shared/components/attachment-button";
@@ -19,7 +22,6 @@ import { SecureAttachmentLink } from "../../../shared/components/secure-attachme
 import { useGetMembers } from "../hooks/useGetmembers";
 import { useGetProject } from "../hooks/useGetProject";
 import {
-	useAssignSubtask,
 	useCreateSubtask,
 	useDeleteSubtask,
 	useGetSubtasks,
@@ -66,7 +68,7 @@ export default function UserStoryDetailModal({
 	const { data: projectRes } = useGetProject(story?.projectId);
 	const project = projectRes?.data;
 
-	const { data: subtasksRes, isLoading: loadingSubtasks } = useGetSubtasks(
+	const { data: subtasksRes, isLoading: loadingSubtasks = true } = useGetSubtasks(
 		story.id,
 	);
 	const { data: membersRes } = useGetMembers({
@@ -77,7 +79,7 @@ export default function UserStoryDetailModal({
 
 	const createSubtask = useCreateSubtask(story.id);
 	const updateStatus = useUpdateSubtaskStatus(story.id);
-	const assignSubtask = useAssignSubtask(story.id);
+
 	const deleteSubtask = useDeleteSubtask(story.id);
 	const updateStory = useUpdateUserStory();
 	const assignMember = useAssignUserStoryToMember();
@@ -86,14 +88,12 @@ export default function UserStoryDetailModal({
 	const subtasks = subtasksRes?.data || [];
 	const members = membersRes?.data || [];
 
-	// Build a userId → name map so CommentSection can resolve old comments stored with only userId
 	const membersMap: Record<string, string> = {};
 	members.forEach((m: any) => {
 		const id = m._id || m.id;
 		if (id && m.name) membersMap[id] = m.name;
 	});
 
-	// Filter developers: Must be 'developer' role AND member of the project
 	const projectMemberIds = (project?.members || []).map((pm: any) =>
 		typeof pm === "string" ? pm : (pm.id || pm._id),
 	);
@@ -139,11 +139,7 @@ export default function UserStoryDetailModal({
 		updateStatus.mutate({ subtaskId: subtask.id, status: newStatus });
 	};
 
-	const handleAssignSubtask = (subtaskId: string, developerId: string) => {
-		assignSubtask.mutate({ subtaskId, payload: { assignedTo: developerId } });
-	};
 
-	// ... existing logic
 
 	const handleAssignMemberToStory = (memberId: string) => {
 		assignMember.mutate(
@@ -165,7 +161,7 @@ export default function UserStoryDetailModal({
 		assignMember.mutate({
 			projectId: story.projectId,
 			userStoryId: story.id,
-			developerId: "", // Empty string to unassign
+			developerId: "",
 		});
 	};
 
@@ -217,9 +213,15 @@ export default function UserStoryDetailModal({
 		}
 	};
 
-	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-			<div className="bg-white rounded-[2.5rem] w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 flex flex-col">
+	const modalContent = (
+		<div 
+			className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+			onClick={onClose}
+		>
+			<div 
+				className="bg-white rounded-[2.5rem] w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 flex flex-col"
+				onClick={(e) => e.stopPropagation()}
+			>
 				{/* Header */}
 				<div className="px-8 py-6 border-b border-gray-100 flex justify-between items-start bg-gray-50/50">
 					<div className="flex-1 pr-4">
@@ -278,7 +280,7 @@ export default function UserStoryDetailModal({
 				</div>
 
 				{/* Content */}
-				<div className="flex-1 overflow-y-auto p-8 space-y-8">
+				<div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
 					{/* Description Section */}
 					<div className="space-y-3">
 						<div className="flex items-center justify-between">
@@ -389,7 +391,7 @@ export default function UserStoryDetailModal({
 						</div>
 					)}
 
-					{/* Assignee Section (Single) */}
+					{/* Assignee Section */}
 					<div className="space-y-4">
 						<h3 className="text-sm font-black text-gray-700 uppercase tracking-wider flex items-center gap-2">
 							<Users size={16} className="text-indigo-500" />
@@ -432,7 +434,6 @@ export default function UserStoryDetailModal({
 								<p className="text-xs text-gray-400 font-medium italic">Unassigned</p>
 							)}
 
-							{/* Assign/Reassign Button & Dropdown */}
 							{(isAdmin || user?.role === "lead") && (
 								<div className="relative">
 									<button
@@ -491,17 +492,6 @@ export default function UserStoryDetailModal({
 																</span>
 															</button>
 														))}
-													{developers.filter(
-														(d: any) =>
-															d._id !== story.assignedTo &&
-															d.name
-																.toLowerCase()
-																.includes(assignSearchQuery.toLowerCase()),
-													).length === 0 && (
-															<div className="p-3 text-center text-xs text-gray-400 font-medium italic">
-																No members found
-															</div>
-														)}
 												</div>
 											</div>
 										</>
@@ -524,169 +514,130 @@ export default function UserStoryDetailModal({
 							</div>
 						) : (
 							<div className="space-y-3">
-								{subtasks.map((subtask) => {
-									const assignedDev = developers.find(
-										(d: any) => d._id === subtask.assignedTo,
-									);
-
-									return (
-										<div key={subtask.id} className="flex flex-col gap-2">
-											<div className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-all group border border-transparent hover:border-gray-200">
-											{/* Status: Checkbox for Developer, Badge for Admin */}
-											{isAdmin ? (
-												<div
-													className={`
-                                                    px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border
-                                                    ${subtask.status ===
-															"Done"
+								{subtasks.map((subtask) => (
+									<div key={subtask.id} className="flex flex-col gap-3">
+										<div className="group relative flex items-start gap-4 p-5 bg-white border border-gray-100 rounded-[2rem] hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-100 transition-all duration-300">
+											{/* Status Indicator */}
+											<div className="pt-1.5">
+												{isAdmin ? (
+													<div className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border ${
+														subtask.status === "Done"
 															? "bg-emerald-50 text-emerald-600 border-emerald-100"
-															: "bg-gray-200 text-gray-600 border-gray-300"
-														}
-                                                `}
-												>
-													{subtask.status === "Done" ? "DONE" : "TODO"}
-												</div>
-											) : (
-												<input
-													type="checkbox"
-													checked={subtask.status === "Done"}
-													onChange={() => handleToggleSubtask(subtask)}
-													className="w-5 h-5 rounded-md border-2 border-gray-300 text-indigo-600 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
-												/>
-											)}
-
-											<div className="flex-1 min-w-0 flex flex-col gap-2">
-												<p
-													className={`font-bold text-sm ${subtask.status === "Done" ? "line-through text-gray-400" : "text-gray-900"}`}
-												>
-													{subtask.title}
-												</p>
-
-												{/* Assignment UI */}
-												<div className="flex items-center gap-2">
-													{assignedDev ? (
-														<div className="flex items-center gap-2 bg-white px-2 py-1 rounded-lg border border-gray-200 shadow-sm">
-															<div className="w-5 h-5 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-[9px] font-black text-indigo-600 uppercase">
-																{assignedDev.name?.slice(0, 2)}
-															</div>
-															<span className="text-xs font-bold text-gray-700">
-																{assignedDev.name}
-															</span>
-															{isAdmin && (
-																<button
-																	onClick={() =>
-																		handleAssignSubtask(subtask.id, "")
-																	}
-																	className="ml-1 p-0.5 hover:bg-rose-50 text-gray-400 hover:text-rose-500 rounded transition-colors"
-																	title="Unassign"
-																>
-																	<X size={12} />
-																</button>
-															)}
-														</div>
-													) : isAdmin ? (
-														<select
-															value=""
-															onChange={(e) =>
-																handleAssignSubtask(subtask.id, e.target.value)
-															}
-															className="text-xs px-2 py-1 bg-white border border-gray-200 rounded-lg font-bold text-gray-500 hover:border-indigo-300 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-														>
-															<option value="" disabled>
-																Assign Member
-															</option>
-															{developers.map((dev: any) => (
-																<option key={dev._id} value={dev._id}>
-																	{dev.name}
-																</option>
-															))}
-														</select>
-													) : (
-														<span className="text-xs font-medium text-gray-400 italic">
-															Unassigned
-														</span>
-													)}
-
-													{/* Time Tracking Badges */}
-													{(subtask.estimatedHours !== undefined || subtask.actualHours !== undefined) && (
-														<div className="flex gap-2 ml-auto">
-															{subtask.estimatedHours !== undefined && (
-																<span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium border border-slate-200">
-																	Est: {subtask.estimatedHours}h
-																</span>
-															)}
-															{subtask.actualHours !== undefined && (
-																<span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-medium border border-blue-100">
-																	Act: {subtask.actualHours}h
-																</span>
-															)}
-														</div>
-													)}
-													<button
-														onClick={() => setExpandedComments(prev => ({ ...prev, [subtask.id]: !prev[subtask.id] }))}
-														className="ml-2 text-[10px] font-bold text-gray-400 hover:text-indigo-600 transition-colors uppercase tracking-wider"
-													>
-														Comments ({subtask.comments?.length || 0})
-													</button>
-                                                    <AttachmentButton subtaskId={subtask.id} userStoryId={story.id} variant="icon" />
-												</div>
-                                                
-                                                {/* Attachments List */}
-                                                {(subtask as any).attachments && (subtask as any).attachments.length > 0 && (
-                                                    <div className="flex flex-wrap gap-2 mt-2">
-                                                        {(subtask as any).attachments.map((att: any, idx: number) => (
-                                                            <SecureAttachmentLink 
-                                                                key={idx} 
-                                                                fileUrl={att.fileUrl} 
-                                                                fileName={att.fileName} 
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                )}
+															: "bg-amber-50 text-amber-600 border-amber-100"
+													}`}>
+														{subtask.status === "Done" ? "DONE" : "TODO"}
+													</div>
+												) : (
+													<div className="relative flex items-center justify-center">
+														<input
+															type="checkbox"
+															checked={subtask.status === "Done"}
+															onChange={() => handleToggleSubtask(subtask)}
+															className="peer h-6 w-6 cursor-pointer appearance-none rounded-lg border-2 border-gray-200 transition-all checked:border-indigo-500 checked:bg-indigo-500 hover:border-indigo-300"
+														/>
+														<CheckCircle2 className="pointer-events-none absolute h-4 w-4 text-white opacity-0 transition-opacity peer-checked:opacity-100" strokeWidth={3} />
+													</div>
+												)}
 											</div>
 
-											{/* Delete Button (Admin Only) */}
-											{isAdmin && (
-												<button
-													onClick={() => handleDeleteClick(subtask.id)}
-													className="opacity-0 group-hover:opacity-100 p-2 hover:bg-rose-50 rounded-xl transition-all text-gray-400 hover:text-rose-600"
-													title="Delete Subtask"
-												>
-													<Trash2 size={16} />
-												</button>
-											)}
+											{/* Content Area */}
+											<div className="flex-1 min-w-0 space-y-3">
+												<div className="flex items-start justify-between gap-4">
+													<p className={`text-sm font-bold leading-relaxed ${
+														subtask.status === "Done" ? "text-gray-400 line-through" : "text-gray-900"
+													}`}>
+														{subtask.title}
+													</p>
+													
+													{/* Metadata Badges */}
+													<div className="flex shrink-0 items-center gap-2">
+														{subtask.estimatedHours !== undefined && (
+															<div className="flex items-center gap-1 px-2 py-1 bg-gray-50 text-gray-400 border border-gray-100 rounded-lg text-[10px] font-black lowercase tracking-tight">
+																<Clock size={10} strokeWidth={3} />
+																<span>{subtask.estimatedHours}h est</span>
+															</div>
+														)}
+														{subtask.actualHours !== undefined && (
+															<div className="flex items-center gap-1 px-2 py-1 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-lg text-[10px] font-black lowercase tracking-tight">
+																<Zap size={10} strokeWidth={3} />
+																<span>{subtask.actualHours}h act</span>
+															</div>
+														)}
+													</div>
+												</div>
+
+												{/* Subtask Footer/Actions */}
+												<div className="flex items-center justify-between">
+													<div className="flex items-center gap-4">
+														<button
+															onClick={() => setExpandedComments(prev => ({ ...prev, [subtask.id]: !prev[subtask.id] }))}
+															className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider transition-colors ${
+																expandedComments[subtask.id] ? "text-indigo-600" : "text-gray-400 hover:text-indigo-600"
+															}`}
+														>
+															<Edit3 size={12} strokeWidth={3} />
+															Comments ({subtask.comments?.length || 0})
+														</button>
+														
+														<div className="h-1 w-1 rounded-full bg-gray-200" />
+														
+														<AttachmentButton subtaskId={subtask.id} userStoryId={story.id} variant="icon" />
+													</div>
+
+													<div className="flex items-center gap-2">
+														{isAdmin && (
+															<button
+																onClick={() => handleDeleteClick(subtask.id)}
+																className="p-2 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+																title="Delete Subtask"
+															>
+																<Trash2 size={16} />
+															</button>
+														)}
+													</div>
+												</div>
+
+												{/* Attachments Section */}
+												{(subtask as any).attachments && (subtask as any).attachments.length > 0 && (
+													<div className="flex flex-wrap gap-2 pt-1">
+														{(subtask as any).attachments.map((att: any, idx: number) => (
+															<SecureAttachmentLink 
+																key={idx} 
+																fileUrl={att.fileUrl} 
+																fileName={att.fileName} 
+															/>
+														))}
+													</div>
+												)}
+											</div>
 										</div>
+
+										{/* Expanded Comments Panel */}
 										{expandedComments[subtask.id] && (
-											<div className="pl-12 pr-4 pb-2">
-												<CommentSection
-													initialComments={subtask.comments || []}
-													currentUserName={user?.name}
-													membersMap={membersMap}
-													onSubmit={(message, onSuccess) => {
-														addSubtaskComment.mutate(
-															{ subtaskId: subtask.id, message },
-															{ onSuccess }
-														);
-													}}
-													isPending={addSubtaskComment.isPending}
-													isError={addSubtaskComment.isError}
-													error={addSubtaskComment.error}
-												/>
+											<div className="mx-4 animate-in slide-in-from-top-2 duration-300">
+												<div className="bg-gray-50/50 rounded-b-3xl border-x border-b border-gray-100 p-6 pt-2">
+													<CommentSection
+														initialComments={subtask.comments || []}
+														currentUserName={user?.name}
+														membersMap={membersMap}
+														onSubmit={(message, onSuccess) => {
+															addSubtaskComment.mutate(
+																{ subtaskId: subtask.id, message },
+																{ onSuccess }
+															);
+														}}
+														isPending={addSubtaskComment.isPending}
+														isError={addSubtaskComment.isError}
+														error={addSubtaskComment.error}
+													/>
+												</div>
 											</div>
 										)}
 									</div>
-								);
-							})}
-
-								{subtasks.length === 0 && (
-									<div className="text-center py-8 text-gray-400 font-bold text-sm">
-										No subtasks yet. Add one below!
-									</div>
-								)}
+								))}
 							</div>
 						)}
 
-						{/* Add Subtask (Developers Only) */}
 						{user?.role === "developers" && (
 							<div className="flex gap-2 pt-2">
 								<input
@@ -697,28 +648,17 @@ export default function UserStoryDetailModal({
 									placeholder="Add a new subtask..."
 									className="flex-1 px-5 py-3 bg-white border-2 border-dashed border-gray-200 rounded-2xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400"
 								/>
-								<input
-									type="number"
-									min="0"
-									step="0.5"
-									value={newSubtaskEstimatedHours}
-									onChange={(e) => setNewSubtaskEstimatedHours(e.target.value ? Number(e.target.value) : "")}
-									placeholder="Est. Hours"
-									className="w-28 px-4 py-3 bg-white border-2 border-dashed border-gray-200 rounded-2xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400"
-								/>
 								<button
 									onClick={handleCreateSubtask}
 									disabled={!newSubtaskTitle.trim() || createSubtask.isPending}
-									className="px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+									className="px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center gap-2"
 								>
-									<Plus size={18} />
-									Add
+									<Plus size={18} /> Add
 								</button>
 							</div>
 						)}
 					</div>
 
-					{/* Comments Section */}
 					<CommentSection
 						initialComments={story.comments || []}
 						currentUserName={user?.name}
@@ -738,9 +678,11 @@ export default function UserStoryDetailModal({
 				onClose={() => setIsDeleteModalOpen(false)}
 				onConfirm={handleConfirmDelete}
 				title="Delete Subtask"
-				message="Are you sure you want to remove this subtask? This action cannot be undone."
+				message="Are you sure you want to remove this subtask?"
 				isLoading={deleteSubtask.isPending}
 			/>
 		</div>
 	);
+
+	return createPortal(modalContent, document.body);
 }

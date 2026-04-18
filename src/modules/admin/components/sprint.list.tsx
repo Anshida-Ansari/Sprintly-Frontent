@@ -8,6 +8,7 @@ import {
 	Rocket,
 	Search,
 	Trash2,
+	TrendingDown,
 } from "lucide-react";
 import { useState } from "react";
 import { Pagination } from "../../../shared/components/pagination";
@@ -22,6 +23,7 @@ import {
 import type { ISprint, SprintStatus } from "../types/types.tsx";
 import DeleteConfirmationModal from "./delete-confirmation-modal.tsx";
 import SprintModal from "./sprint.modal.tsx";
+import { SprintBurndownModal } from "./sprint.burndown.modal";
 
 interface SprintRowProps {
 	sprint: ISprint;
@@ -29,11 +31,12 @@ interface SprintRowProps {
 	onDelete: (id: string) => void;
 	onStart: (id: string) => void;
 	onComplete: (id: string) => void;
+	onViewBurndown: (sprint: ISprint) => void;
 	isProcessing: boolean;
 	isReadOnly?: boolean;
 }
 
-function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, isProcessing, isReadOnly = false }: SprintRowProps) {
+function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, onViewBurndown, isProcessing, isReadOnly = false }: SprintRowProps) {
 	const isActive = sprint.status === "ACTIVE";
 	const isCompleted = sprint.status === "COMPLETED";
 
@@ -76,9 +79,17 @@ function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, isProcessing
 				</span>
 			</div>
 
-			{/* Actions - Hover Only */}
-			{!isReadOnly && (
-				<div className="col-span-2 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+			{/* Actions - Always show Burndown, others on hover */}
+			<div className="col-span-2 flex items-center justify-end gap-1">
+				<button
+					onClick={(e) => { e.stopPropagation(); onViewBurndown(sprint); }}
+					className="p-2 text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-all"
+					title="View Burndown"
+				>
+					<TrendingDown size={16} strokeWidth={2.5} />
+				</button>
+				
+				<div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
 					{sprint.status === "PLANNED" && (
 						<button
 							onClick={(e) => { e.stopPropagation(); onStart(sprint._id); }}
@@ -118,7 +129,7 @@ function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, isProcessing
 						</button>
 					)}
 				</div>
-			)}
+			</div>
 		</div>
 	);
 }
@@ -141,6 +152,8 @@ export default function SprintList({
 	const [statusFilter, setStatusFilter] = useState<SprintStatus | undefined>();
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [selectedSprint, setSelectedSprint] = useState<ISprint | undefined>();
+	const [burndownSprint, setBurndownSprint] = useState<ISprint | null>(null);
+	const [isBurndownModalOpen, setIsBurndownModalOpen] = useState(false);
 
 	// Delete Modal State
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -170,6 +183,11 @@ export default function SprintList({
 	const handleOpenEdit = (sprint: ISprint) => {
 		setSelectedSprint(sprint);
 		setIsModalOpen(true);
+	};
+
+	const handleOpenBurndown = (sprint: ISprint) => {
+		setBurndownSprint(sprint);
+		setIsBurndownModalOpen(true);
 	};
 
 	const handleDeleteClick = (sprintId: string) => {
@@ -293,12 +311,19 @@ export default function SprintList({
 								onDelete={handleDeleteClick}
 								onStart={(id) => startMutation.mutate(id)}
 								onComplete={(id) => completeMutation.mutate(id)}
+								onViewBurndown={handleOpenBurndown}
 								isProcessing={startMutation.isPending || completeMutation.isPending || deleteMutation.isPending}
 							/>
 						))}
 					</div>
 				)}
 			</div>
+
+			<SprintBurndownModal 
+				isOpen={isBurndownModalOpen}
+				onClose={() => setIsBurndownModalOpen(false)}
+				sprint={burndownSprint}
+			/>
 
 			{/* Pagination */}
 			{totalPages > 1 && (

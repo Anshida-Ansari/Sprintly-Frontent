@@ -23,6 +23,7 @@ export const ROUTES = {
         MEETING_ROOM: "meeting/:roomId",
         TEAM: "team",
         REPORTS: "reports",
+        ANALYTICS: "analytics",
         SETTINGS: "settings",
         PROFILE: "profile",
         WORKLOGS: "worklogs",

@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "../../../constants/api-endpoints.constants";
 import api from "../../../lib/axios.user";
 import type {
 	CreateProjectPayload,
@@ -9,13 +10,13 @@ export const projectService = {
 	async createProject(
 		payload: CreateProjectPayload,
 	): Promise<CreateProjectResponse> {
-		const res = await api.post("project/create-project", payload);
+		const res = await api.post(API_ENDPOINTS.ADMIN.PROJECT.CREATE, payload);
 		return res.data;
 	},
 
 	async updateProject(payload: EditProjectPayload): Promise<any> {
 		const { projectId, ...data } = payload;
-		const res = await api.patch(`project/update-project/${projectId}`, data);
+		const res = await api.patch(API_ENDPOINTS.ADMIN.PROJECT.UPDATE(projectId), data);
 		return res.data;
 	},
 
@@ -29,7 +30,7 @@ export const projectService = {
 		if (params?.limit) query.append("limit", params.limit.toString());
 		if (params?.search) query.append("search", params.search);
 
-		const res = await api.get(`project/projects?${query.toString()}`);
+		const res = await api.get(`${API_ENDPOINTS.ADMIN.PROJECT.LIST}?${query.toString()}`);
 
 		if (res.data && res.data.data) {
 			res.data.data = res.data.data.map((p: any) => ({
@@ -51,7 +52,7 @@ export const projectService = {
 	},
 
 	async getProjectById(projectId: string): Promise<any> {
-		const res = await api.get(`project/get-projects/${projectId}`);
+		const res = await api.get(API_ENDPOINTS.ADMIN.PROJECT.GET_BY_ID(projectId));
 		if (res.data && res.data.data) {
 			const p = res.data.data;
 			res.data.data = {
@@ -71,7 +72,7 @@ export const projectService = {
 		return res.data;
 	},
 	async addMember(projectId: string, memberId: string): Promise<any> {
-		const res = await api.patch(`project/${projectId}/add-member`, { memberId });
+		const res = await api.patch(API_ENDPOINTS.ADMIN.PROJECT.ADD_MEMBER(projectId), { memberId });
 		return res.data;
 	},
 };

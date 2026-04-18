@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "../../../constants/api-endpoints.constants";
 import api from "../../../lib/axios.user";
 import type {
 	AddCommentPayload,
@@ -35,7 +36,7 @@ export const userStoryService = {
 		projectId: string,
 		payload: CreateUserStoryPayload,
 	): Promise<any> {
-		const res = await api.post(`projects/${projectId}/user-stories`, payload);
+		const res = await api.post(API_ENDPOINTS.ADMIN.USERSTORY.CREATE(projectId), payload);
 		return res.data;
 	},
 
@@ -45,7 +46,7 @@ export const userStoryService = {
 		payload: EditUserStoryPayload,
 	): Promise<any> {
 		const res = await api.post(
-			`projects/${projectId}/user-stories/${userStoryId}`,
+			API_ENDPOINTS.ADMIN.USERSTORY.UPDATE(projectId, userStoryId),
 			payload,
 		);
 		return res.data;
@@ -69,7 +70,7 @@ export const userStoryService = {
 		if (params?.status) query.append("status", params.status);
 
 		const res = await api.get(
-			`projects/${projectId}/user-stories?${query.toString()}`,
+			`${API_ENDPOINTS.ADMIN.USERSTORY.LIST(projectId)}?${query.toString()}`,
 		);
 
 		if (res.data && res.data.data) {
@@ -84,7 +85,7 @@ export const userStoryService = {
 		userStoryId: string,
 		sprintId: string | null,
 	) {
-		const res = await api.post(`projects/${projectId}/assign-sprint`, {
+		const res = await api.post(API_ENDPOINTS.ADMIN.USERSTORY.ASSIGN_SPRINT(projectId), {
 			userStoryId,
 			sprintId,
 		});
@@ -96,7 +97,7 @@ export const userStoryService = {
 		developerId: string,
 	) {
 		const res = await api.patch(
-			`projects/${userStoryId}/assign-member`,
+			API_ENDPOINTS.ADMIN.USERSTORY.ASSIGN_MEMBER(userStoryId),
 			{
 				developerId,
 			},
@@ -109,7 +110,7 @@ export const userStoryService = {
 		payload: AddCommentPayload,
 	): Promise<any> {
 		const res = await api.post(
-			`projects/${userStoryId}/comments`,
+			API_ENDPOINTS.ADMIN.USERSTORY.ADD_COMMENT(userStoryId),
 			payload,
 		);
 		return res.data;

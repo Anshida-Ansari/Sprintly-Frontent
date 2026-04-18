@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "../../../constants/api-endpoints.constants";
 import api from "../../../lib/axios.user";
 
 export const workLogService = {
@@ -7,7 +8,7 @@ export const workLogService = {
 		description: string;
 		date: string | Date;
 	}) {
-		const res = await api.post("worklogs", payload);
+		const res = await api.post(API_ENDPOINTS.WORKLOG.CREATE, payload);
 		return res.data;
 	},
 
@@ -16,7 +17,7 @@ export const workLogService = {
 		Object.entries(filters).forEach(([key, value]) => {
 			if (value) queryParams.append(key, value as string);
 		});
-		const res = await api.get(`worklogs/me?${queryParams.toString()}`);
+		const res = await api.get(`${API_ENDPOINTS.WORKLOG.MY_WORKLOGS}?${queryParams.toString()}`);
 		return res.data;
 	},
 
@@ -25,7 +26,7 @@ export const workLogService = {
 		Object.entries(filters).forEach(([key, value]) => {
 			if (value) queryParams.append(key, value as string);
 		});
-		const res = await api.get(`worklogs/admin?${queryParams.toString()}`);
+		const res = await api.get(`${API_ENDPOINTS.WORKLOG.ADMIN_WORKLOGS}?${queryParams.toString()}`);
 		return res.data;
 	},
 };

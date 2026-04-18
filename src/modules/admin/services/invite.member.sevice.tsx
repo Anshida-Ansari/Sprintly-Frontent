@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "../../../constants/api-endpoints.constants";
 import api from "../../../lib/axios.user";
 import type {
 	GetMembersResponse,
@@ -25,15 +26,15 @@ export const inviteMemberService = {
 	async inviteMember(
 		payload: InviteMemberPayload,
 	): Promise<InviteMemberResponse> {
-		const res = await api.post("admin/invite-member", payload);
+		const res = await api.post(API_ENDPOINTS.ADMIN.MEMBER.INVITE, payload);
 		return res.data;
 	},
 	async verifyToken(token: string): Promise<VerifyInvitationResponse> {
-		const res = await api.post("admin/verify-invitation", { token });
+		const res = await api.post(API_ENDPOINTS.ADMIN.MEMBER.VERIFY_INVITATION, { token });
 		return res.data;
 	},
 	async setpassword(payload: SetPasswordPayload): Promise<SetPasswordResponse> {
-		const res = await api.post("auth/set-password", payload);
+		const res = await api.post(API_ENDPOINTS.AUTH.SET_PASSWORD, payload);
 		return res.data;
 	},
 	async getMembers({
@@ -50,7 +51,7 @@ export const inviteMemberService = {
 		params.append("limit", limit.toString());
 		if (search) params.append("search", search);
 
-		const res = await api.get(`/admin/members?${params.toString()}`);
+		const res = await api.get(`${API_ENDPOINTS.ADMIN.MEMBER.LIST}?${params.toString()}`);
 
 		if (res.data && res.data.data) {
 			res.data.data = res.data.data.map(mapMember);
@@ -59,7 +60,7 @@ export const inviteMemberService = {
 		return res.data;
 	},
 	async blockUser(userId: string, status: "active" | "block") {
-		const res = await api.patch(`admin/block-user/${userId}`, { status });
+		const res = await api.patch(API_ENDPOINTS.ADMIN.MEMBER.BLOCK(userId), { status });
 		return res.data;
 	},
 };
