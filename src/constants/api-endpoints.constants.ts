@@ -15,7 +15,8 @@ export const API_ENDPOINTS = {
 
 	SUPERADMIN: {
 		COMPANIES: "/superadmin/companies",
-		COMPANY_STATUS: (companyId: string) => `superadmin/company/${companyId}/status`,
+		COMPANY_STATUS: (companyId: string) =>
+			`superadmin/company/${companyId}/status`,
 		COMPANY_DETAIL: (companyId: string) => `superadmin/company/${companyId}`,
 		DASHBOARD_STATS: "/superadmin/dashboard/stats",
 		SUBSCRIPTION_ANALYTICS: "/superadmin/subscription-analytics",
@@ -40,7 +41,8 @@ export const API_ENDPOINTS = {
 		SPRINT: {
 			CREATE: (projectId: string) => `/project/${projectId}/sprints`,
 			LIST: (projectId: string) => `/project/${projectId}/sprints`,
-			EDIT: (projectId: string, sprintId: string) => `/project/${projectId}/sprints/${sprintId}`,
+			EDIT: (projectId: string, sprintId: string) =>
+				`/project/${projectId}/sprints/${sprintId}`,
 			START: (sprintId: string) => `/project/${sprintId}/start`,
 			COMPLETE: (sprintId: string) => `/project/${sprintId}/complete`,
 			DELETE: (sprintId: string) => `/project/${sprintId}/delete`,
@@ -48,10 +50,13 @@ export const API_ENDPOINTS = {
 		},
 		USERSTORY: {
 			CREATE: (projectId: string) => `projects/${projectId}/user-stories`,
-			UPDATE: (projectId: string, userStoryId: string) => `projects/${projectId}/user-stories/${userStoryId}`,
+			UPDATE: (projectId: string, userStoryId: string) =>
+				`projects/${projectId}/user-stories/${userStoryId}`,
 			LIST: (projectId: string) => `projects/${projectId}/user-stories`,
-			ASSIGN_SPRINT: (projectId: string) => `projects/${projectId}/assign-sprint`,
-			ASSIGN_MEMBER: (userStoryId: string) => `projects/${userStoryId}/assign-member`,
+			ASSIGN_SPRINT: (projectId: string) =>
+				`projects/${projectId}/assign-sprint`,
+			ASSIGN_MEMBER: (userStoryId: string) =>
+				`projects/${userStoryId}/assign-member`,
 			ADD_COMMENT: (userStoryId: string) => `projects/${userStoryId}/comments`,
 		},
 		SUBTASK: {
@@ -63,7 +68,8 @@ export const API_ENDPOINTS = {
 			DELETE: (subtaskId: string) => `userstory/${subtaskId}`,
 			ADD_COMMENT: (subtaskId: string) => `userstory/${subtaskId}/comments`,
 			UPLOAD_URL: `userstory/upload-url`,
-			ADD_ATTACHMENT: (subtaskId: string) => `userstory/${subtaskId}/attachments`,
+			ADD_ATTACHMENT: (subtaskId: string) =>
+				`userstory/${subtaskId}/attachments`,
 			DOWNLOAD_URL: `userstory/download-url`,
 		},
 		MEMBER: {
@@ -79,8 +85,10 @@ export const API_ENDPOINTS = {
 			HISTORY: (projectId: string) => `meeting/history/${projectId}`,
 		},
 		ANALYTICS: {
-			SPRINT_BURNDOWN: (sprintId: string) => `/projects/burndown/sprint/${sprintId}`,
-			USER_BURNDOWN: (sprintId: string) => `/projects/burndown/user/${sprintId}`,
+			SPRINT_BURNDOWN: (sprintId: string) =>
+				`/projects/burndown/sprint/${sprintId}`,
+			USER_BURNDOWN: (sprintId: string) =>
+				`/projects/burndown/user/${sprintId}`,
 		},
 	},
 
@@ -93,20 +101,24 @@ export const API_ENDPOINTS = {
 	REPORTS: {
 		PROJECT_REPORT: (projectId: string) => `projects/${projectId}/reports-list`,
 		ALL_PROJECTS_REPORT: `reports/projects`,
-		SPRINT_REPORT: (projectId: string) => `projects/${projectId}/reports/sprints`,
+		SPRINT_REPORT: (projectId: string) =>
+			`projects/${projectId}/reports/sprints`,
 		ALL_SPRINTS_REPORT: `reports/sprints`,
-		STORY_REPORT: (projectId: string) => `projects/${projectId}/reports/stories`,
+		STORY_REPORT: (projectId: string) =>
+			`projects/${projectId}/reports/stories`,
 		ALL_STORIES_REPORT: `reports/userstories`,
 		TASK_REPORT: (projectId: string) => `projects/${projectId}/reports/tasks`,
 		ALL_TASKS_REPORT: `reports/subtasks`,
-		USER_PERFORMANCE_REPORT: (projectId: string) => `projects/${projectId}/reports/users`,
+		USER_PERFORMANCE_REPORT: (projectId: string) =>
+			`projects/${projectId}/reports/users`,
 		ALL_PERFORMANCE_REPORT: `reports/performance`,
 	},
 
 	DEVELOPER: {
 		DASHBOARD: (companyId: string) => `/companies/${companyId}/dashboard`,
 		MY_TASKS: "projects/my-tasks",
-		UPDATE_USERSTORY_STATUS: (userStoryId: string) => `userstory/${userStoryId}/status`,
+		UPDATE_USERSTORY_STATUS: (userStoryId: string) =>
+			`userstory/${userStoryId}/status`,
 		ADD_COMMENT: (userStoryId: string) => `projects/${userStoryId}/comments`,
 	},
 
@@ -124,7 +136,8 @@ export const API_ENDPOINTS = {
 		SUBMIT: (base: string) => base,
 		LIST: (base: string) => base,
 		TODAY: (base: string) => `${base}/today`,
-		ADD_COMMENT: (base: string, standupId: string) => `${base}/${standupId}/comments`,
+		ADD_COMMENT: (base: string, standupId: string) =>
+			`${base}/${standupId}/comments`,
 	},
 
 	PROFILE: {

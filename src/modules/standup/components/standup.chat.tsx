@@ -1,21 +1,30 @@
-import { Loader2, MessageSquare, Plus, X, Calendar as CalendarIcon, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState, useMemo } from "react";
+import {
+	addDays,
+	addMonths,
+	endOfMonth,
+	endOfWeek,
+	format,
+	isAfter,
+	isSameDay,
+	isSameMonth,
+	startOfMonth,
+	startOfWeek,
+	subMonths,
+} from "date-fns";
+import {
+	Calendar as CalendarIcon,
+	ChevronLeft,
+	ChevronRight,
+	Loader2,
+	MessageSquare,
+	Plus,
+	TrendingUp,
+	X,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 import { useListStandups } from "../hooks/useListStandup";
 import { StandupCard } from "./standup.card";
 import { StandupForm } from "./standup.form";
-import { 
-	format, 
-	addMonths, 
-	subMonths, 
-	startOfMonth, 
-	endOfMonth, 
-	startOfWeek, 
-	endOfWeek, 
-	isSameMonth, 
-	isSameDay, 
-	addDays, 
-	isAfter 
-} from "date-fns";
 
 interface StandupChatProps {
 	projectId: string;
@@ -32,8 +41,12 @@ export const StandupChat = ({
 	const [selectedDate, setSelectedDate] = useState<string>(todayStr);
 	const [currentMonth, setCurrentMonth] = useState(new Date());
 	const [showCalendar, setShowCalendar] = useState(false);
-	
-	const { data: standups, isLoading } = useListStandups(projectId, sprintId, selectedDate);
+
+	const { data: standups, isLoading } = useListStandups(
+		projectId,
+		sprintId,
+		selectedDate,
+	);
 	const [showForm, setShowForm] = useState(false);
 
 	const handleDateChange = (days: number) => {
@@ -80,8 +93,8 @@ export const StandupChat = ({
 						>
 							<ChevronLeft size={18} />
 						</button>
-						
-						<div 
+
+						<div
 							onClick={() => setShowCalendar(!showCalendar)}
 							className="px-4 flex items-center gap-3 font-black text-gray-800 text-sm min-w-[200px] justify-center cursor-pointer hover:text-indigo-600 transition-colors py-1 relative"
 						>
@@ -89,7 +102,9 @@ export const StandupChat = ({
 								<CalendarIcon size={14} className="text-indigo-500" />
 							</div>
 							<span className="tracking-tight">
-								{selectedDate === todayStr ? "Today" : format(new Date(selectedDate), "MMM d, yyyy")}
+								{selectedDate === todayStr
+									? "Today"
+									: format(new Date(selectedDate), "MMM d, yyyy")}
 							</span>
 						</div>
 
@@ -117,20 +132,37 @@ export const StandupChat = ({
 						{showCalendar && (
 							<div className="absolute top-full left-0 mt-4 bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-5 z-[100] w-72 animate-in zoom-in-95 duration-200 origin-top">
 								<div className="flex items-center justify-between mb-4 px-1">
-									<button onClick={(e) => { e.stopPropagation(); setCurrentMonth(subMonths(currentMonth, 1)); }} className="p-1.5 hover:bg-gray-50 rounded-xl transition-colors">
+									<button
+										onClick={(e) => {
+											e.stopPropagation();
+											setCurrentMonth(subMonths(currentMonth, 1));
+										}}
+										className="p-1.5 hover:bg-gray-50 rounded-xl transition-colors"
+									>
 										<ChevronLeft size={16} />
 									</button>
 									<span className="text-sm font-black text-gray-800 uppercase tracking-widest pl-1">
 										{format(currentMonth, "MMMM yyyy")}
 									</span>
-									<button onClick={(e) => { e.stopPropagation(); setCurrentMonth(addMonths(currentMonth, 1)); }} className="p-1.5 hover:bg-gray-50 rounded-xl transition-colors">
+									<button
+										onClick={(e) => {
+											e.stopPropagation();
+											setCurrentMonth(addMonths(currentMonth, 1));
+										}}
+										className="p-1.5 hover:bg-gray-50 rounded-xl transition-colors"
+									>
 										<ChevronRight size={16} />
 									</button>
 								</div>
 
 								<div className="grid grid-cols-7 gap-1 mb-2">
-									{['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => (
-										<div key={d} className="text-center text-[9px] font-black text-gray-400 py-1">{d}</div>
+									{["S", "M", "T", "W", "T", "F", "S"].map((d) => (
+										<div
+											key={d}
+											className="text-center text-[9px] font-black text-gray-400 py-1"
+										>
+											{d}
+										</div>
 									))}
 								</div>
 
@@ -154,10 +186,10 @@ export const StandupChat = ({
 												}}
 												className={`
 													aspect-square p-2 rounded-xl text-[11px] font-bold transition-all relative
-													${isSelected ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100 scale-110' : ''}
-													${!isSelected && isCurrentMonth && !isDisabled ? 'hover:bg-indigo-50 text-gray-700' : ''}
-													${!isCurrentMonth || isDisabled ? 'text-gray-200' : ''}
-													${isToday && !isSelected ? 'text-indigo-600 ring-2 ring-indigo-50' : ''}
+													${isSelected ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100 scale-110" : ""}
+													${!isSelected && isCurrentMonth && !isDisabled ? "hover:bg-indigo-50 text-gray-700" : ""}
+													${!isCurrentMonth || isDisabled ? "text-gray-200" : ""}
+													${isToday && !isSelected ? "text-indigo-600 ring-2 ring-indigo-50" : ""}
 												`}
 											>
 												{format(day, "d")}
@@ -175,15 +207,18 @@ export const StandupChat = ({
 					</div>
 				</div>
 
-				{userRole === "developer" && !showForm && selectedDate === todayStr && !!sprintId && (
-					<button
-						onClick={() => setShowForm(true)}
-						className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95"
-					>
-						<Plus size={18} />
-						<span>Post Update</span>
-					</button>
-				)}
+				{userRole === "developer" &&
+					!showForm &&
+					selectedDate === todayStr &&
+					!!sprintId && (
+						<button
+							onClick={() => setShowForm(true)}
+							className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95"
+						>
+							<Plus size={18} />
+							<span>Post Update</span>
+						</button>
+					)}
 			</div>
 
 			<div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-10 scrollbar-none">
@@ -199,8 +234,12 @@ export const StandupChat = ({
 								<X size={20} />
 							</button>
 							<div className="mb-8">
-								<h4 className="font-black text-gray-900 text-2xl tracking-tight">Daily Status</h4>
-								<p className="text-gray-400 font-medium text-sm mt-1">Sync your progress with the team</p>
+								<h4 className="font-black text-gray-900 text-2xl tracking-tight">
+									Daily Status
+								</h4>
+								<p className="text-gray-400 font-medium text-sm mt-1">
+									Sync your progress with the team
+								</p>
 							</div>
 							<StandupForm
 								projectId={projectId}
@@ -214,19 +253,18 @@ export const StandupChat = ({
 				<div className="grid gap-10 max-w-4xl mx-auto w-full pb-20">
 					{standups && standups.length > 0 ? (
 						standups.map((standup) => (
-							<StandupCard
-								key={standup._id}
-								standup={standup}
-							/>
+							<StandupCard key={standup._id} standup={standup} />
 						))
 					) : (
 						<div className="flex flex-col items-center justify-center py-32 text-center animate-in fade-in zoom-in-95 duration-700">
 							<div className="w-20 h-20 bg-gray-50 rounded-[2rem] flex items-center justify-center mb-6 border border-gray-100">
 								<MessageSquare size={32} className="text-gray-200" />
 							</div>
-							<h3 className="text-xl font-black text-gray-900 mb-2">No logs found</h3>
+							<h3 className="text-xl font-black text-gray-900 mb-2">
+								No logs found
+							</h3>
 							<p className="text-gray-400 font-medium max-w-xs mx-auto text-sm">
-								{selectedDate === todayStr 
+								{selectedDate === todayStr
 									? "Be the first to share your progress today."
 									: "No one submitted their standup for this date."}
 							</p>

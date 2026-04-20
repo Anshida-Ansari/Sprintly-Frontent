@@ -1,14 +1,17 @@
-import { LayoutGrid, Plus, AlertCircle, Zap, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { AlertCircle, LayoutGrid, Loader2, Plus, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import CreateProjectModal from "../components/create.project.modal";
 import EditProjectModal from "../components/edit.project.modal";
-import UpgradeModal from "../components/UpgradeModal";
 import ProjectCard from "../components/project.card";
+import UpgradeModal from "../components/UpgradeModal";
 import { useCreateProject } from "../hooks/useCreateProject";
 import { useEditProject } from "../hooks/useEditProject";
 import { useProjects } from "../hooks/useProjects";
-import { useSubscriptionStatus, useVerifyStripeSession } from "../hooks/useSubscription";
+import {
+	useSubscriptionStatus,
+	useVerifyStripeSession,
+} from "../hooks/useSubscription";
 import type {
 	CreateProjectPayload,
 	EditProjectPayload,
@@ -27,7 +30,8 @@ export default function Projects({ isReadOnly = false }: ProjectsProps) {
 
 	const [searchParams] = useSearchParams();
 	const sessionId = searchParams.get("session_id");
-	const { mutate: verifySession, isPending: isVerifying } = useVerifyStripeSession();
+	const { mutate: verifySession, isPending: isVerifying } =
+		useVerifyStripeSession();
 
 	const { mutate: createProject, isPending: isCreating } = useCreateProject();
 	const { mutate: updateProject, isPending: isUpdating } = useEditProject();
@@ -149,11 +153,16 @@ export default function Projects({ isReadOnly = false }: ProjectsProps) {
 							<AlertCircle className="text-amber-500" size={24} />
 						</div>
 						<div>
-							<h4 className="font-black text-gray-900 tracking-tight">You’ve reached your free limit</h4>
-							<p className="text-gray-500 text-sm font-medium">Upgrade to Pro to create unlimited projects and unlock advanced features.</p>
+							<h4 className="font-black text-gray-900 tracking-tight">
+								You’ve reached your free limit
+							</h4>
+							<p className="text-gray-500 text-sm font-medium">
+								Upgrade to Pro to create unlimited projects and unlock advanced
+								features.
+							</p>
 						</div>
 					</div>
-					<button 
+					<button
 						onClick={() => setIsUpgradeModalOpen(true)}
 						className="px-6 py-2.5 bg-gray-900 text-white rounded-2xl font-bold hover:bg-gray-800 transition shadow-lg shadow-gray-200 flex items-center gap-2 text-sm"
 					>
@@ -263,11 +272,10 @@ export default function Projects({ isReadOnly = false }: ProjectsProps) {
 				isLoading={isUpdating}
 			/>
 
-			<UpgradeModal 
+			<UpgradeModal
 				isOpen={isUpgradeModalOpen}
 				onClose={() => setIsUpgradeModalOpen(false)}
 			/>
 		</div>
 	);
 }
-

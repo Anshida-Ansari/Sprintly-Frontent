@@ -1,5 +1,5 @@
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { authService } from "../services/auth.services";
 import { UserAuth } from "../store/store";
 
@@ -22,13 +22,13 @@ export function useGetMe() {
 				login(user, token!);
 			}
 		}
-	}, [query.isSuccess, query.data]);
+	}, [query.isSuccess, query.data, login, token]);
 
 	useEffect(() => {
 		if (query.isError) {
 			logout();
 		}
-	}, [query.isError]);
+	}, [query.isError, logout]);
 
 	return query;
 }

@@ -1,22 +1,22 @@
 import {
 	BarChart3,
+	Clock,
 	FolderKanban,
 	LayoutDashboard,
 	LogOut,
 	ScrollText,
 	Settings,
+	UserCircle,
 	UserPlus,
 	Users,
 	Video,
 	Zap,
-	UserCircle,
-	Clock,
 } from "lucide-react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { UserAuth } from "../../modules/auth/store/store";
+import { DashboardHeader } from "../components/layout/DashboardHeader";
 import { useLogout } from "../hooks/useLogout";
 import { useSocketNotifications } from "../hooks/useSocketNotifications";
-import { DashboardHeader } from "../components/layout/DashboardHeader";
 
 const sidebarLinks = [
 	{ name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
@@ -39,8 +39,6 @@ export default function AdminLayout() {
 	const location = useLocation();
 	useSocketNotifications();
 
-
-
 	return (
 		<div className="flex min-h-screen bg-[#FDFDFF]">
 			{/* Sidebar */}
@@ -50,8 +48,12 @@ export default function AdminLayout() {
 						<Zap className="text-white" size={20} fill="white" />
 					</div>
 					<h2 className="text-xl font-bold tracking-tight text-gray-900 flex flex-col">
-						<span>Sprintly<span className="text-indigo-600">.</span></span>
-						<span className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">{user?.role} Workspace</span>
+						<span>
+							Sprintly<span className="text-indigo-600">.</span>
+						</span>
+						<span className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">
+							{user?.role} Workspace
+						</span>
 					</h2>
 				</div>
 
@@ -66,9 +68,10 @@ export default function AdminLayout() {
 								key={link.path}
 								to={link.path}
 								className={({ isActive }) =>
-									`flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${isActive
-										? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
-										: "text-gray-500 hover:bg-indigo-50 hover:text-indigo-600"
+									`flex items-center gap-3 px-4 py-3 rounded-xl transition-all group ${
+										isActive
+											? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
+											: "text-gray-500 hover:bg-indigo-50 hover:text-indigo-600"
 									}`
 								}
 							>
@@ -112,7 +115,13 @@ export default function AdminLayout() {
 
 			{/* Main Content */}
 			<main className="flex-1 p-8 lg:p-12 overflow-y-auto">
-				<DashboardHeader title={location.pathname === "/admin/dashboard" ? "Admin Dashboard" : undefined} />
+				<DashboardHeader
+					title={
+						location.pathname === "/admin/dashboard"
+							? "Admin Dashboard"
+							: undefined
+					}
+				/>
 				<Outlet />
 			</main>
 		</div>

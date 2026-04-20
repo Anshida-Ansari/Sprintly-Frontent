@@ -1,12 +1,12 @@
 import {
 	ArrowLeft,
 	Calendar,
+	CheckCircle,
 	Clock,
 	Filter,
 	Search,
 	Users,
 	Video,
-	CheckCircle,
 	XCircle,
 } from "lucide-react";
 import { useState } from "react";
@@ -146,7 +146,9 @@ export default function MeetingHistory() {
 							<div
 								key={meeting.id}
 								className={`grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-indigo-50/30 transition-colors ${
-									idx !== filteredHistory.length - 1 ? "border-b border-gray-50" : ""
+									idx !== filteredHistory.length - 1
+										? "border-b border-gray-50"
+										: ""
 								}`}
 							>
 								{/* Title + host */}
@@ -155,7 +157,9 @@ export default function MeetingHistory() {
 										<Video size={18} className="text-gray-400" />
 									</div>
 									<div className="min-w-0">
-										<p className="font-black text-gray-900 truncate">{meeting.title}</p>
+										<p className="font-black text-gray-900 truncate">
+											{meeting.title}
+										</p>
 										<p className="text-xs text-gray-400 font-medium truncate">
 											By {meeting.createdBy?.name || "Member"}
 										</p>
@@ -164,7 +168,10 @@ export default function MeetingHistory() {
 
 								{/* Date */}
 								<div className="col-span-2 flex items-center gap-2 text-sm font-bold text-gray-600">
-									<Calendar size={14} className="text-indigo-400 flex-shrink-0" />
+									<Calendar
+										size={14}
+										className="text-indigo-400 flex-shrink-0"
+									/>
 									{new Date(meeting.date).toLocaleDateString(undefined, {
 										day: "2-digit",
 										month: "short",
@@ -216,7 +223,9 @@ export default function MeetingHistory() {
 					<div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
 						<Video size={40} />
 					</div>
-					<h3 className="text-2xl font-black text-gray-400">No meeting history</h3>
+					<h3 className="text-2xl font-black text-gray-400">
+						No meeting history
+					</h3>
 					<p className="text-gray-400 font-medium mt-2">
 						Completed meetings will appear here
 					</p>

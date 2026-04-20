@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
 import { standupService } from "../services/standup.service";
 import type { SubmitStandupPayload } from "../types/standup.types";
-import { toast } from "react-hot-toast";
 
 export const useSubmitStandup = (projectId: string, sprintId: string) => {
 	const qc = useQueryClient();
@@ -18,8 +18,11 @@ export const useSubmitStandup = (projectId: string, sprintId: string) => {
 			});
 		},
 		onError: (error: any) => {
-			const message = error.response?.data?.message || error.message || "Failed to submit standup";
+			const message =
+				error.response?.data?.message ||
+				error.message ||
+				"Failed to submit standup";
 			toast.error(message);
-		}
+		},
 	});
 };

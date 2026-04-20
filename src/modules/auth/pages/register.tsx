@@ -1,3 +1,4 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	ArrowRight,
 	Building2,
@@ -7,11 +8,10 @@ import {
 	ShieldCheck,
 	User,
 } from "lucide-react";
+import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { useRegister } from "../hooks/useRegister";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema, type RegisterFormData } from "../schemas/auth.schemas";
+import { type RegisterFormData, registerSchema } from "../schemas/auth.schemas";
 
 export default function Register() {
 	const { mutate, isPending } = useRegister();
@@ -58,11 +58,19 @@ export default function Register() {
 					</div>
 
 					{/* Industrial Register Form */}
-					<form onSubmit={handleSubmit(onSubmit)} className="space-y-3" noValidate>
+					<form
+						onSubmit={handleSubmit(onSubmit)}
+						className="space-y-3"
+						noValidate
+					>
 						<div className="grid grid-cols-2 gap-3">
 							{/* Admin Name */}
-							<div className={`group relative border-2 ${errors.name ? 'border-red-500' : 'border-slate-100'} rounded-2xl p-3 focus-within:border-${errors.name ? 'red' : 'blue'}-600 focus-within:ring-4 focus-within:ring-${errors.name ? 'red' : 'blue'}-50 transition-all bg-slate-50/30`}>
-								<p className={`text-[9px] font-black uppercase tracking-widest ${errors.name ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1`}>
+							<div
+								className={`group relative border-2 ${errors.name ? "border-red-500" : "border-slate-100"} rounded-2xl p-3 focus-within:border-${errors.name ? "red" : "blue"}-600 focus-within:ring-4 focus-within:ring-${errors.name ? "red" : "blue"}-50 transition-all bg-slate-50/30`}
+							>
+								<p
+									className={`text-[9px] font-black uppercase tracking-widest ${errors.name ? "text-red-600" : "text-slate-400 group-focus-within:text-blue-600"} mb-1`}
+								>
 									Lead Admin
 								</p>
 								<div className="flex items-center gap-2">
@@ -76,8 +84,12 @@ export default function Register() {
 							</div>
 
 							{/* Company Name */}
-							<div className={`group relative border-2 ${errors.companyName ? 'border-red-500' : 'border-slate-100'} rounded-2xl p-3 focus-within:border-${errors.companyName ? 'red' : 'blue'}-600 focus-within:ring-4 focus-within:ring-${errors.companyName ? 'red' : 'blue'}-50 transition-all bg-slate-50/30`}>
-								<p className={`text-[9px] font-black uppercase tracking-widest ${errors.companyName ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1`}>
+							<div
+								className={`group relative border-2 ${errors.companyName ? "border-red-500" : "border-slate-100"} rounded-2xl p-3 focus-within:border-${errors.companyName ? "red" : "blue"}-600 focus-within:ring-4 focus-within:ring-${errors.companyName ? "red" : "blue"}-50 transition-all bg-slate-50/30`}
+							>
+								<p
+									className={`text-[9px] font-black uppercase tracking-widest ${errors.companyName ? "text-red-600" : "text-slate-400 group-focus-within:text-blue-600"} mb-1`}
+								>
 									Company
 								</p>
 								<div className="flex items-center gap-2">
@@ -109,8 +121,12 @@ export default function Register() {
 						</div>
 
 						{/* Email */}
-						<div className={`group relative border-2 ${errors.email ? 'border-red-500' : 'border-slate-100'} rounded-2xl p-4 focus-within:border-${errors.email ? 'red' : 'blue'}-600 focus-within:ring-4 focus-within:ring-${errors.email ? 'red' : 'blue'}-50 transition-all bg-slate-50/30`}>
-							<p className={`text-[9px] font-black uppercase tracking-widest ${errors.email ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1`}>
+						<div
+							className={`group relative border-2 ${errors.email ? "border-red-500" : "border-slate-100"} rounded-2xl p-4 focus-within:border-${errors.email ? "red" : "blue"}-600 focus-within:ring-4 focus-within:ring-${errors.email ? "red" : "blue"}-50 transition-all bg-slate-50/30`}
+						>
+							<p
+								className={`text-[9px] font-black uppercase tracking-widest ${errors.email ? "text-red-600" : "text-slate-400 group-focus-within:text-blue-600"} mb-1`}
+							>
 								Work Email
 							</p>
 							<div className="flex items-center gap-2">
@@ -130,8 +146,12 @@ export default function Register() {
 
 						<div className="grid grid-cols-2 gap-3">
 							{/* Password */}
-							<div className={`group relative border-2 ${errors.password ? 'border-red-500' : 'border-slate-100'} rounded-2xl p-4 focus-within:border-${errors.password ? 'red' : 'blue'}-600 transition-all bg-slate-50/30`}>
-								<p className={`text-[9px] font-black uppercase tracking-widest ${errors.password ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1`}>
+							<div
+								className={`group relative border-2 ${errors.password ? "border-red-500" : "border-slate-100"} rounded-2xl p-4 focus-within:border-${errors.password ? "red" : "blue"}-600 transition-all bg-slate-50/30`}
+							>
+								<p
+									className={`text-[9px] font-black uppercase tracking-widest ${errors.password ? "text-red-600" : "text-slate-400 group-focus-within:text-blue-600"} mb-1`}
+								>
 									Password
 								</p>
 								<input
@@ -143,8 +163,12 @@ export default function Register() {
 							</div>
 
 							{/* Confirm Password */}
-							<div className={`group relative border-2 ${errors.confirmPassword ? 'border-red-500' : 'border-slate-100'} rounded-2xl p-4 focus-within:border-${errors.confirmPassword ? 'red' : 'blue'}-600 transition-all bg-slate-50/30`}>
-								<p className={`text-[9px] font-black uppercase tracking-widest ${errors.confirmPassword ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1`}>
+							<div
+								className={`group relative border-2 ${errors.confirmPassword ? "border-red-500" : "border-slate-100"} rounded-2xl p-4 focus-within:border-${errors.confirmPassword ? "red" : "blue"}-600 transition-all bg-slate-50/30`}
+							>
+								<p
+									className={`text-[9px] font-black uppercase tracking-widest ${errors.confirmPassword ? "text-red-600" : "text-slate-400 group-focus-within:text-blue-600"} mb-1`}
+								>
 									Verify
 								</p>
 								<input

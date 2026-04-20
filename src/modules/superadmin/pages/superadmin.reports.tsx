@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { companyService } from "../services/company.services";
+import { Calendar, Clock, CreditCard, FileText, Zap } from "lucide-react";
+import { useState } from "react";
 import { PaginatedTable } from "../../../shared/components/PaginatedTable";
-import { FileText, CreditCard, Clock, Zap, Calendar } from "lucide-react";
+import { companyService } from "../services/company.services";
 
 type ReportType = "subscriptions" | "payments" | "expiring" | "trials";
 
@@ -18,31 +18,66 @@ export default function SuperAdminReports() {
 			queryKey: ["report-subscriptions", page, limit],
 			queryFn: () => companyService.getSubscriptionReport(page, limit),
 			columns: [
-				{ header: "Company", key: "companyName", render: (item: any) => <span className="font-bold text-gray-900">{item.companyName}</span> },
-				{ header: "Plan", key: "plan", render: (item: any) => (
-                    <span className={`px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-tight ${item.plan === 'PRO' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600'}`}>
-                        {item.plan}
-                    </span>
-                )},
-				{ header: "End Date", key: "endDate", render: (item: any) => (
-                    <div className="flex items-center gap-1.5 text-sm font-medium text-gray-600">
-                        <Calendar size={14} className="text-gray-400" />
-                        {item.endDate !== 'N/A' ? new Date(item.endDate).toLocaleDateString() : 'N/A'}
-                    </div>
-                )},
-				{ header: "Status", key: "status", render: (item: any) => {
-                    const statusColors = {
-                        'Active': 'bg-emerald-50 text-emerald-700',
-                        'Expired': 'bg-rose-50 text-rose-700',
-                        'Expiring Soon': 'bg-amber-50 text-amber-700 font-bold animate-pulse'
-                    };
-                    return <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${statusColors[item.status as keyof typeof statusColors]}`}>{item.status}</span>
-                }},
-				{ header: "Renewal", key: "autoRenew", render: (item: any) => (
-                    <span className={`text-xs font-bold ${item.autoRenew ? 'text-emerald-600' : 'text-gray-400'}`}>
-                        {item.autoRenew ? "Auto-Renew ON" : "Manual"}
-                    </span>
-                )},
+				{
+					header: "Company",
+					key: "companyName",
+					render: (item: any) => (
+						<span className="font-bold text-gray-900">{item.companyName}</span>
+					),
+				},
+				{
+					header: "Plan",
+					key: "plan",
+					render: (item: any) => (
+						<span
+							className={`px-2 py-1 rounded-full text-[10px] font-black uppercase tracking-tight ${item.plan === "PRO" ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-600"}`}
+						>
+							{item.plan}
+						</span>
+					),
+				},
+				{
+					header: "End Date",
+					key: "endDate",
+					render: (item: any) => (
+						<div className="flex items-center gap-1.5 text-sm font-medium text-gray-600">
+							<Calendar size={14} className="text-gray-400" />
+							{item.endDate !== "N/A"
+								? new Date(item.endDate).toLocaleDateString()
+								: "N/A"}
+						</div>
+					),
+				},
+				{
+					header: "Status",
+					key: "status",
+					render: (item: any) => {
+						const statusColors = {
+							Active: "bg-emerald-50 text-emerald-700",
+							Expired: "bg-rose-50 text-rose-700",
+							"Expiring Soon":
+								"bg-amber-50 text-amber-700 font-bold animate-pulse",
+						};
+						return (
+							<span
+								className={`px-2.5 py-1 rounded-lg text-xs font-bold ${statusColors[item.status as keyof typeof statusColors]}`}
+							>
+								{item.status}
+							</span>
+						);
+					},
+				},
+				{
+					header: "Renewal",
+					key: "autoRenew",
+					render: (item: any) => (
+						<span
+							className={`text-xs font-bold ${item.autoRenew ? "text-emerald-600" : "text-gray-400"}`}
+						>
+							{item.autoRenew ? "Auto-Renew ON" : "Manual"}
+						</span>
+					),
+				},
 			],
 		},
 		payments: {
@@ -51,13 +86,49 @@ export default function SuperAdminReports() {
 			queryKey: ["report-payments", page, limit],
 			queryFn: () => companyService.getPaymentReport(page, limit),
 			columns: [
-				{ header: "Transaction ID", key: "paymentId", render: (item: any) => <span className="font-mono text-xs text-indigo-600 font-bold">{item.paymentId}</span> },
-				{ header: "Company", key: "companyName", render: (item: any) => <span className="font-bold text-gray-900">{item.companyName}</span> },
-				{ header: "Amount", key: "amount", render: (item: any) => <span className="font-black text-gray-900">₹{item.amount.toLocaleString()}</span> },
-				{ header: "Status", key: "status", render: (item: any) => (
-                    <span className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-md text-[10px] font-black uppercase">{item.status}</span>
-                )},
-				{ header: "Date", key: "date", render: (item: any) => <span className="text-sm font-medium text-gray-500">{new Date(item.date).toLocaleDateString()}</span> },
+				{
+					header: "Transaction ID",
+					key: "paymentId",
+					render: (item: any) => (
+						<span className="font-mono text-xs text-indigo-600 font-bold">
+							{item.paymentId}
+						</span>
+					),
+				},
+				{
+					header: "Company",
+					key: "companyName",
+					render: (item: any) => (
+						<span className="font-bold text-gray-900">{item.companyName}</span>
+					),
+				},
+				{
+					header: "Amount",
+					key: "amount",
+					render: (item: any) => (
+						<span className="font-black text-gray-900">
+							₹{item.amount.toLocaleString()}
+						</span>
+					),
+				},
+				{
+					header: "Status",
+					key: "status",
+					render: (item: any) => (
+						<span className="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-md text-[10px] font-black uppercase">
+							{item.status}
+						</span>
+					),
+				},
+				{
+					header: "Date",
+					key: "date",
+					render: (item: any) => (
+						<span className="text-sm font-medium text-gray-500">
+							{new Date(item.date).toLocaleDateString()}
+						</span>
+					),
+				},
 			],
 		},
 		expiring: {
@@ -66,10 +137,28 @@ export default function SuperAdminReports() {
 			queryKey: ["report-expiring", page, limit],
 			queryFn: () => companyService.getExpiringSoonReport(page, limit),
 			columns: [
-				{ header: "Company", key: "companyName", render: (item: any) => <span className="font-bold text-gray-900">{item.companyName}</span> },
-				{ header: "Expiry Date", key: "endDate", render: (item: any) => <span className="text-sm font-bold text-rose-600">{new Date(item.endDate).toLocaleDateString()}</span> },
+				{
+					header: "Company",
+					key: "companyName",
+					render: (item: any) => (
+						<span className="font-bold text-gray-900">{item.companyName}</span>
+					),
+				},
+				{
+					header: "Expiry Date",
+					key: "endDate",
+					render: (item: any) => (
+						<span className="text-sm font-bold text-rose-600">
+							{new Date(item.endDate).toLocaleDateString()}
+						</span>
+					),
+				},
 				{ header: "Plan", key: "plan" },
-				{ header: "Auto-Renew", key: "autoRenew", render: (item: any) => <span>{item.autoRenew ? "Yes" : "No"}</span> },
+				{
+					header: "Auto-Renew",
+					key: "autoRenew",
+					render: (item: any) => <span>{item.autoRenew ? "Yes" : "No"}</span>,
+				},
 			],
 		},
 		trials: {
@@ -78,16 +167,41 @@ export default function SuperAdminReports() {
 			queryKey: ["report-trials", page, limit],
 			queryFn: () => companyService.getTrialReport(page, limit),
 			columns: [
-				{ header: "Company", key: "companyName", render: (item: any) => <span className="font-bold text-gray-900">{item.companyName}</span> },
-				{ header: "Projects", key: "projectCount", render: (item: any) => (
-                    <div className="flex items-center gap-2">
-                        <span className="font-bold text-gray-900">{item.projectCount} / {item.projectLimit}</span>
-                        <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-indigo-500" style={{width: `${(item.projectCount / item.projectLimit) * 100}%`}} />
-                        </div>
-                    </div>
-                )},
-				{ header: "Joined Date", key: "createdAt", render: (item: any) => <span className="text-sm text-gray-500">{new Date(item.createdAt).toLocaleDateString()}</span> },
+				{
+					header: "Company",
+					key: "companyName",
+					render: (item: any) => (
+						<span className="font-bold text-gray-900">{item.companyName}</span>
+					),
+				},
+				{
+					header: "Projects",
+					key: "projectCount",
+					render: (item: any) => (
+						<div className="flex items-center gap-2">
+							<span className="font-bold text-gray-900">
+								{item.projectCount} / {item.projectLimit}
+							</span>
+							<div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+								<div
+									className="h-full bg-indigo-500"
+									style={{
+										width: `${(item.projectCount / item.projectLimit) * 100}%`,
+									}}
+								/>
+							</div>
+						</div>
+					),
+				},
+				{
+					header: "Joined Date",
+					key: "createdAt",
+					render: (item: any) => (
+						<span className="text-sm text-gray-500">
+							{new Date(item.createdAt).toLocaleDateString()}
+						</span>
+					),
+				},
 			],
 		},
 	};
@@ -108,8 +222,12 @@ export default function SuperAdminReports() {
 		<div className="space-y-8">
 			{/* Header */}
 			<div className="flex flex-col gap-2">
-				<h1 className="text-3xl font-bold tracking-tight text-gray-900">Platform Reports</h1>
-				<p className="text-gray-500 font-medium">Exportable data and detailed logs for all platform activities.</p>
+				<h1 className="text-3xl font-bold tracking-tight text-gray-900">
+					Platform Reports
+				</h1>
+				<p className="text-gray-500 font-medium">
+					Exportable data and detailed logs for all platform activities.
+				</p>
 			</div>
 
 			{/* Tabs Navigation */}

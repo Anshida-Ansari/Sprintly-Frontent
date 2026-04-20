@@ -22,8 +22,8 @@ import {
 } from "../hooks/useSprints.tsx";
 import type { ISprint, SprintStatus } from "../types/types.tsx";
 import DeleteConfirmationModal from "./delete-confirmation-modal.tsx";
-import SprintModal from "./sprint.modal.tsx";
 import { SprintBurndownModal } from "./sprint.burndown.modal";
+import SprintModal from "./sprint.modal.tsx";
 
 interface SprintRowProps {
 	sprint: ISprint;
@@ -36,17 +36,31 @@ interface SprintRowProps {
 	isReadOnly?: boolean;
 }
 
-function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, onViewBurndown, isProcessing }: SprintRowProps) {
+function SprintRow({
+	sprint,
+	onEdit,
+	onDelete,
+	onStart,
+	onComplete,
+	onViewBurndown,
+	isProcessing,
+}: SprintRowProps) {
 	const isActive = sprint.status === "ACTIVE";
 	const isCompleted = sprint.status === "COMPLETED";
 
 	return (
-		<div className={`group grid grid-cols-12 gap-4 px-4 py-4 items-center border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-default ${isActive ? "bg-gray-50/50" : ""}`}>
+		<div
+			className={`group grid grid-cols-12 gap-4 px-4 py-4 items-center border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-default ${isActive ? "bg-gray-50/50" : ""}`}
+		>
 			{/* Name & Identifier */}
 			<div className="col-span-5 flex items-center gap-3 min-w-0">
-				<div className={`w-3 h-3 rounded-full shrink-0 ${isActive ? "bg-black shadow-[0_0_0_2px_rgba(0,0,0,0.1)] ring-2 ring-white" : isCompleted ? "bg-emerald-600" : "bg-gray-300"}`} />
+				<div
+					className={`w-3 h-3 rounded-full shrink-0 ${isActive ? "bg-black shadow-[0_0_0_2px_rgba(0,0,0,0.1)] ring-2 ring-white" : isCompleted ? "bg-emerald-600" : "bg-gray-300"}`}
+				/>
 				<div className="flex flex-col min-w-0">
-					<span className={`text-sm font-bold truncate ${isActive ? "text-black" : "text-gray-700"}`}>
+					<span
+						className={`text-sm font-bold truncate ${isActive ? "text-black" : "text-gray-700"}`}
+					>
 						{sprint.name}
 					</span>
 					{sprint.goal && (
@@ -59,13 +73,20 @@ function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, onViewBurndo
 
 			{/* Status Badge - Bold */}
 			<div className="col-span-2 flex items-center">
-				<span className={`text-[11px] font-black uppercase tracking-wider px-2 py-1 rounded-md ${isActive
-					? "bg-black text-white"
-					: isCompleted
-						? "bg-emerald-100 text-emerald-800"
-						: "bg-gray-100 text-gray-600"
-					}`}>
-					{sprint.status === "ACTIVE" ? "Current" : sprint.status === "COMPLETED" ? "Done" : "Planned"}
+				<span
+					className={`text-[11px] font-black uppercase tracking-wider px-2 py-1 rounded-md ${
+						isActive
+							? "bg-black text-white"
+							: isCompleted
+								? "bg-emerald-100 text-emerald-800"
+								: "bg-gray-100 text-gray-600"
+					}`}
+				>
+					{sprint.status === "ACTIVE"
+						? "Current"
+						: sprint.status === "COMPLETED"
+							? "Done"
+							: "Planned"}
 				</span>
 			</div>
 
@@ -73,26 +94,38 @@ function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, onViewBurndo
 			<div className="col-span-3 text-xs text-gray-900 font-bold tracking-tight flex items-center gap-2">
 				<Calendar size={14} className="text-gray-400 stroke-[2.5]" />
 				<span>
-					{new Date(sprint.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+					{new Date(sprint.startDate).toLocaleDateString(undefined, {
+						month: "short",
+						day: "numeric",
+					})}
 					<span className="mx-1.5 text-gray-300">/</span>
-					{new Date(sprint.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+					{new Date(sprint.endDate).toLocaleDateString(undefined, {
+						month: "short",
+						day: "numeric",
+					})}
 				</span>
 			</div>
 
 			{/* Actions - Always show Burndown, others on hover */}
 			<div className="col-span-2 flex items-center justify-end gap-1">
 				<button
-					onClick={(e) => { e.stopPropagation(); onViewBurndown(sprint); }}
+					onClick={(e) => {
+						e.stopPropagation();
+						onViewBurndown(sprint);
+					}}
 					className="p-2 text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-all"
 					title="View Burndown"
 				>
 					<TrendingDown size={16} strokeWidth={2.5} />
 				</button>
-				
+
 				<div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
 					{sprint.status === "PLANNED" && (
 						<button
-							onClick={(e) => { e.stopPropagation(); onStart(sprint._id); }}
+							onClick={(e) => {
+								e.stopPropagation();
+								onStart(sprint._id);
+							}}
 							disabled={isProcessing}
 							className="p-2 text-gray-500 hover:text-black hover:bg-gray-200 rounded-lg transition-all"
 							title="Start Sprint"
@@ -102,7 +135,10 @@ function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, onViewBurndo
 					)}
 					{isActive && (
 						<button
-							onClick={(e) => { e.stopPropagation(); onComplete(sprint._id); }}
+							onClick={(e) => {
+								e.stopPropagation();
+								onComplete(sprint._id);
+							}}
 							disabled={isProcessing}
 							className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
 							title="Complete Sprint"
@@ -112,7 +148,10 @@ function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, onViewBurndo
 					)}
 
 					<button
-						onClick={(e) => { e.stopPropagation(); onEdit(sprint); }}
+						onClick={(e) => {
+							e.stopPropagation();
+							onEdit(sprint);
+						}}
 						className="p-2 text-gray-500 hover:text-black hover:bg-gray-200 rounded-lg transition-all"
 						title="Edit"
 					>
@@ -121,7 +160,10 @@ function SprintRow({ sprint, onEdit, onDelete, onStart, onComplete, onViewBurndo
 
 					{(sprint.status === "PLANNED" || sprint.status === "COMPLETED") && (
 						<button
-							onClick={(e) => { e.stopPropagation(); onDelete(sprint._id); }}
+							onClick={(e) => {
+								e.stopPropagation();
+								onDelete(sprint._id);
+							}}
 							className="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
 							title="Delete"
 						>
@@ -221,9 +263,6 @@ export default function SprintList({
 		}
 	};
 
-
-
-
 	return (
 		<div className="space-y-8">
 			{/* Action Bar */}
@@ -290,8 +329,12 @@ export default function SprintList({
 						<div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gray-50 mb-3">
 							<Layers size={20} className="text-gray-400" />
 						</div>
-						<h3 className="text-sm font-medium text-gray-900">No sprints found</h3>
-						<p className="text-xs text-gray-500 mt-1 mb-4">Get started by planning your first sprint.</p>
+						<h3 className="text-sm font-medium text-gray-900">
+							No sprints found
+						</h3>
+						<p className="text-xs text-gray-500 mt-1 mb-4">
+							Get started by planning your first sprint.
+						</p>
 						{!isReadOnly && (
 							<button
 								onClick={handleOpenCreate}
@@ -312,14 +355,18 @@ export default function SprintList({
 								onStart={(id) => startMutation.mutate(id)}
 								onComplete={(id) => completeMutation.mutate(id)}
 								onViewBurndown={handleOpenBurndown}
-								isProcessing={startMutation.isPending || completeMutation.isPending || deleteMutation.isPending}
+								isProcessing={
+									startMutation.isPending ||
+									completeMutation.isPending ||
+									deleteMutation.isPending
+								}
 							/>
 						))}
 					</div>
 				)}
 			</div>
 
-			<SprintBurndownModal 
+			<SprintBurndownModal
 				isOpen={isBurndownModalOpen}
 				onClose={() => setIsBurndownModalOpen(false)}
 				sprint={burndownSprint}

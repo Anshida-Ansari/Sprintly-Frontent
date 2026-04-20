@@ -1,9 +1,9 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { CalendarIcon, GripVertical } from "lucide-react";
-import { UserAuth } from "../../auth/store/store";
 import { AttachmentButton } from "../../../shared/components/attachment-button";
 import { SecureAttachmentLink } from "../../../shared/components/secure-attachment-link";
+import { UserAuth } from "../../auth/store/store";
 
 interface SubTask {
 	_id: string;
@@ -32,7 +32,11 @@ interface TaskCardProps {
 	onSubtaskTimeUpdate?: (subtaskId: string, actualHours: number) => void;
 }
 
-export function TaskCard({ task, onSubtaskUpdate, onSubtaskTimeUpdate }: TaskCardProps) {
+export function TaskCard({
+	task,
+	onSubtaskUpdate,
+	onSubtaskTimeUpdate,
+}: TaskCardProps) {
 	const user = UserAuth((state) => state.user);
 
 	const { attributes, listeners, setNodeRef, transform, transition } =
@@ -105,7 +109,11 @@ export function TaskCard({ task, onSubtaskUpdate, onSubtaskTimeUpdate }: TaskCar
 				</p>
 				{task.subtasks && task.subtasks.length > 0 ? (
 					task.subtasks.map((subtask) => {
-						const isAssignedToMe = subtask.assignedTo === myId || (Array.isArray(task.assignedTo) ? task.assignedTo.includes(myId || "") : task.assignedTo === myId);
+						const isAssignedToMe =
+							subtask.assignedTo === myId ||
+							(Array.isArray(task.assignedTo)
+								? task.assignedTo.includes(myId || "")
+								: task.assignedTo === myId);
 
 						return (
 							<div
@@ -119,7 +127,10 @@ export function TaskCard({ task, onSubtaskUpdate, onSubtaskTimeUpdate }: TaskCar
 
 									<div className="flex items-center gap-2">
 										{subtask.estimatedHours !== undefined && (
-											<span className="text-[9px] text-gray-400 font-mono bg-white/5 px-1.5 py-0.5 rounded border border-white/10" title="Estimated Hours">
+											<span
+												className="text-[9px] text-gray-400 font-mono bg-white/5 px-1.5 py-0.5 rounded border border-white/10"
+												title="Estimated Hours"
+											>
 												E: {subtask.estimatedHours}h
 											</span>
 										)}
@@ -164,7 +175,10 @@ export function TaskCard({ task, onSubtaskUpdate, onSubtaskTimeUpdate }: TaskCar
 										) : (
 											<>
 												{subtask.actualHours !== undefined && (
-													<span className="text-[9px] text-indigo-300 font-mono bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20" title="Actual Hours">
+													<span
+														className="text-[9px] text-indigo-300 font-mono bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20"
+														title="Actual Hours"
+													>
 														A: {subtask.actualHours}h
 													</span>
 												)}
@@ -174,22 +188,26 @@ export function TaskCard({ task, onSubtaskUpdate, onSubtaskTimeUpdate }: TaskCar
 											</>
 										)}
 										{/* Upload Button */}
-										<AttachmentButton subtaskId={subtask._id} userStoryId={task.id} variant="icon" />
+										<AttachmentButton
+											subtaskId={subtask._id}
+											userStoryId={task.id}
+											variant="icon"
+										/>
 									</div>
 								</div>
-                                
-                                {/* Render Attachment Links using Secure Links */}
-                                {subtask.attachments && subtask.attachments.length > 0 && (
-                                    <div className="flex flex-wrap gap-1.5 mt-2 overflow-x-auto pb-1 hide-scrollbar">
-                                        {subtask.attachments.map((att, idx) => (
-                                            <SecureAttachmentLink 
-                                                key={idx} 
-                                                fileUrl={att.fileUrl} 
-                                                fileName={att.fileName} 
-                                            />
-                                        ))}
-                                    </div>
-                                )}
+
+								{/* Render Attachment Links using Secure Links */}
+								{subtask.attachments && subtask.attachments.length > 0 && (
+									<div className="flex flex-wrap gap-1.5 mt-2 overflow-x-auto pb-1 hide-scrollbar">
+										{subtask.attachments.map((att, idx) => (
+											<SecureAttachmentLink
+												key={idx}
+												fileUrl={att.fileUrl}
+												fileName={att.fileName}
+											/>
+										))}
+									</div>
+								)}
 							</div>
 						);
 					})

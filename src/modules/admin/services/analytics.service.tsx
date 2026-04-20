@@ -7,16 +7,28 @@ export interface BurndownResponse {
 	actual: number[];
 }
 
-export const getSprintBurndown = async (sprintId: string, type: "hours" | "points" = "hours"): Promise<BurndownResponse> => {
-	const response = await api.get(API_ENDPOINTS.ADMIN.ANALYTICS.SPRINT_BURNDOWN(sprintId), {
-		params: { type }
-	});
+export const getSprintBurndown = async (
+	sprintId: string,
+	type: "hours" | "points" = "hours",
+): Promise<BurndownResponse> => {
+	const response = await api.get(
+		API_ENDPOINTS.ADMIN.ANALYTICS.SPRINT_BURNDOWN(sprintId),
+		{
+			params: { type },
+		},
+	);
 	return response.data.data;
 };
 
-export const getUserBurndown = async (sprintId: string, type: "hours" | "points" = "hours"): Promise<BurndownResponse> => {
-	const response = await api.get(API_ENDPOINTS.ADMIN.ANALYTICS.USER_BURNDOWN(sprintId), {
-		params: { type }
-	});
+export const getUserBurndown = async (
+	sprintId: string,
+	type: "hours" | "points" = "hours",
+): Promise<BurndownResponse> => {
+	const response = await api.get(
+		API_ENDPOINTS.ADMIN.ANALYTICS.USER_BURNDOWN(sprintId),
+		{
+			params: { type },
+		},
+	);
 	return response.data.data;
 };

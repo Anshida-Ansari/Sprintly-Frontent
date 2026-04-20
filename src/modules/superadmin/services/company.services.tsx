@@ -8,13 +8,18 @@ export const companyService = {
 		return res.data;
 	},
 	async UpdateStatus(companyId: string, status: "approved" | "rejected") {
-		const res = await api.patch(API_ENDPOINTS.SUPERADMIN.COMPANY_STATUS(companyId), {
-			status,
-		});
+		const res = await api.patch(
+			API_ENDPOINTS.SUPERADMIN.COMPANY_STATUS(companyId),
+			{
+				status,
+			},
+		);
 		return res.data;
 	},
 	async getCompanyDetails(companyId: string) {
-		const res = await api.get(API_ENDPOINTS.SUPERADMIN.COMPANY_DETAIL(companyId));
+		const res = await api.get(
+			API_ENDPOINTS.SUPERADMIN.COMPANY_DETAIL(companyId),
+		);
 		return res.data;
 	},
 	async getDashboardStats() {
@@ -30,7 +35,9 @@ export const companyService = {
 		return res.data;
 	},
 	async getSubscriptionMetrics() {
-		const res = await api.get(API_ENDPOINTS.SUPERADMIN.SUBSCRIPTION_DISTRIBUTION);
+		const res = await api.get(
+			API_ENDPOINTS.SUPERADMIN.SUBSCRIPTION_DISTRIBUTION,
+		);
 		return res.data;
 	},
 	async getTopCompanies() {
@@ -38,19 +45,27 @@ export const companyService = {
 		return res.data;
 	},
 	async getSubscriptionReport(page: number, limit: number) {
-		const res = await api.get(API_ENDPOINTS.SUPERADMIN.SUBSCRIPTION_REPORTS, { params: { page, limit } });
+		const res = await api.get(API_ENDPOINTS.SUPERADMIN.SUBSCRIPTION_REPORTS, {
+			params: { page, limit },
+		});
 		return res.data;
 	},
 	async getPaymentReport(page: number, limit: number) {
-		const res = await api.get(API_ENDPOINTS.SUPERADMIN.PAYMENT_REPORTS, { params: { page, limit } });
+		const res = await api.get(API_ENDPOINTS.SUPERADMIN.PAYMENT_REPORTS, {
+			params: { page, limit },
+		});
 		return res.data;
 	},
 	async getExpiringSoonReport(page: number, limit: number) {
-		const res = await api.get(API_ENDPOINTS.SUPERADMIN.EXPIRING_REPORTS, { params: { page, limit } });
+		const res = await api.get(API_ENDPOINTS.SUPERADMIN.EXPIRING_REPORTS, {
+			params: { page, limit },
+		});
 		return res.data;
 	},
 	async getTrialReport(page: number, limit: number) {
-		const res = await api.get(API_ENDPOINTS.SUPERADMIN.TRIAL_REPORTS, { params: { page, limit } });
+		const res = await api.get(API_ENDPOINTS.SUPERADMIN.TRIAL_REPORTS, {
+			params: { page, limit },
+		});
 		return res.data;
 	},
 	async getPlatformAnalytics() {

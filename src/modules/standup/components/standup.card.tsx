@@ -1,19 +1,12 @@
 import { format } from "date-fns";
-import {
-	AlertCircle,
-	CheckCircle2,
-	Clock,
-} from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock } from "lucide-react";
 import type { Standup } from "../types/standup.types";
 
 interface StandupCardProps {
 	standup: Standup;
 }
 
-export const StandupCard = ({
-	standup,
-}: StandupCardProps) => {
-
+export const StandupCard = ({ standup }: StandupCardProps) => {
 	return (
 		<div className="bg-white rounded-[1.5rem] border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 overflow-hidden group">
 			<div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-gray-50">
@@ -69,17 +62,19 @@ export const StandupCard = ({
 								<AlertCircle size={10} />
 								Blockers
 							</h5>
-							<p className={`text-[13px] leading-relaxed line-clamp-3 group-hover/section:line-clamp-none transition-all ${
-								standup.blockers ? 'text-rose-600 font-bold' : 'text-gray-300 font-medium italic'
-							}`}>
+							<p
+								className={`text-[13px] leading-relaxed line-clamp-3 group-hover/section:line-clamp-none transition-all ${
+									standup.blockers
+										? "text-rose-600 font-bold"
+										: "text-gray-300 font-medium italic"
+								}`}
+							>
 								{standup.blockers || "No blockers"}
 							</p>
 						</div>
 					</div>
-
 				</div>
 			</div>
 		</div>
 	);
 };
-

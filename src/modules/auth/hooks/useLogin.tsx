@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { buildPath, ROUTES } from "../../../constants/routes";
 import { authService } from "../services/auth.services";
 import { UserAuth } from "../store/store";
 import type { LoginRequest } from "../types/types";
-import { buildPath, ROUTES } from "../../../constants/routes";
 
 export function useLogin() {
 	const navigate = useNavigate();
@@ -26,10 +26,14 @@ export function useLogin() {
 					navigate(buildPath.admin(ROUTES.ADMIN.DASHBOARD), { replace: true });
 					break;
 				case "superadmin":
-					navigate(buildPath.superadmin(ROUTES.SUPERADMIN.DASHBOARD), { replace: true });
+					navigate(buildPath.superadmin(ROUTES.SUPERADMIN.DASHBOARD), {
+						replace: true,
+					});
 					break;
 				case "developers":
-					navigate(buildPath.developer(ROUTES.DEVELOPER.DASHBOARD), { replace: true });
+					navigate(buildPath.developer(ROUTES.DEVELOPER.DASHBOARD), {
+						replace: true,
+					});
 					break;
 				default:
 					navigate(ROUTES.PUBLIC.ROOT, { replace: true });

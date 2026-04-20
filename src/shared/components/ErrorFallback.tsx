@@ -5,7 +5,10 @@ interface ErrorFallbackProps {
 	resetErrorBoundary: () => void;
 }
 
-export const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
+export const ErrorFallback = ({
+	error,
+	resetErrorBoundary,
+}: ErrorFallbackProps) => {
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-[#FDFDFF] p-6 font-sans">
 			<div className="max-w-md w-full bg-white border border-gray-100 rounded-[2.5rem] p-12 text-center shadow-[0_20px_50px_rgba(79,70,229,0.08)] relative overflow-hidden">
@@ -21,9 +24,10 @@ export const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps)
 					<h1 className="text-2xl font-bold mb-3 tracking-tight text-gray-900">
 						Oops! Something happened
 					</h1>
-					
+
 					<p className="text-gray-500 mb-8 leading-relaxed text-[15px]">
-						We've encountered an unexpected error. Our team has been notified. You can try to reload or head back.
+						We've encountered an unexpected error. Our team has been notified.
+						You can try to reload or head back.
 					</p>
 
 					{/* Error Detail (Optional/Debug) */}
@@ -45,7 +49,9 @@ export const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps)
 							Try to Refresh
 						</button>
 						<button
-							onClick={() => (window.location.href = "/")}
+							onClick={() => {
+								window.location.href = "/";
+							}}
 							type="button"
 							className="flex items-center justify-center gap-2 bg-white text-gray-600 font-semibold py-4 px-8 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all duration-300 active:scale-[0.98]"
 						>

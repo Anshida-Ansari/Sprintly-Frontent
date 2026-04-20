@@ -70,11 +70,11 @@ export default function UserStoryList({
 				setSelectedDetailStory(updatedStory);
 			}
 		}
-	}, [userStoriesRes, selectedDetailStory?.id]);
+	}, [userStoriesRes, selectedDetailStory?.id, selectedDetailStory]);
 
 	useEffect(() => {
 		setPage(1);
-	}, [debouncedSearch, statusFilter]);
+	}, []);
 
 	const { mutate: createStory, isPending: isCreating } = useCreateUserStory();
 	const { mutate: updateStory, isPending: isUpdating } = useUpdateUserStory();
@@ -238,7 +238,8 @@ export default function UserStoryList({
 													{(() => {
 														const member = members.find(
 															(m) =>
-																m.id === story.assignedTo || m._id === story.assignedTo,
+																m.id === story.assignedTo ||
+																m._id === story.assignedTo,
 														);
 														return member ? (
 															<img
@@ -279,7 +280,9 @@ export default function UserStoryList({
 						<div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
 							<Search className="text-gray-300" size={20} />
 						</div>
-						<h4 className="text-gray-900 font-medium text-sm mb-1">No issues found</h4>
+						<h4 className="text-gray-900 font-medium text-sm mb-1">
+							No issues found
+						</h4>
 						{!isReadOnly && (
 							<button
 								onClick={handleOpenCreateModal}
@@ -293,31 +296,29 @@ export default function UserStoryList({
 			</div>
 
 			{/* Pagination Controls */}
-			{
-				totalPages > 1 && (
-					<div className="flex items-center justify-between px-2">
-						<p className="text-xs text-gray-500 font-medium">
-							Showing page {page} of {totalPages}
-						</p>
-						<div className="flex items-center gap-2">
-							<button
-								onClick={() => setPage((p) => Math.max(1, p - 1))}
-								disabled={page === 1}
-								className="p-1.5 text-gray-500 hover:text-indigo-600 disabled:opacity-30 disabled:hover:text-gray-500"
-							>
-								<ChevronLeft size={16} />
-							</button>
-							<button
-								onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-								disabled={page === totalPages}
-								className="p-1.5 text-gray-500 hover:text-indigo-600 disabled:opacity-30 disabled:hover:text-gray-500"
-							>
-								<ChevronRight size={16} />
-							</button>
-						</div>
+			{totalPages > 1 && (
+				<div className="flex items-center justify-between px-2">
+					<p className="text-xs text-gray-500 font-medium">
+						Showing page {page} of {totalPages}
+					</p>
+					<div className="flex items-center gap-2">
+						<button
+							onClick={() => setPage((p) => Math.max(1, p - 1))}
+							disabled={page === 1}
+							className="p-1.5 text-gray-500 hover:text-indigo-600 disabled:opacity-30 disabled:hover:text-gray-500"
+						>
+							<ChevronLeft size={16} />
+						</button>
+						<button
+							onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+							disabled={page === totalPages}
+							className="p-1.5 text-gray-500 hover:text-indigo-600 disabled:opacity-30 disabled:hover:text-gray-500"
+						>
+							<ChevronRight size={16} />
+						</button>
 					</div>
-				)
-			}
+				</div>
+			)}
 
 			<UserStoryModal
 				isOpen={isModalOpen}
@@ -327,15 +328,13 @@ export default function UserStoryList({
 				isLoading={isCreating || isUpdating}
 			/>
 
-			{
-				selectedDetailStory && (
-					<UserStoryDetailModal
-						isOpen={isDetailModalOpen}
-						onClose={() => setIsDetailModalOpen(false)}
-						story={selectedDetailStory}
-					/>
-				)
-			}
-		</div >
+			{selectedDetailStory && (
+				<UserStoryDetailModal
+					isOpen={isDetailModalOpen}
+					onClose={() => setIsDetailModalOpen(false)}
+					story={selectedDetailStory}
+				/>
+			)}
+		</div>
 	);
 }

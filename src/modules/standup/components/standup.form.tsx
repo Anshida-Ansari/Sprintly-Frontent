@@ -1,7 +1,14 @@
+import {
+	AlertCircle,
+	CheckCircle2,
+	Clock,
+	Loader2,
+	Send,
+	Sparkles,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSubmitStandup } from "../hooks/useSubmitStandup";
 import { useTodayStandup } from "../hooks/useTodayStandup";
-import { CheckCircle2, Clock, AlertCircle, Send, Loader2, Sparkles } from "lucide-react";
 
 interface StandupFormProps {
 	projectId: string;
@@ -40,7 +47,9 @@ export const StandupForm = ({
 		return (
 			<div className="flex flex-col items-center justify-center py-8 gap-3">
 				<Loader2 className="w-6 h-6 animate-spin text-indigo-600 opacity-30" />
-				<p className="text-gray-400 font-bold text-[10px] uppercase tracking-widest animate-pulse">Syncing draft...</p>
+				<p className="text-gray-400 font-bold text-[10px] uppercase tracking-widest animate-pulse">
+					Syncing draft...
+				</p>
 			</div>
 		);
 	}
@@ -93,31 +102,33 @@ export const StandupForm = ({
 
 			<div className="pt-4 flex items-center justify-between gap-4 border-t border-gray-50 mt-2">
 				<div className="flex items-center gap-2">
-                    <Sparkles size={10} className="text-indigo-400 animate-pulse" />
-                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Active Sync</span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                    {onClose && (
-                        <button
-                            onClick={onClose}
-                            className="px-4 py-2 text-gray-400 font-bold text-[11px] hover:text-gray-900 transition-colors"
-                        >
-                            Cancel
-                        </button>
-                    )}
-                    <button
-                        onClick={() => {
-                            handleSubmit();
-                            if (onClose && !isPending) setTimeout(onClose, 800);
-                        }}
-                        disabled={isPending || !yesterday.trim() || !today.trim()}
-                        className="group flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg text-xs hover:bg-indigo-700 transition-all shadow-sm active:scale-95 disabled:opacity-20"
-                    >
-                        {isPending ? "Syncing..." : todayStandup ? "Update" : "Publish"}
-                        {!isPending && <Send size={14} />}
-                    </button>
-                </div>
+					<Sparkles size={10} className="text-indigo-400 animate-pulse" />
+					<span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+						Active Sync
+					</span>
+				</div>
+
+				<div className="flex items-center gap-2">
+					{onClose && (
+						<button
+							onClick={onClose}
+							className="px-4 py-2 text-gray-400 font-bold text-[11px] hover:text-gray-900 transition-colors"
+						>
+							Cancel
+						</button>
+					)}
+					<button
+						onClick={() => {
+							handleSubmit();
+							if (onClose && !isPending) setTimeout(onClose, 800);
+						}}
+						disabled={isPending || !yesterday.trim() || !today.trim()}
+						className="group flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg text-xs hover:bg-indigo-700 transition-all shadow-sm active:scale-95 disabled:opacity-20"
+					>
+						{isPending ? "Syncing..." : todayStandup ? "Update" : "Publish"}
+						{!isPending && <Send size={14} />}
+					</button>
+				</div>
 			</div>
 		</div>
 	);

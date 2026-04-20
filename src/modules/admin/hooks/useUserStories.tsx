@@ -101,11 +101,7 @@ export const useAssignUserStoryToMember = () => {
 			projectId: string;
 			userStoryId: string;
 			developerId: string;
-		}) =>
-			userStoryService.assignUserStoryToMember(
-				userStoryId,
-				developerId,
-			),
+		}) => userStoryService.assignUserStoryToMember(userStoryId, developerId),
 		onSuccess: (res: any) => {
 			queryClient.invalidateQueries({ queryKey: ["user-stories"] });
 			toast.success(res.message || "Member assigned successfully");
@@ -126,9 +122,7 @@ export const useAddComment = (userStoryId: string) => {
 			queryClient.invalidateQueries({ queryKey: ["my-user-stories"] });
 		},
 		onError: (error: any) => {
-			toast.error(
-				error.response?.data?.message || "Failed to post comment",
-			);
+			toast.error(error.response?.data?.message || "Failed to post comment");
 		},
 	});
 };

@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { UserAuth } from "../modules/auth/store/store";
 import { useGetMe } from "../modules/auth/hooks/useGetMe";
+import { UserAuth } from "../modules/auth/store/store";
 import { AiChatbot } from "../shared/components/AiChatbot";
 
 export default function ProtectedRoutes() {

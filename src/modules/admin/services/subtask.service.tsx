@@ -27,7 +27,7 @@ export const subtaskService = {
 	async getSubtasks(userStoryId: string): Promise<GetSubtasksResponse> {
 		const res = await api.get(API_ENDPOINTS.ADMIN.SUBTASK.LIST(userStoryId));
 
-		if (res.data && res.data.data) {
+		if (res.data?.data) {
 			res.data.data = res.data.data.map(mapSubtask);
 		}
 
@@ -35,17 +35,29 @@ export const subtaskService = {
 	},
 
 	async createSubtask(userStoryId: string, payload: CreateSubtaskPayload) {
-		const res = await api.post(API_ENDPOINTS.ADMIN.SUBTASK.CREATE(userStoryId), payload);
+		const res = await api.post(
+			API_ENDPOINTS.ADMIN.SUBTASK.CREATE(userStoryId),
+			payload,
+		);
 		return res.data;
 	},
 
 	async updateSubtaskStatus(subtaskId: string, status: SubtaskStatus) {
-		const res = await api.patch(API_ENDPOINTS.ADMIN.SUBTASK.UPDATE_STATUS(subtaskId), { status });
+		const res = await api.patch(
+			API_ENDPOINTS.ADMIN.SUBTASK.UPDATE_STATUS(subtaskId),
+			{ status },
+		);
 		return res.data;
 	},
 
-	async updateSubtaskTime(subtaskId: string, payload: { estimatedHours?: number; actualHours?: number }) {
-		const res = await api.patch(API_ENDPOINTS.ADMIN.SUBTASK.UPDATE_TIME(subtaskId), payload);
+	async updateSubtaskTime(
+		subtaskId: string,
+		payload: { estimatedHours?: number; actualHours?: number },
+	) {
+		const res = await api.patch(
+			API_ENDPOINTS.ADMIN.SUBTASK.UPDATE_TIME(subtaskId),
+			payload,
+		);
 		return res.data;
 	},
 
@@ -63,7 +75,10 @@ export const subtaskService = {
 	},
 
 	async addSubtaskComment(subtaskId: string, payload: { message: string }) {
-		const res = await api.post(API_ENDPOINTS.ADMIN.SUBTASK.ADD_COMMENT(subtaskId), payload);
+		const res = await api.post(
+			API_ENDPOINTS.ADMIN.SUBTASK.ADD_COMMENT(subtaskId),
+			payload,
+		);
 		return res.data;
 	},
 
@@ -72,8 +87,14 @@ export const subtaskService = {
 		return res.data;
 	},
 
-	async addAttachment(subtaskId: string, payload: { fileUrl: string; fileName: string }) {
-		const res = await api.post(API_ENDPOINTS.ADMIN.SUBTASK.ADD_ATTACHMENT(subtaskId), payload);
+	async addAttachment(
+		subtaskId: string,
+		payload: { fileUrl: string; fileName: string },
+	) {
+		const res = await api.post(
+			API_ENDPOINTS.ADMIN.SUBTASK.ADD_ATTACHMENT(subtaskId),
+			payload,
+		);
 		return res.data;
 	},
 
@@ -82,5 +103,5 @@ export const subtaskService = {
 			params: { fileUrl },
 		});
 		return res.data;
-	}
+	},
 };

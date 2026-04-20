@@ -23,7 +23,10 @@ const mapSprint = (s: any) => ({
 
 export const sprintService = {
 	async createSprint(projectId: string, payload: CreateSprintPayload) {
-		const res = await api.post(API_ENDPOINTS.ADMIN.SPRINT.CREATE(projectId), payload);
+		const res = await api.post(
+			API_ENDPOINTS.ADMIN.SPRINT.CREATE(projectId),
+			payload,
+		);
 		return res.data;
 	},
 
@@ -46,7 +49,7 @@ export const sprintService = {
 			`${API_ENDPOINTS.ADMIN.SPRINT.LIST(projectId)}?${searchParams.toString()}`,
 		);
 
-		if (res.data && res.data.data) {
+		if (res.data?.data) {
 			res.data.data = res.data.data.map(mapSprint);
 		}
 

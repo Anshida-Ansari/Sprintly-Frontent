@@ -30,7 +30,9 @@ export const inviteMemberService = {
 		return res.data;
 	},
 	async verifyToken(token: string): Promise<VerifyInvitationResponse> {
-		const res = await api.post(API_ENDPOINTS.ADMIN.MEMBER.VERIFY_INVITATION, { token });
+		const res = await api.post(API_ENDPOINTS.ADMIN.MEMBER.VERIFY_INVITATION, {
+			token,
+		});
 		return res.data;
 	},
 	async setpassword(payload: SetPasswordPayload): Promise<SetPasswordResponse> {
@@ -51,16 +53,20 @@ export const inviteMemberService = {
 		params.append("limit", limit.toString());
 		if (search) params.append("search", search);
 
-		const res = await api.get(`${API_ENDPOINTS.ADMIN.MEMBER.LIST}?${params.toString()}`);
+		const res = await api.get(
+			`${API_ENDPOINTS.ADMIN.MEMBER.LIST}?${params.toString()}`,
+		);
 
-		if (res.data && res.data.data) {
+		if (res.data?.data) {
 			res.data.data = res.data.data.map(mapMember);
 		}
 
 		return res.data;
 	},
 	async blockUser(userId: string, status: "active" | "block") {
-		const res = await api.patch(API_ENDPOINTS.ADMIN.MEMBER.BLOCK(userId), { status });
+		const res = await api.patch(API_ENDPOINTS.ADMIN.MEMBER.BLOCK(userId), {
+			status,
+		});
 		return res.data;
 	},
 };

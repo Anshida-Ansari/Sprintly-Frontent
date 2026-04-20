@@ -1,9 +1,9 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Calendar, Layout, Loader2, Target, X } from "lucide-react";
 import { useEffect } from "react";
-import type { ISprint } from "../types/types.tsx";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { sprintSchema, type SprintFormData } from "../schemas/admin.schemas";
+import { type SprintFormData, sprintSchema } from "../schemas/admin.schemas";
+import type { ISprint } from "../types/types.tsx";
 
 interface SprintModalProps {
 	isOpen: boolean;
@@ -44,12 +44,15 @@ export default function SprintModal({
 		if (sprint) {
 			setValue("name", sprint.name);
 			setValue("goal", sprint.goal || "");
-			setValue("startDate", new Date(sprint.startDate).toISOString().split("T")[0]);
+			setValue(
+				"startDate",
+				new Date(sprint.startDate).toISOString().split("T")[0],
+			);
 			setValue("endDate", new Date(sprint.endDate).toISOString().split("T")[0]);
 		} else {
 			reset();
 		}
-	}, [sprint, isOpen, reset, setValue]);
+	}, [sprint, reset, setValue]);
 
 	if (!isOpen) return null;
 
@@ -84,7 +87,11 @@ export default function SprintModal({
 					</button>
 				</div>
 
-				<form onSubmit={handleSubmit(handleFormSubmit)} className="p-8 space-y-6" noValidate>
+				<form
+					onSubmit={handleSubmit(handleFormSubmit)}
+					className="p-8 space-y-6"
+					noValidate
+				>
 					{minDate && maxDate && (
 						<div className="p-3 bg-amber-50 border border-amber-100 rounded-xl flex items-start gap-2 text-xs font-bold text-amber-600">
 							<span className="mt-0.5">⚠️</span>
@@ -103,7 +110,7 @@ export default function SprintModal({
 						<input
 							{...register("name")}
 							placeholder="e.g. Sprint 1: Foundation"
-							className={`w-full px-5 py-4 bg-gray-50 border ${errors.name ? 'border-red-500' : 'border-transparent'} rounded-2xl focus:bg-white focus:border-${errors.name ? 'red' : 'indigo'}-500 focus:ring-4 focus:ring-${errors.name ? 'red' : 'indigo'}-500/10 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400`}
+							className={`w-full px-5 py-4 bg-gray-50 border ${errors.name ? "border-red-500" : "border-transparent"} rounded-2xl focus:bg-white focus:border-${errors.name ? "red" : "indigo"}-500 focus:ring-4 focus:ring-${errors.name ? "red" : "indigo"}-500/10 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400`}
 						/>
 						{errors.name && (
 							<p className="text-red-500 text-xs mt-1 font-medium">
@@ -119,7 +126,7 @@ export default function SprintModal({
 						<textarea
 							{...register("goal")}
 							placeholder="What do we want to achieve?"
-							className={`w-full px-5 py-4 bg-gray-50 border ${errors.goal ? 'border-red-500' : 'border-transparent'} rounded-2xl focus:bg-white focus:border-${errors.goal ? 'red' : 'indigo'}-500 focus:ring-4 focus:ring-${errors.goal ? 'red' : 'indigo'}-500/10 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400 min-h-[100px] resize-none`}
+							className={`w-full px-5 py-4 bg-gray-50 border ${errors.goal ? "border-red-500" : "border-transparent"} rounded-2xl focus:bg-white focus:border-${errors.goal ? "red" : "indigo"}-500 focus:ring-4 focus:ring-${errors.goal ? "red" : "indigo"}-500/10 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400 min-h-[100px] resize-none`}
 						/>
 						{errors.goal && (
 							<p className="text-red-500 text-xs mt-1 font-medium">
@@ -146,7 +153,7 @@ export default function SprintModal({
 										? new Date(maxDate).toISOString().split("T")[0]
 										: undefined
 								}
-								className={`w-full px-5 py-4 bg-gray-50 border ${errors.startDate ? 'border-red-500' : 'border-transparent'} rounded-2xl focus:bg-white focus:border-${errors.startDate ? 'red' : 'indigo'}-500 focus:ring-4 focus:ring-${errors.startDate ? 'red' : 'indigo'}-500/10 transition-all outline-none font-bold text-gray-900`}
+								className={`w-full px-5 py-4 bg-gray-50 border ${errors.startDate ? "border-red-500" : "border-transparent"} rounded-2xl focus:bg-white focus:border-${errors.startDate ? "red" : "indigo"}-500 focus:ring-4 focus:ring-${errors.startDate ? "red" : "indigo"}-500/10 transition-all outline-none font-bold text-gray-900`}
 							/>
 							{errors.startDate && (
 								<p className="text-red-500 text-xs mt-1 font-medium">
@@ -171,7 +178,7 @@ export default function SprintModal({
 										? new Date(maxDate).toISOString().split("T")[0]
 										: undefined
 								}
-								className={`w-full px-5 py-4 bg-gray-50 border ${errors.endDate ? 'border-red-500' : 'border-transparent'} rounded-2xl focus:bg-white focus:border-${errors.endDate ? 'red' : 'indigo'}-500 focus:ring-4 focus:ring-${errors.endDate ? 'red' : 'indigo'}-500/10 transition-all outline-none font-bold text-gray-900`}
+								className={`w-full px-5 py-4 bg-gray-50 border ${errors.endDate ? "border-red-500" : "border-transparent"} rounded-2xl focus:bg-white focus:border-${errors.endDate ? "red" : "indigo"}-500 focus:ring-4 focus:ring-${errors.endDate ? "red" : "indigo"}-500/10 transition-all outline-none font-bold text-gray-900`}
 							/>
 							{errors.endDate && (
 								<p className="text-red-500 text-xs mt-1 font-medium">
@@ -188,8 +195,10 @@ export default function SprintModal({
 					>
 						{isLoading ? (
 							<Loader2 className="animate-spin" size={24} />
+						) : sprint ? (
+							"Update Sprint"
 						) : (
-							<>{sprint ? "Update Sprint" : "Create Sprint"}</>
+							"Create Sprint"
 						)}
 					</button>
 				</form>

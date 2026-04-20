@@ -9,27 +9,21 @@ export const standupService = {
 		data: SubmitStandupPayload,
 	) => {
 		const base = API_ENDPOINTS.STANDUP.BASE(projectId, sprintId);
-		const res = await api.post(
-			API_ENDPOINTS.STANDUP.SUBMIT(base),
-			data,
-		);
+		const res = await api.post(API_ENDPOINTS.STANDUP.SUBMIT(base), data);
 		return res.data;
 	},
 
 	list: async (projectId: string, sprintId: string, date?: string) => {
 		const base = API_ENDPOINTS.STANDUP.BASE(projectId, sprintId);
-		const res = await api.get(
-			API_ENDPOINTS.STANDUP.LIST(base),
-			{ params: { date } }
-		);
+		const res = await api.get(API_ENDPOINTS.STANDUP.LIST(base), {
+			params: { date },
+		});
 		return res.data;
 	},
 
 	today: async (projectId: string, sprintId: string) => {
 		const base = API_ENDPOINTS.STANDUP.BASE(projectId, sprintId);
-		const res = await api.post(
-			API_ENDPOINTS.STANDUP.TODAY(base),
-		);
+		const res = await api.post(API_ENDPOINTS.STANDUP.TODAY(base));
 		return res.data;
 	},
 

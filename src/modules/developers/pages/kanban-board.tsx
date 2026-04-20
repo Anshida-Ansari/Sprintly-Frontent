@@ -1,28 +1,39 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+	AlertCircle,
 	CheckCircle2,
 	Clock,
-	Zap,
-	Kanban,
 	Flame,
-	AlertCircle,
-	TrendingUp,
-	TrendingDown,
+	Kanban,
 	MessageSquare,
+	TrendingDown,
+	TrendingUp,
 	X,
+	Zap,
 } from "lucide-react";
-import { useState, useMemo, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useProjects } from "../../admin/hooks/useProjects";
-import { useGetSubtasks, useUpdateSubtaskStatus, useAddSubtaskComment } from "../../admin/hooks/useSubtasks";
-import { useAddComment as useAddStoryComment } from "../../admin/hooks/useUserStories";
-import { useGetMembers } from "../../admin/hooks/useGetmembers";
-import { useGetSprints } from "../../admin/hooks/useSprints";
-import { userStoryService } from "../services/userstory.service";
-import type { IUserStory, SubtaskStatus, ISubtask } from "../../admin/types/types";
-import CommentSection from "../../admin/components/comment-section";
-import { UserAuth } from "../../auth/store/store";
+import { useEffect, useMemo, useState } from "react";
 import { AttachmentButton } from "../../../shared/components/attachment-button";
 import { SecureAttachmentLink } from "../../../shared/components/secure-attachment-link";
+import CommentSection from "../../admin/components/comment-section";
+import { useGetMembers } from "../../admin/hooks/useGetmembers";
+import { useProjects } from "../../admin/hooks/useProjects";
+import { useGetSprints } from "../../admin/hooks/useSprints";
+import {
+	useAddSubtaskComment,
+	useGetSubtasks,
+	useUpdateSubtaskStatus,
+} from "../../admin/hooks/useSubtasks";
+import { useAddComment as useAddStoryComment } from "../../admin/hooks/useUserStories";
+import type {
+	IMember,
+	IProject,
+	ISprint,
+	ISubtask,
+	IUserStory,
+	SubtaskStatus,
+} from "../../admin/types/types";
+import { UserAuth } from "../../auth/store/store";
+import { userStoryService } from "../services/userstory.service";
 
 export default function KanbanBoard() {
 	const [selectedProjectId, setSelectedProjectId] = useState<string>("");
@@ -33,16 +44,22 @@ export default function KanbanBoard() {
 		queryFn: () => userStoryService.getMyUserStories(),
 	});
 	const { data: membersRes } = useGetMembers({ page: 1, limit: 100 });
-	const { data: sprintsRes } = useGetSprints(selectedProjectId, { page: 1, limit: 100 });
+	const { data: sprintsRes } = useGetSprints(selectedProjectId, {
+		page: 1,
+		limit: 100,
+	});
 
-	const projects = projectsRes?.data || [];
-	const allStories = userStoriesRes?.data || [];
-	const members = membersRes?.data || [];
-	const sprints = sprintsRes?.data || [];
+	const projects = useMemo(() => projectsRes?.data || [], [projectsRes?.data]);
+	const allStories = useMemo(
+		() => userStoriesRes?.data || [],
+		[userStoriesRes?.data],
+	);
+	const members = useMemo(() => membersRes?.data || [], [membersRes?.data]);
+	const sprints = useMemo(() => sprintsRes?.data || [], [sprintsRes?.data]);
 
 	useEffect(() => {
 		if (sprints.length > 0) {
-			const activeSprint = sprints.find((s: any) => s.status === "ACTIVE");
+			const activeSprint = sprints.find((s: ISprint) => s.status === "ACTIVE");
 			if (activeSprint) {
 				setSelectedSprintId(activeSprint.id || (activeSprint as any)._id);
 			} else if (!selectedSprintId) {
@@ -53,34 +70,53 @@ export default function KanbanBoard() {
 		} else {
 			setSelectedSprintId("");
 		}
-	}, [sprints]);
+	}, [sprints, selectedSprintId]);
 
 	const sprintStatusMap = useMemo(() => {
 		const map: Record<string, string> = {};
-		sprints.forEach((s: any) => {
+		sprints.forEach((s: ISprint) => {
 			const id = s.id || s._id;
 			if (id) map[id] = s.status;
 		});
 		return map;
 	}, [sprints]);
 
-	const activeSprintStories = allStories.filter((s: IUserStory) => 
-		s.sprintId && 
-		(!selectedProjectId || s.projectId === selectedProjectId) &&
-		(!selectedSprintId || s.sprintId === selectedSprintId)
+	const activeSprintStories = allStories.filter(
+		(s: IUserStory) =>
+			s.sprintId &&
+			(!selectedProjectId || s.projectId === selectedProjectId) &&
+			(!selectedSprintId || s.sprintId === selectedSprintId),
 	);
 
 	// Build a userId → name map for resolving old comments and initials
 	const membersMap: Record<string, string> = {};
-	members.forEach((m: any) => {
+	members.forEach((m: IMember) => {
 		const id = m._id || m.id;
 		if (id && m.name) membersMap[id] = m.name;
 	});
 
 	const columns = [
-		{ id: "In pending", title: "To Do", icon: Clock, color: "gray", status: "In pending" as SubtaskStatus },
-		{ id: "In progress", title: "In Progress", icon: Zap, color: "indigo", status: "In progress" as SubtaskStatus },
-		{ id: "Done", title: "Done", icon: CheckCircle2, color: "emerald", status: "Done" as SubtaskStatus },
+		{
+			id: "In pending",
+			title: "To Do",
+			icon: Clock,
+			color: "gray",
+			status: "In pending" as SubtaskStatus,
+		},
+		{
+			id: "In progress",
+			title: "In Progress",
+			icon: Zap,
+			color: "indigo",
+			status: "In progress" as SubtaskStatus,
+		},
+		{
+			id: "Done",
+			title: "Done",
+			icon: CheckCircle2,
+			color: "emerald",
+			status: "Done" as SubtaskStatus,
+		},
 	];
 
 	return (
@@ -118,15 +154,27 @@ export default function KanbanBoard() {
 								className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 font-bold text-gray-900 hover:border-indigo-300 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 cursor-pointer shadow-sm text-sm"
 							>
 								<option value="">Select Project...</option>
-								{projects.map((p: any) => (
+								{projects.map((p: IProject) => (
 									<option key={p.id} value={p.id}>
 										{p.name}
 									</option>
 								))}
 							</select>
 							<div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-								<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-									<path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+								<svg
+									width="12"
+									height="12"
+									viewBox="0 0 12 12"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M2.5 4.5L6 8L9.5 4.5"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
 								</svg>
 							</div>
 						</div>
@@ -137,18 +185,30 @@ export default function KanbanBoard() {
 								value={selectedSprintId}
 								onChange={(e) => setSelectedSprintId(e.target.value)}
 								disabled={!selectedProjectId}
-								className={`w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 font-bold text-gray-900 hover:border-indigo-300 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 cursor-pointer shadow-sm text-sm ${!selectedProjectId ? 'opacity-50 cursor-not-allowed' : ''}`}
+								className={`w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 font-bold text-gray-900 hover:border-indigo-300 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 cursor-pointer shadow-sm text-sm ${!selectedProjectId ? "opacity-50 cursor-not-allowed" : ""}`}
 							>
 								<option value="">All Sprints</option>
-								{sprints.map((s: any) => (
+								{sprints.map((s: ISprint) => (
 									<option key={s.id || s._id} value={s.id || s._id}>
 										{s.name} {s.status === "ACTIVE" ? "(Active)" : ""}
 									</option>
 								))}
 							</select>
 							<div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-								<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-									<path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+								<svg
+									width="12"
+									height="12"
+									viewBox="0 0 12 12"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M2.5 4.5L6 8L9.5 4.5"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
 								</svg>
 							</div>
 						</div>
@@ -164,7 +224,8 @@ export default function KanbanBoard() {
 							No Project Selected
 						</h4>
 						<p className="text-gray-500 font-medium text-center max-w-sm">
-							Please select a project from the dropdown above to view its active board.
+							Please select a project from the dropdown above to view its active
+							board.
 						</p>
 					</div>
 				) : isLoading ? (
@@ -179,9 +240,11 @@ export default function KanbanBoard() {
 								User Story
 							</div>
 							<div className="col-span-3 grid grid-cols-3 gap-6">
-								{columns.map(col => (
+								{columns.map((col) => (
 									<div key={col.id} className="flex items-center gap-2">
-										<div className={`p-1.5 rounded-lg bg-${col.color}-50 text-${col.color}-600`}>
+										<div
+											className={`p-1.5 rounded-lg bg-${col.color}-50 text-${col.color}-600`}
+										>
 											<col.icon size={14} />
 										</div>
 										<span className="text-gray-500 font-bold text-xs uppercase tracking-wider">
@@ -194,11 +257,11 @@ export default function KanbanBoard() {
 
 						<div className="space-y-4">
 							{activeSprintStories.map((story: IUserStory) => (
-								<Swimlane 
-									key={story.id} 
-									story={story} 
-									columns={columns} 
-									membersMap={membersMap} 
+								<Swimlane
+									key={story.id}
+									story={story}
+									columns={columns}
+									membersMap={membersMap}
 									sprintStatusMap={sprintStatusMap}
 								/>
 							))}
@@ -208,7 +271,8 @@ export default function KanbanBoard() {
 										No active stories found in this sprint.
 									</p>
 									<p className="text-gray-400 text-sm mt-1">
-										Try selecting a different project or add stories to the current sprint.
+										Try selecting a different project or add stories to the
+										current sprint.
 									</p>
 								</div>
 							)}
@@ -220,16 +284,22 @@ export default function KanbanBoard() {
 	);
 }
 
-function Swimlane({ 
-	story, 
-	columns, 
-	membersMap, 
-	sprintStatusMap 
-}: { 
-	story: IUserStory, 
-	columns: any[], 
-	membersMap: Record<string, string>,
-	sprintStatusMap: Record<string, string>
+function Swimlane({
+	story,
+	columns,
+	membersMap,
+	sprintStatusMap,
+}: {
+	story: IUserStory;
+	columns: {
+		id: string;
+		title: string;
+		icon: any;
+		color: string;
+		status: SubtaskStatus;
+	}[];
+	membersMap: Record<string, string>;
+	sprintStatusMap: Record<string, string>;
 }) {
 	const { data: subtasksRes } = useGetSubtasks(story.id);
 	const subtasks = subtasksRes?.data || [];
@@ -244,16 +314,22 @@ function Swimlane({
 
 	const getPriorityStyle = (priority: string) => {
 		switch (priority) {
-			case "High": return "bg-rose-50 text-rose-700 border-rose-100";
-			case "Medium": return "bg-amber-50 text-amber-700 border-amber-100";
-			default: return "bg-emerald-50 text-emerald-700 border-emerald-100";
+			case "High":
+				return "bg-rose-50 text-rose-700 border-rose-100";
+			case "Medium":
+				return "bg-amber-50 text-amber-700 border-amber-100";
+			default:
+				return "bg-emerald-50 text-emerald-700 border-emerald-100";
 		}
 	};
 	const getPriorityIcon = (priority: string) => {
 		switch (priority) {
-			case "High": return <Flame size={12} />;
-			case "Medium": return <AlertCircle size={12} />;
-			default: return <CheckCircle2 size={12} />;
+			case "High":
+				return <Flame size={12} />;
+			case "Medium":
+				return <AlertCircle size={12} />;
+			default:
+				return <CheckCircle2 size={12} />;
 		}
 	};
 
@@ -264,16 +340,18 @@ function Swimlane({
 	const onDrop = (e: React.DragEvent, targetStatus: SubtaskStatus) => {
 		e.preventDefault();
 		if (!isSprintActive) return;
-		
+
 		const subtaskId = e.dataTransfer.getData("subtaskId");
 		if (subtaskId) {
 			updateSubtaskMutation.mutate(
 				{ subtaskId, status: targetStatus },
 				{
 					onSuccess: () => {
-						queryClient.invalidateQueries({ queryKey: ["active-sprint-stories"] });
-					}
-				}
+						queryClient.invalidateQueries({
+							queryKey: ["active-sprint-stories"],
+						});
+					},
+				},
 			);
 		}
 	};
@@ -285,14 +363,21 @@ function Swimlane({
 	const isReview = story.status === "In review";
 
 	return (
-		<div className={`grid grid-cols-1 md:grid-cols-4 gap-6 p-6 rounded-3xl border transition-all duration-300 shadow-sm ${isReview ? 'bg-amber-50/50 border-amber-200 shadow-amber-100/50' : 'bg-white border-gray-100 hover:shadow-md hover:border-indigo-100'
-			}`}>
+		<div
+			className={`grid grid-cols-1 md:grid-cols-4 gap-6 p-6 rounded-3xl border transition-all duration-300 shadow-sm ${
+				isReview
+					? "bg-amber-50/50 border-amber-200 shadow-amber-100/50"
+					: "bg-white border-gray-100 hover:shadow-md hover:border-indigo-100"
+			}`}
+		>
 			{/* Story Info (Swimlane Header) */}
 			<div className="md:col-span-1 space-y-4">
 				<div className="flex items-start gap-3">
 					<div className="flex-1 space-y-2">
 						<div className="flex flex-wrap items-center gap-2">
-							<span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wide ${getPriorityStyle(story.priority)}`}>
+							<span
+								className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wide ${getPriorityStyle(story.priority)}`}
+							>
 								{getPriorityIcon(story.priority)}
 								{story.priority}
 							</span>
@@ -302,41 +387,58 @@ function Swimlane({
 								</span>
 							)}
 							{sprintStatus && (
-								<span className={`inline-flex items-center px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wide ${
-									isSprintActive 
-										? 'bg-emerald-100 text-emerald-900 border-emerald-200' 
-										: 'bg-gray-100 text-gray-500 border-gray-200'
-								}`}>
+								<span
+									className={`inline-flex items-center px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-wide ${
+										isSprintActive
+											? "bg-emerald-100 text-emerald-900 border-emerald-200"
+											: "bg-gray-100 text-gray-500 border-gray-200"
+									}`}
+								>
 									Sprint: {sprintStatus}
 								</span>
 							)}
 						</div>
-						<h4 className="font-bold text-gray-900 text-lg leading-snug tracking-tight">{story.title}</h4>
+						<h4 className="font-bold text-gray-900 text-lg leading-snug tracking-tight">
+							{story.title}
+						</h4>
 
 						{/* Story Points */}
-						{(story as any).estimationPoints && (
+						{story.estimationPoints && (
 							<div className="flex items-center gap-2">
-								<span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Points</span>
+								<span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+									Points
+								</span>
 								<span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-black">
-									{(story as any).estimationPoints}
+									{story.estimationPoints}
 								</span>
 							</div>
 						)}
 
 						{/* Acceptance Criteria */}
-						{(story as any).acceptanceCriteria && (story as any).acceptanceCriteria.length > 0 && (
-							<div className="mt-1">
-								<p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Acceptance Criteria</p>
-								<ul className="space-y-1">
-									{(story as any).acceptanceCriteria.map((c: string, i: number) => (
-										<li key={i} className="flex items-start gap-1.5 text-xs text-gray-500">
-											<CheckCircle2 size={11} className="text-emerald-500 mt-0.5 flex-shrink-0" />
-											<span>{c}</span>
-										</li>
-									))}
-								</ul>
-							</div>
-						)}
+						{story.acceptanceCriteria &&
+							story.acceptanceCriteria.length > 0 && (
+								<div className="mt-1">
+									<p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+										Acceptance Criteria
+									</p>
+									<ul className="space-y-1">
+										{story.acceptanceCriteria.map(
+											(c: string, i: number) => (
+												<li
+													key={i}
+													className="flex items-start gap-1.5 text-xs text-gray-500"
+												>
+													<CheckCircle2
+														size={11}
+														className="text-emerald-500 mt-0.5 flex-shrink-0"
+													/>
+													<span>{c}</span>
+												</li>
+											),
+										)}
+									</ul>
+								</div>
+							)}
 					</div>
 				</div>
 				<div className="flex flex-col gap-2">
@@ -344,10 +446,15 @@ function Swimlane({
 						<div className="h-1.5 flex-1 bg-gray-100 rounded-full overflow-hidden">
 							<div
 								className="h-full bg-indigo-500 rounded-full transition-all duration-500"
-								style={{ width: `${(subtasks.filter((s: any) => s.status === "Done").length / (subtasks.length || 1)) * 100}%` }}
+								style={{
+									width: `${(subtasks.filter((s: ISubtask) => s.status === "Done").length / (subtasks.length || 1)) * 100}%`,
+								}}
 							/>
 						</div>
-						<span>{subtasks.filter((s: any) => s.status === "Done").length}/{subtasks.length}</span>
+						<span>
+							{subtasks.filter((s: ISubtask) => s.status === "Done").length}/
+							{subtasks.length}
+						</span>
 					</div>
 					<button
 						onClick={() => setShowStoryComments(!showStoryComments)}
@@ -370,14 +477,20 @@ function Swimlane({
 							onSubmit={(message, onSuccess) => {
 								addStoryComment.mutate(
 									{ message },
-									{ 
+									{
 										onSuccess: () => {
 											onSuccess();
-											queryClient.invalidateQueries({ queryKey: ["my-user-stories"] });
-											queryClient.invalidateQueries({ queryKey: ["user-stories"] });
-											queryClient.invalidateQueries({ queryKey: ["active-sprint-stories"] });
-										}
-									}
+											queryClient.invalidateQueries({
+												queryKey: ["my-user-stories"],
+											});
+											queryClient.invalidateQueries({
+												queryKey: ["user-stories"],
+											});
+											queryClient.invalidateQueries({
+												queryKey: ["active-sprint-stories"],
+											});
+										},
+									},
 								);
 							}}
 							isPending={addStoryComment.isPending}
@@ -387,8 +500,10 @@ function Swimlane({
 					</div>
 				)}
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-					{columns.map((col: any) => {
-						const colSubtasks = subtasks.filter((s: any) => s.status === col.status);
+					{columns.map((col) => {
+						const colSubtasks = subtasks.filter(
+							(s: ISubtask) => s.status === col.status,
+						);
 
 						return (
 							<div
@@ -411,7 +526,7 @@ function Swimlane({
 								)}
 
 								{/* Cards */}
-								{colSubtasks.map((task: any) => (
+								{colSubtasks.map((task: ISubtask) => (
 									<SubtaskCard
 										key={task.id}
 										task={task}
@@ -447,8 +562,10 @@ function SubtaskCard({
 
 	const estH = task.estimatedHours;
 	const actH = task.actualHours;
-	const rawVariance = estH !== undefined && actH !== undefined ? actH - estH : null;
-	const variance = rawVariance !== null ? parseFloat(rawVariance.toFixed(2)) : null;
+	const rawVariance =
+		estH !== undefined && actH !== undefined ? actH - estH : null;
+	const variance =
+		rawVariance !== null ? parseFloat(rawVariance.toFixed(2)) : null;
 
 	return (
 		<>
@@ -457,8 +574,8 @@ function SubtaskCard({
 				onDragStart={(e) => isSprintActive && onDragStart(e, task.id)}
 				onClick={() => setIsModalOpen(true)}
 				className={`bg-white border p-3.5 rounded-xl shadow-sm transition-all group/card flex flex-col gap-3 ${
-					isSprintActive 
-						? "cursor-grab active:cursor-grabbing hover:border-indigo-300 hover:shadow-md border-gray-200" 
+					isSprintActive
+						? "cursor-grab active:cursor-grabbing hover:border-indigo-300 hover:shadow-md border-gray-200"
 						: "opacity-75 cursor-not-allowed border-gray-100 grayscale-[0.5]"
 				}`}
 			>
@@ -482,13 +599,20 @@ function SubtaskCard({
 							</span>
 						)}
 						{variance !== null && (
-							<span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border ${
-								variance <= 0
-									? "bg-emerald-50 text-emerald-700 border-emerald-200"
-									: "bg-rose-50 text-rose-700 border-rose-200"
-							}`}>
-								{variance <= 0 ? <TrendingDown size={9} /> : <TrendingUp size={9} />}
-								{variance > 0 ? "+" : ""}{variance}h
+							<span
+								className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border ${
+									variance <= 0
+										? "bg-emerald-50 text-emerald-700 border-emerald-200"
+										: "bg-rose-50 text-rose-700 border-rose-200"
+								}`}
+							>
+								{variance <= 0 ? (
+									<TrendingDown size={9} />
+								) : (
+									<TrendingUp size={9} />
+								)}
+								{variance > 0 ? "+" : ""}
+								{variance}h
 							</span>
 						)}
 					</div>
@@ -501,30 +625,37 @@ function SubtaskCard({
 								{task.id.slice(-4)}
 							</span>
 							<div className="flex items-center gap-1 text-[10px] font-bold text-gray-400 group-hover/card:text-indigo-500 transition-colors">
-								<MessageSquare size={11} />
-								({task.comments?.length || 0})
+								<MessageSquare size={11} />({task.comments?.length || 0})
 							</div>
 							{/* Upload Button wrapped to stop propagation */}
 							<div onClick={(e) => e.stopPropagation()}>
-								<AttachmentButton subtaskId={task.id} userStoryId={story.id} variant="icon" />
+								<AttachmentButton
+									subtaskId={task.id}
+									userStoryId={story.id}
+									variant="icon"
+								/>
 							</div>
 						</div>
-						
+
 						{/* Attachments rendering */}
-						{(task as any).attachments && (task as any).attachments.length > 0 && (
-							<div className="flex flex-wrap gap-1.5 overflow-x-auto pb-1 hide-scrollbar" onClick={(e) => e.stopPropagation()}>
-								{(task as any).attachments.map((att: any, idx: number) => (
-									<SecureAttachmentLink 
-										key={idx} 
-										fileUrl={att.fileUrl} 
-										fileName={att.fileName} 
-									/>
-								))}
-							</div>
-						)}
+						{task.attachments &&
+							task.attachments.length > 0 && (
+								<div
+									className="flex flex-wrap gap-1.5 overflow-x-auto pb-1 hide-scrollbar"
+									onClick={(e) => e.stopPropagation()}
+								>
+									{task.attachments.map((att: any, idx: number) => (
+										<SecureAttachmentLink
+											key={idx}
+											fileUrl={att.fileUrl}
+											fileName={att.fileName}
+										/>
+									))}
+								</div>
+							)}
 					</div>
 					{task.assignedTo && (
-						<div 
+						<div
 							className="px-2 py-0.5 rounded-full bg-indigo-100 border border-indigo-200 flex items-center justify-center text-[9px] font-bold text-indigo-700 shadow-sm transition-colors hover:bg-indigo-200 shrink-0"
 							title={membersMap[task.assignedTo] || "Assigned"}
 						>
@@ -562,14 +693,22 @@ function SubtaskModal({
 
 	const estH = task.estimatedHours;
 	const actH = task.actualHours;
-	const rawVariance = estH !== undefined && actH !== undefined ? actH - estH : null;
-	const variance = rawVariance !== null ? parseFloat(rawVariance.toFixed(2)) : null;
+	const rawVariance =
+		estH !== undefined && actH !== undefined ? actH - estH : null;
+	const variance =
+		rawVariance !== null ? parseFloat(rawVariance.toFixed(2)) : null;
 
 	return (
-		<div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
+		<div
+			className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
+			onClick={(e) => e.stopPropagation()}
+		>
 			{/* Overlay */}
-			<div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
-			
+			<div
+				className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity"
+				onClick={onClose}
+			/>
+
 			<div className="relative w-full max-w-2xl max-h-[90vh] bg-white rounded-3xl shadow-2xl flex flex-col animate-in fade-in zoom-in duration-200">
 				{/* Modal Header */}
 				<div className="flex items-center justify-between p-6 border-b border-gray-100">
@@ -593,13 +732,15 @@ function SubtaskModal({
 						<X size={20} />
 					</button>
 				</div>
-				
+
 				{/* Modal Body (Scrollable) */}
 				<div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
 					{/* Hours and Assignee Section */}
 					<div className="flex flex-wrap gap-6">
 						<div className="space-y-2">
-							<h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Assignee</h4>
+							<h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+								Assignee
+							</h4>
 							<div className="flex items-center gap-2">
 								{task.assignedTo ? (
 									<div className="flex items-center gap-2">
@@ -611,14 +752,18 @@ function SubtaskModal({
 										</span>
 									</div>
 								) : (
-									<span className="text-sm text-gray-500 italic">Unassigned</span>
+									<span className="text-sm text-gray-500 italic">
+										Unassigned
+									</span>
 								)}
 							</div>
 						</div>
 
 						{(estH !== undefined || actH !== undefined) && (
 							<div className="space-y-2">
-								<h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Time Tracking</h4>
+								<h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+									Time Tracking
+								</h4>
 								<div className="flex flex-wrap items-center gap-2">
 									{estH !== undefined && (
 										<span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 bg-blue-50 text-blue-700 border border-blue-100 rounded-lg">
@@ -633,13 +778,20 @@ function SubtaskModal({
 										</span>
 									)}
 									{variance !== null && (
-										<span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg border ${
-											variance <= 0
-												? "bg-emerald-50 text-emerald-700 border-emerald-200"
-												: "bg-rose-50 text-rose-700 border-rose-200"
-										}`}>
-											{variance <= 0 ? <TrendingDown size={12} /> : <TrendingUp size={12} />}
-											{variance > 0 ? "+" : ""}{variance}h
+										<span
+											className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg border ${
+												variance <= 0
+													? "bg-emerald-50 text-emerald-700 border-emerald-200"
+													: "bg-rose-50 text-rose-700 border-rose-200"
+											}`}
+										>
+											{variance <= 0 ? (
+												<TrendingDown size={12} />
+											) : (
+												<TrendingUp size={12} />
+											)}
+											{variance > 0 ? "+" : ""}
+											{variance}h
 										</span>
 									)}
 								</div>
@@ -650,16 +802,23 @@ function SubtaskModal({
 					{/* Attachments Section */}
 					<div className="space-y-3">
 						<div className="flex items-center justify-between">
-							<h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Attachments</h4>
-							<AttachmentButton subtaskId={task.id} userStoryId={story.id} variant="icon" />
+							<h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+								Attachments
+							</h4>
+							<AttachmentButton
+								subtaskId={task.id}
+								userStoryId={story.id}
+								variant="icon"
+							/>
 						</div>
-						{(task as any).attachments && (task as any).attachments.length > 0 ? (
+						{(task as any).attachments &&
+						(task as any).attachments.length > 0 ? (
 							<div className="flex flex-wrap gap-2">
 								{(task as any).attachments.map((att: any, idx: number) => (
-									<SecureAttachmentLink 
-										key={idx} 
-										fileUrl={att.fileUrl} 
-										fileName={att.fileName} 
+									<SecureAttachmentLink
+										key={idx}
+										fileUrl={att.fileUrl}
+										fileName={att.fileName}
 									/>
 								))}
 							</div>
@@ -670,7 +829,9 @@ function SubtaskModal({
 
 					{/* Comments Section */}
 					<div className="space-y-3 border-t border-gray-100 pt-6">
-						<h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Comments ({task.comments?.length || 0})</h4>
+						<h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+							Comments ({task.comments?.length || 0})
+						</h4>
 						<div className="bg-gray-50/50 rounded-2xl p-4 border border-gray-100">
 							<CommentSection
 								initialComments={task.comments || []}
@@ -679,7 +840,7 @@ function SubtaskModal({
 								onSubmit={(message, onSuccess) => {
 									addComment.mutate(
 										{ subtaskId: task.id, message },
-										{ onSuccess }
+										{ onSuccess },
 									);
 								}}
 								isPending={addComment.isPending}

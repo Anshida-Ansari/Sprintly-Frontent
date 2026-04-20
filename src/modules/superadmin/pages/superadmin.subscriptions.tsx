@@ -1,6 +1,6 @@
+import { formatDistanceToNow } from "date-fns";
 import { CreditCard, IndianRupee, PieChart, Users, Zap } from "lucide-react";
 import { useSubscriptionAnalytics } from "../hooks/useSubscriptionAnalytics";
-import { formatDistanceToNow } from "date-fns";
 
 export default function SuperAdminSubscriptions() {
 	const { data, isLoading } = useSubscriptionAnalytics();
@@ -152,20 +152,30 @@ export default function SuperAdminSubscriptions() {
 													></div>
 													<div className="flex flex-col">
 														<span className="text-sm font-semibold text-gray-900">
-															{new Date(company.subscriptionEndDate).toLocaleDateString()}
+															{new Date(
+																company.subscriptionEndDate,
+															).toLocaleDateString()}
 														</span>
 														<span className="text-xs text-gray-500 mt-0.5">
-															{formatDistanceToNow(new Date(company.subscriptionEndDate), { addSuffix: true })}
+															{formatDistanceToNow(
+																new Date(company.subscriptionEndDate),
+																{ addSuffix: true },
+															)}
 														</span>
 													</div>
 												</div>
 											) : (
-												<span className="text-sm text-gray-400 italic">No Active Renewal</span>
+												<span className="text-sm text-gray-400 italic">
+													No Active Renewal
+												</span>
 											)}
 										</td>
 										<td className="px-6 py-4 text-sm font-mono text-gray-500">
 											{company.stripeCustomerId ? (
-												<span className="truncate w-32 inline-block" title={company.stripeCustomerId}>
+												<span
+													className="truncate w-32 inline-block"
+													title={company.stripeCustomerId}
+												>
 													{company.stripeCustomerId}
 												</span>
 											) : (

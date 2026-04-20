@@ -16,7 +16,10 @@ export const projectService = {
 
 	async updateProject(payload: EditProjectPayload): Promise<any> {
 		const { projectId, ...data } = payload;
-		const res = await api.patch(API_ENDPOINTS.ADMIN.PROJECT.UPDATE(projectId), data);
+		const res = await api.patch(
+			API_ENDPOINTS.ADMIN.PROJECT.UPDATE(projectId),
+			data,
+		);
 		return res.data;
 	},
 
@@ -30,9 +33,11 @@ export const projectService = {
 		if (params?.limit) query.append("limit", params.limit.toString());
 		if (params?.search) query.append("search", params.search);
 
-		const res = await api.get(`${API_ENDPOINTS.ADMIN.PROJECT.LIST}?${query.toString()}`);
+		const res = await api.get(
+			`${API_ENDPOINTS.ADMIN.PROJECT.LIST}?${query.toString()}`,
+		);
 
-		if (res.data && res.data.data) {
+		if (res.data?.data) {
 			res.data.data = res.data.data.map((p: any) => ({
 				...p,
 				id: p._id || p.id,
@@ -53,7 +58,7 @@ export const projectService = {
 
 	async getProjectById(projectId: string): Promise<any> {
 		const res = await api.get(API_ENDPOINTS.ADMIN.PROJECT.GET_BY_ID(projectId));
-		if (res.data && res.data.data) {
+		if (res.data?.data) {
 			const p = res.data.data;
 			res.data.data = {
 				...p,
@@ -72,7 +77,10 @@ export const projectService = {
 		return res.data;
 	},
 	async addMember(projectId: string, memberId: string): Promise<any> {
-		const res = await api.patch(API_ENDPOINTS.ADMIN.PROJECT.ADD_MEMBER(projectId), { memberId });
+		const res = await api.patch(
+			API_ENDPOINTS.ADMIN.PROJECT.ADD_MEMBER(projectId),
+			{ memberId },
+		);
 		return res.data;
 	},
 };

@@ -154,9 +154,10 @@ export default function SuperAdminCompanyDetail() {
 									Status
 								</p>
 								<span
-									className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${statusStyles[company.status as CompanyStatus] ||
+									className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+										statusStyles[company.status as CompanyStatus] ||
 										statusStyles.pending
-										}`}
+									}`}
 								>
 									{company.status}
 								</span>
@@ -170,11 +171,11 @@ export default function SuperAdminCompanyDetail() {
 									<span>
 										{company.createdAt
 											? new Date(company.createdAt).toLocaleDateString(
-												undefined,
-												{
-													dateStyle: "long",
-												},
-											)
+													undefined,
+													{
+														dateStyle: "long",
+													},
+												)
 											: "N/A"}
 									</span>
 								</div>

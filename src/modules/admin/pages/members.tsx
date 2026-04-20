@@ -14,7 +14,6 @@ export default function AdminInviteMemberPage() {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 
-
 	const mutation = useInviteMember();
 
 	const handleSubmit = (e: React.FormEvent) => {

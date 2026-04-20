@@ -1,31 +1,37 @@
 import {
+	AlertTriangle,
 	ArrowUpRight,
+	CalendarClock,
+	CheckCircle2,
 	ChevronRight,
+	Crown,
 	FolderOpen,
+	Layers,
 	Play,
 	Plus,
 	RefreshCw,
-	Zap,
-	Video,
-	Crown,
-	AlertTriangle,
-	CalendarClock,
-	Layers,
-	Users,
-	CheckCircle2,
 	Target,
+	Users,
+	Video,
+	Zap,
 } from "lucide-react";
 // Refresh
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+	Cell,
+	Legend,
+	Pie,
+	PieChart,
+	ResponsiveContainer,
+	Tooltip,
+} from "recharts";
+import { buildPath, ROUTES } from "../../../constants/routes";
 import { UserAuth } from "../../auth/store/store";
 import InviteMemberBtn from "../components/invite.member.btn";
 import InviteMemberModal from "../components/invite.modal";
 import { useDashboardStats } from "../hooks/useDashboardStats";
 import { useInviteMember } from "../hooks/useInviteMember";
-import { buildPath, ROUTES } from "../../../constants/routes";
-
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 
 export default function AdminDashboard() {
 	const navigate = useNavigate();
@@ -33,7 +39,11 @@ export default function AdminDashboard() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const { mutate: inviteMember, isPending } = useInviteMember();
 	const { data: statsRes } = useDashboardStats();
-	const handleInvite = (data: { name: string; email: string; role: string }) => {
+	const handleInvite = (data: {
+		name: string;
+		email: string;
+		role: string;
+	}) => {
 		inviteMember(data, {
 			onSuccess: () => setIsModalOpen(false),
 		});
@@ -80,10 +90,22 @@ export default function AdminDashboard() {
 	];
 
 	const storyData = [
-		{ name: "Pending", value: dashboardStats?.userStoriesByStatus?.pending || 0, color: "#94a3b8" },
-		{ name: "In Progress", value: dashboardStats?.userStoriesByStatus?.inProgress || 0, color: "#6366f1" },
-		{ name: "Completed", value: dashboardStats?.userStoriesByStatus?.done || 0, color: "#10b981" },
-	].filter(d => d.value > 0);
+		{
+			name: "Pending",
+			value: dashboardStats?.userStoriesByStatus?.pending || 0,
+			color: "#94a3b8",
+		},
+		{
+			name: "In Progress",
+			value: dashboardStats?.userStoriesByStatus?.inProgress || 0,
+			color: "#6366f1",
+		},
+		{
+			name: "Completed",
+			value: dashboardStats?.userStoriesByStatus?.done || 0,
+			color: "#10b981",
+		},
+	].filter((d) => d.value > 0);
 
 	// const COLORS = ["#94a3b8", "#6366f1", "#10b981"];
 
@@ -168,7 +190,8 @@ export default function AdminDashboard() {
 				const isPro = plan.toLowerCase() === "pro";
 				const limit = dashboardStats?.projectLimit ?? 2;
 				const used = dashboardStats?.activeProjects ?? 0;
-				const usagePct = limit === -1 ? 0 : Math.min(Math.round((used / limit) * 100), 100);
+				const usagePct =
+					limit === -1 ? 0 : Math.min(Math.round((used / limit) * 100), 100);
 				const endDate = dashboardStats?.subscriptionEndDate
 					? new Date(dashboardStats.subscriptionEndDate)
 					: null;
@@ -179,16 +202,20 @@ export default function AdminDashboard() {
 				const expiringSoon = daysLeft !== null && daysLeft <= 7;
 
 				return (
-					<div className={`rounded-3xl border p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 ${
-						isPro
-							? "bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-100"
-							: "bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200"
-					}`}>
+					<div
+						className={`rounded-3xl border p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 ${
+							isPro
+								? "bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-100"
+								: "bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200"
+						}`}
+					>
 						{/* Left: Plan Info */}
 						<div className="flex items-center gap-4">
-							<div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm ${
-								isPro ? "bg-indigo-600" : "bg-amber-500"
-							}`}>
+							<div
+								className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm ${
+									isPro ? "bg-indigo-600" : "bg-amber-500"
+								}`}
+							>
 								<Crown size={22} className="text-white" />
 							</div>
 							<div>
@@ -196,19 +223,27 @@ export default function AdminDashboard() {
 									<p className="text-lg font-black text-gray-900">
 										{isPro ? "Pro Plan" : "Free Plan"}
 									</p>
-									<span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-										isPro
-											? "bg-indigo-100 text-indigo-700"
-											: "bg-amber-100 text-amber-700"
-									}`}>
+									<span
+										className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+											isPro
+												? "bg-indigo-100 text-indigo-700"
+												: "bg-amber-100 text-amber-700"
+										}`}
+									>
 										{isPro ? "Active" : "Limited"}
 									</span>
 								</div>
 								{isPro && endDate && (
-									<p className={`text-xs font-semibold flex items-center gap-1 ${
-										expiringSoon ? "text-rose-500" : "text-gray-500"
-									}`}>
-										{expiringSoon ? <AlertTriangle size={12} /> : <CalendarClock size={12} />}
+									<p
+										className={`text-xs font-semibold flex items-center gap-1 ${
+											expiringSoon ? "text-rose-500" : "text-gray-500"
+										}`}
+									>
+										{expiringSoon ? (
+											<AlertTriangle size={12} />
+										) : (
+											<CalendarClock size={12} />
+										)}
 										{expiringSoon
 											? `Expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"}!`
 											: `Renews on ${endDate.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}`}
@@ -231,14 +266,20 @@ export default function AdminDashboard() {
 								<p className="text-xs font-bold text-gray-500 uppercase tracking-wide">
 									Project Usage
 								</p>
-								<p className={`text-xs font-bold ${nearLimit ? "text-rose-600" : "text-gray-700"}`}>
+								<p
+									className={`text-xs font-bold ${nearLimit ? "text-rose-600" : "text-gray-700"}`}
+								>
 									{used} / {limit === -1 ? "âˆž" : limit}
 								</p>
 							</div>
 							<div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
 								<div
 									className={`h-full rounded-full transition-all duration-500 ${
-										nearLimit ? "bg-rose-500" : isPro ? "bg-indigo-500" : "bg-amber-500"
+										nearLimit
+											? "bg-rose-500"
+											: isPro
+												? "bg-indigo-500"
+												: "bg-amber-500"
 									}`}
 									style={{ width: limit === -1 ? "10%" : `${usagePct}%` }}
 								/>
@@ -263,7 +304,6 @@ export default function AdminDashboard() {
 				);
 			})()}
 
-
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 				<div className="lg:col-span-2 space-y-8">
 					{/* User Story & Sprint Snapshot Row */}
@@ -271,7 +311,9 @@ export default function AdminDashboard() {
 						{/* User Story Status Overview */}
 						<div className="bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm">
 							<div className="flex items-center justify-between mb-6">
-								<h3 className="text-xl font-bold text-gray-900">User Story Status</h3>
+								<h3 className="text-xl font-bold text-gray-900">
+									User Story Status
+								</h3>
 								<Target size={20} className="text-indigo-600" />
 							</div>
 							<div className="h-[200px] w-full">
@@ -290,25 +332,45 @@ export default function AdminDashboard() {
 												<Cell key={`cell-${index}`} fill={entry.color} />
 											))}
 										</Pie>
-										<Tooltip 
-											contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+										<Tooltip
+											contentStyle={{
+												borderRadius: "12px",
+												border: "none",
+												boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+											}}
 										/>
-										<Legend verticalAlign="bottom" height={36} iconType="circle" />
+										<Legend
+											verticalAlign="bottom"
+											height={36}
+											iconType="circle"
+										/>
 									</PieChart>
 								</ResponsiveContainer>
 							</div>
 							<div className="grid grid-cols-3 gap-2 mt-4">
 								<div className="text-center">
-									<p className="text-[10px] font-bold text-gray-400 uppercase">Pending</p>
-									<p className="text-lg font-bold text-gray-700">{dashboardStats?.userStoriesByStatus?.pending || 0}</p>
+									<p className="text-[10px] font-bold text-gray-400 uppercase">
+										Pending
+									</p>
+									<p className="text-lg font-bold text-gray-700">
+										{dashboardStats?.userStoriesByStatus?.pending || 0}
+									</p>
 								</div>
 								<div className="text-center">
-									<p className="text-[10px] font-bold text-gray-400 uppercase">In Progress</p>
-									<p className="text-lg font-bold text-indigo-600">{dashboardStats?.userStoriesByStatus?.inProgress || 0}</p>
+									<p className="text-[10px] font-bold text-gray-400 uppercase">
+										In Progress
+									</p>
+									<p className="text-lg font-bold text-indigo-600">
+										{dashboardStats?.userStoriesByStatus?.inProgress || 0}
+									</p>
 								</div>
 								<div className="text-center">
-									<p className="text-[10px] font-bold text-gray-400 uppercase">Done</p>
-									<p className="text-lg font-bold text-emerald-600">{dashboardStats?.userStoriesByStatus?.done || 0}</p>
+									<p className="text-[10px] font-bold text-gray-400 uppercase">
+										Done
+									</p>
+									<p className="text-lg font-bold text-emerald-600">
+										{dashboardStats?.userStoriesByStatus?.done || 0}
+									</p>
 								</div>
 							</div>
 						</div>
@@ -316,9 +378,11 @@ export default function AdminDashboard() {
 						{/* Active Sprint Snapshot */}
 						<div className="bg-white rounded-[2rem] border border-indigo-50 p-8 shadow-sm relative overflow-hidden">
 							<div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/50 rounded-full -mr-16 -mt-16 pointer-events-none" />
-							
+
 							<div className="flex items-center justify-between mb-6 relative z-10">
-								<h3 className="text-xl font-bold text-gray-900">Active Sprint</h3>
+								<h3 className="text-xl font-bold text-gray-900">
+									Active Sprint
+								</h3>
 								<div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold uppercase tracking-wider">
 									On Track
 								</div>
@@ -327,7 +391,9 @@ export default function AdminDashboard() {
 							{dashboardStats?.activeSprint ? (
 								<div className="space-y-6 relative z-10">
 									<div>
-										<p className="text-xs font-bold text-gray-400 uppercase mb-1">Current Sprint</p>
+										<p className="text-xs font-bold text-gray-400 uppercase mb-1">
+											Current Sprint
+										</p>
 										<h4 className="text-2xl font-black text-gray-900 leading-tight">
 											{dashboardStats.activeSprint.name}
 										</h4>
@@ -339,23 +405,30 @@ export default function AdminDashboard() {
 												Progress
 											</p>
 											<p className="text-sm font-black text-indigo-600">
-												{dashboardStats.activeSprint.completedTasks}/{dashboardStats.activeSprint.totalTasks} Tasks
+												{dashboardStats.activeSprint.completedTasks}/
+												{dashboardStats.activeSprint.totalTasks} Tasks
 											</p>
 										</div>
 										<div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden">
-											<div 
+											<div
 												className="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full transition-all duration-1000"
-												style={{ width: `${dashboardStats.activeSprint.totalTasks > 0 ? (dashboardStats.activeSprint.completedTasks / dashboardStats.activeSprint.totalTasks) * 100 : 0}%` }}
+												style={{
+													width: `${dashboardStats.activeSprint.totalTasks > 0 ? (dashboardStats.activeSprint.completedTasks / dashboardStats.activeSprint.totalTasks) * 100 : 0}%`,
+												}}
 											/>
 										</div>
 									</div>
 
 									<div className="flex items-center gap-4 pt-2">
 										<div className="flex-1 bg-indigo-50 p-3 rounded-2xl border border-indigo-100">
-											<p className="text-[10px] font-bold text-indigo-400 uppercase">Days Left</p>
+											<p className="text-[10px] font-bold text-indigo-400 uppercase">
+												Days Left
+											</p>
 											<p className="text-xl font-black text-indigo-700">
 												{(() => {
-													const end = new Date(dashboardStats.activeSprint.endDate);
+													const end = new Date(
+														dashboardStats.activeSprint.endDate,
+													);
 													const diff = end.getTime() - Date.now();
 													const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
 													return days > 0 ? days : 0;
@@ -363,9 +436,18 @@ export default function AdminDashboard() {
 											</p>
 										</div>
 										<div className="flex-1 bg-emerald-50 p-3 rounded-2xl border border-emerald-100">
-											<p className="text-[10px] font-bold text-emerald-400 uppercase">Completion</p>
+											<p className="text-[10px] font-bold text-emerald-400 uppercase">
+												Completion
+											</p>
 											<p className="text-xl font-black text-emerald-700">
-												{dashboardStats.activeSprint.totalTasks > 0 ? Math.round((dashboardStats.activeSprint.completedTasks / dashboardStats.activeSprint.totalTasks) * 100) : 0}%
+												{dashboardStats.activeSprint.totalTasks > 0
+													? Math.round(
+															(dashboardStats.activeSprint.completedTasks /
+																dashboardStats.activeSprint.totalTasks) *
+																100,
+														)
+													: 0}
+												%
 											</p>
 										</div>
 									</div>
@@ -375,9 +457,13 @@ export default function AdminDashboard() {
 									<div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
 										<CalendarClock size={32} className="text-gray-300" />
 									</div>
-									<p className="text-sm font-bold text-gray-500">No active sprint running</p>
-									<button 
-										onClick={() => navigate(buildPath.admin(ROUTES.ADMIN.SPRINTS))}
+									<p className="text-sm font-bold text-gray-500">
+										No active sprint running
+									</p>
+									<button
+										onClick={() =>
+											navigate(buildPath.admin(ROUTES.ADMIN.SPRINTS))
+										}
 										className="mt-4 text-xs font-bold text-indigo-600 hover:underline"
 									>
 										Start a new sprint
@@ -390,7 +476,9 @@ export default function AdminDashboard() {
 					{/* Live Activity Feed */}
 					<div className="bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm">
 						<div className="flex items-center justify-between mb-8">
-							<h3 className="text-2xl font-bold text-gray-900">Live Activity</h3>
+							<h3 className="text-2xl font-bold text-gray-900">
+								Live Activity
+							</h3>
 							<button className="text-sm font-bold text-indigo-600 px-4 py-2 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-colors">
 								History
 							</button>
@@ -398,40 +486,57 @@ export default function AdminDashboard() {
 						<div className="space-y-6">
 							{/* Dynamic Activity List */}
 							{dashboardStats?.liveActivity?.length > 0 ? (
-								dashboardStats.liveActivity.slice(0, 6).map((item: any, i: number) => {
-									const colors = ["bg-blue-500", "bg-emerald-500", "bg-purple-500", "bg-orange-500", "bg-indigo-500"];
-									const colorClass = colors[i % colors.length];
-									return (
-										<div
-											key={item.id}
-											className="flex items-center gap-4 group cursor-pointer"
-										>
+								dashboardStats.liveActivity
+									.slice(0, 6)
+									.map((item: any, i: number) => {
+										const colors = [
+											"bg-blue-500",
+											"bg-emerald-500",
+											"bg-purple-500",
+											"bg-orange-500",
+											"bg-indigo-500",
+										];
+										const colorClass = colors[i % colors.length];
+										return (
 											<div
-												className={`${colorClass} w-10 h-10 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-sm group-hover:scale-110 transition-transform uppercase`}
+												key={item.id}
+												className="flex items-center gap-4 group cursor-pointer"
 											>
-												{item.title ? item.title.slice(0, 2) : "ST"}
+												<div
+													className={`${colorClass} w-10 h-10 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-sm group-hover:scale-110 transition-transform uppercase`}
+												>
+													{item.title ? item.title.slice(0, 2) : "ST"}
+												</div>
+												<div className="flex-1">
+													<p className="text-gray-700 text-sm">
+														<span className="font-bold text-gray-900">
+															{item.title}
+														</span>{" "}
+														- {item.status}
+													</p>
+													<p className="text-[11px] font-bold text-gray-400 mt-0.5">
+														{new Date(
+															item.updatedAt || item.createdAt,
+														).toLocaleDateString("en-IN", {
+															day: "numeric",
+															month: "short",
+															hour: "2-digit",
+															minute: "2-digit",
+														})}
+													</p>
+												</div>
+												<ChevronRight
+													size={18}
+													className="text-gray-300 opacity-0 group-hover:opacity-100 transition-all mr-2"
+												/>
 											</div>
-											<div className="flex-1">
-												<p className="text-gray-700 text-sm">
-													<span className="font-bold text-gray-900">
-														{item.title}
-													</span>{" "}
-													- {item.status}
-												</p>
-												<p className="text-[11px] font-bold text-gray-400 mt-0.5">
-													{new Date(item.updatedAt || item.createdAt).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-												</p>
-											</div>
-											<ChevronRight
-												size={18}
-												className="text-gray-300 opacity-0 group-hover:opacity-100 transition-all mr-2"
-											/>
-										</div>
-									);
-								})
+										);
+									})
 							) : (
 								<div className="text-center py-8">
-									<p className="text-gray-400 font-medium text-sm">No recent activity detected in the workspace.</p>
+									<p className="text-gray-400 font-medium text-sm">
+										No recent activity detected in the workspace.
+									</p>
 								</div>
 							)}
 						</div>
@@ -479,20 +584,32 @@ export default function AdminDashboard() {
 								<div className="p-1.5 bg-white rounded-lg text-indigo-600 shadow-sm">
 									<CheckCircle2 size={16} />
 								</div>
-								<p className="text-xs font-bold text-indigo-600 uppercase">Workspace Health</p>
+								<p className="text-xs font-bold text-indigo-600 uppercase">
+									Workspace Health
+								</p>
 							</div>
 							<div className="flex justify-between items-end mb-2">
 								<p className="text-sm font-bold text-gray-900">
-									{dashboardStats?.subTasksByStatus?.completed || 0}/{dashboardStats?.totalSubTasks || 0} Tasks
+									{dashboardStats?.subTasksByStatus?.completed || 0}/
+									{dashboardStats?.totalSubTasks || 0} Tasks
 								</p>
 								<p className="text-xs font-black text-indigo-600">
-									{dashboardStats?.totalSubTasks ? Math.round(((dashboardStats?.subTasksByStatus?.completed || 0) / dashboardStats?.totalSubTasks) * 100) : 0}%
+									{dashboardStats?.totalSubTasks
+										? Math.round(
+												((dashboardStats?.subTasksByStatus?.completed || 0) /
+													dashboardStats?.totalSubTasks) *
+													100,
+											)
+										: 0}
+									%
 								</p>
 							</div>
 							<div className="w-full bg-white h-2 rounded-full overflow-hidden shadow-inner">
 								<div
 									className="bg-indigo-600 h-full rounded-full transition-all duration-700"
-									style={{ width: `${dashboardStats?.totalSubTasks ? Math.round(((dashboardStats?.subTasksByStatus?.completed || 0) / dashboardStats?.totalSubTasks) * 100) : 0}%` }}
+									style={{
+										width: `${dashboardStats?.totalSubTasks ? Math.round(((dashboardStats?.subTasksByStatus?.completed || 0) / dashboardStats?.totalSubTasks) * 100) : 0}%`,
+									}}
 								></div>
 							</div>
 						</div>
@@ -500,15 +617,21 @@ export default function AdminDashboard() {
 
 					{/* Secondary Summary */}
 					<div className="bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm">
-						<h3 className="text-sm font-bold mb-6 text-gray-400 uppercase tracking-widest">Platform Insights</h3>
+						<h3 className="text-sm font-bold mb-6 text-gray-400 uppercase tracking-widest">
+							Platform Insights
+						</h3>
 						<div className="space-y-6">
 							<div className="flex items-center gap-4">
 								<div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center">
 									<Video size={22} className="text-orange-500" />
 								</div>
 								<div>
-									<p className="text-2xl font-black text-gray-900">{dashboardStats?.totalMeetings || 0}</p>
-									<p className="text-xs font-bold text-gray-400 uppercase">Virtual Meetings</p>
+									<p className="text-2xl font-black text-gray-900">
+										{dashboardStats?.totalMeetings || 0}
+									</p>
+									<p className="text-xs font-bold text-gray-400 uppercase">
+										Virtual Meetings
+									</p>
 								</div>
 							</div>
 							<div className="flex items-center gap-4">
@@ -516,8 +639,12 @@ export default function AdminDashboard() {
 									<ArrowUpRight size={22} className="text-emerald-500" />
 								</div>
 								<div>
-									<p className="text-2xl font-black text-gray-900">{dashboardStats?.pendingReviews || 0}</p>
-									<p className="text-xs font-bold text-gray-400 uppercase">Stories in Review</p>
+									<p className="text-2xl font-black text-gray-900">
+										{dashboardStats?.pendingReviews || 0}
+									</p>
+									<p className="text-xs font-bold text-gray-400 uppercase">
+										Stories in Review
+									</p>
 								</div>
 							</div>
 						</div>
@@ -525,7 +652,6 @@ export default function AdminDashboard() {
 				</div>
 			</div>
 
-			
 			<InviteMemberModal
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}

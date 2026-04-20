@@ -1,8 +1,8 @@
 import { ChevronRight, LayoutGrid, ScrollText, Search } from "lucide-react";
 import { useState } from "react";
 import UserStoryList from "../components/user-story-list";
-import { useProjects } from "../hooks/useProjects";
 import { useGetMembers } from "../hooks/useGetmembers";
+import { useProjects } from "../hooks/useProjects";
 
 export default function UserStoriesPage() {
 	const { data: projectsRes, isLoading: isLoadingProjects } = useProjects({
@@ -73,7 +73,11 @@ export default function UserStoriesPage() {
 			<div className="transition-all duration-500">
 				{selectedProjectId ? (
 					<div className="bg-white p-10 rounded-[48px] border border-gray-100 shadow-sm animate-in zoom-in-95 duration-500">
-						<UserStoryList projectId={selectedProjectId} showHeader={true} members={members} />
+						<UserStoryList
+							projectId={selectedProjectId}
+							showHeader={true}
+							members={members}
+						/>
 					</div>
 				) : (
 					<div className="flex flex-col items-center justify-center py-24 bg-gray-50/50 rounded-[48px] border border-dashed border-gray-200">

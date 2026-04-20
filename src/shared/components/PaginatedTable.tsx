@@ -43,8 +43,10 @@ export function PaginatedTable<T>({
 	return (
 		<div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden transition-all">
 			<div className="px-6 py-5 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-				<h3 className="font-bold text-gray-900 text-lg whitespace-nowrap">{title}</h3>
-				
+				<h3 className="font-bold text-gray-900 text-lg whitespace-nowrap">
+					{title}
+				</h3>
+
 				<div className="flex items-center gap-3">
 					{onSearch && (
 						<form onSubmit={handleSearch} className="relative">
@@ -55,10 +57,13 @@ export function PaginatedTable<T>({
 								onChange={(e) => setSearchTerm(e.target.value)}
 								className="pl-10 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 w-full md:w-64 transition-all"
 							/>
-							<Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+							<Search
+								className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+								size={18}
+							/>
 						</form>
 					)}
-					
+
 					<select
 						value={limit}
 						onChange={(e) => onLimitChange(Number(e.target.value))}
@@ -77,9 +82,9 @@ export function PaginatedTable<T>({
 				<table className="w-full text-left">
 					<thead>
 						<tr className="bg-gray-50/50">
-							{columns.map((col, idx) => (
+							{columns.map((col) => (
 								<th
-									key={idx}
+									key={col.header}
 									className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider"
 								>
 									{col.header}
@@ -96,9 +101,12 @@ export function PaginatedTable<T>({
 							</tr>
 						) : data.length > 0 ? (
 							data.map((item, rowIdx) => (
-								<tr key={rowIdx} className="hover:bg-gray-50/50 transition-colors group">
-									{columns.map((col, colIdx) => (
-										<td key={colIdx} className="px-6 py-4">
+								<tr
+									key={(item as any)._id || (item as any).id || rowIdx}
+									className="hover:bg-gray-50/50 transition-colors group"
+								>
+									{columns.map((col) => (
+										<td key={col.key as string} className="px-6 py-4">
 											{col.render ? col.render(item) : (item as any)[col.key]}
 										</td>
 									))}
@@ -106,7 +114,10 @@ export function PaginatedTable<T>({
 							))
 						) : (
 							<tr>
-								<td colSpan={columns.length} className="px-6 py-10 text-center text-gray-400 italic font-medium">
+								<td
+									colSpan={columns.length}
+									className="px-6 py-10 text-center text-gray-400 italic font-medium"
+								>
 									No records found matching your criteria.
 								</td>
 							</tr>
@@ -118,9 +129,10 @@ export function PaginatedTable<T>({
 			{/* Pagination Footer */}
 			<div className="px-6 py-4 bg-gray-50/50 border-t border-gray-50 flex items-center justify-between">
 				<div className="text-sm text-gray-500 font-medium">
-					Showing <span className="text-gray-900">{(page - 1) * limit + 1}</span> to{" "}
-					<span className="text-gray-900">{Math.min(page * limit, total)}</span> of{" "}
-					<span className="text-gray-900">{total}</span> results
+					Showing{" "}
+					<span className="text-gray-900">{(page - 1) * limit + 1}</span> to{" "}
+					<span className="text-gray-900">{Math.min(page * limit, total)}</span>{" "}
+					of <span className="text-gray-900">{total}</span> results
 				</div>
 
 				<div className="flex items-center gap-2">
@@ -131,7 +143,7 @@ export function PaginatedTable<T>({
 					>
 						<ChevronLeft size={20} />
 					</button>
-					
+
 					<div className="flex items-center bg-white border border-gray-100 rounded-lg shadow-sm">
 						{Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
 							let pageNum = page;
@@ -142,7 +154,7 @@ export function PaginatedTable<T>({
 							} else {
 								pageNum = i + 1;
 							}
-							
+
 							return (
 								<button
 									key={pageNum}

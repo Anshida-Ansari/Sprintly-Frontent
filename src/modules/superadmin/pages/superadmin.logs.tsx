@@ -1,18 +1,44 @@
-import { ShieldCheck, Terminal, AlertCircle } from "lucide-react";
+import { AlertCircle, ShieldCheck, Terminal } from "lucide-react";
 
 export default function SuperAdminLogs() {
 	const logs = [
-		{ id: 1, event: "New Company Registered", user: "system", timestamp: "2 mins ago", type: "success" },
-		{ id: 2, event: "Database Backup Completed", user: "system", timestamp: "1 hour ago", type: "success" },
-		{ id: 3, event: "Failed Login Attempt", user: "admin@unknown.com", timestamp: "2 hours ago", type: "warning" },
-		{ id: 4, event: "New SuperAdmin Invite Sent", user: "master_admin", timestamp: "5 hours ago", type: "info" },
+		{
+			id: 1,
+			event: "New Company Registered",
+			user: "system",
+			timestamp: "2 mins ago",
+			type: "success",
+		},
+		{
+			id: 2,
+			event: "Database Backup Completed",
+			user: "system",
+			timestamp: "1 hour ago",
+			type: "success",
+		},
+		{
+			id: 3,
+			event: "Failed Login Attempt",
+			user: "admin@unknown.com",
+			timestamp: "2 hours ago",
+			type: "warning",
+		},
+		{
+			id: 4,
+			event: "New SuperAdmin Invite Sent",
+			user: "master_admin",
+			timestamp: "5 hours ago",
+			type: "info",
+		},
 	];
 
 	return (
 		<div className="space-y-6">
 			<div>
 				<h1 className="text-3xl font-bold text-gray-900">System Logs</h1>
-				<p className="text-gray-500 mt-1">Monitor platform activities and security events.</p>
+				<p className="text-gray-500 mt-1">
+					Monitor platform activities and security events.
+				</p>
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -51,18 +77,30 @@ export default function SuperAdminLogs() {
 				</div>
 				<div className="divide-y divide-gray-50">
 					{logs.map((log) => (
-						<div key={log.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+						<div
+							key={log.id}
+							className="px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors"
+						>
 							<div className="flex items-center gap-4">
-								<div className={`w-2 h-2 rounded-full ${
-									log.type === 'success' ? 'bg-emerald-500' :
-									log.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'
-								}`} />
+								<div
+									className={`w-2 h-2 rounded-full ${
+										log.type === "success"
+											? "bg-emerald-500"
+											: log.type === "warning"
+												? "bg-amber-500"
+												: "bg-blue-500"
+									}`}
+								/>
 								<div>
 									<p className="text-sm font-bold text-gray-900">{log.event}</p>
-									<p className="text-xs text-gray-500">Triggered by: {log.user}</p>
+									<p className="text-xs text-gray-500">
+										Triggered by: {log.user}
+									</p>
 								</div>
 							</div>
-							<span className="text-xs font-medium text-gray-400">{log.timestamp}</span>
+							<span className="text-xs font-medium text-gray-400">
+								{log.timestamp}
+							</span>
 						</div>
 					))}
 				</div>

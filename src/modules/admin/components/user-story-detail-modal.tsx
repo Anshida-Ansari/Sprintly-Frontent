@@ -1,39 +1,42 @@
 import {
 	AlertCircle,
+	CheckCircle2,
 	CheckSquare,
+	Clock,
 	Edit3,
 	Loader2,
 	Plus,
 	Save,
+	Search,
 	Trash2,
 	Users,
-	Search,
 	X,
-	CheckCircle2,
-	Clock,
 	Zap,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-
-import { UserAuth } from "../../auth/store/store";
 import { AttachmentButton } from "../../../shared/components/attachment-button";
 import { SecureAttachmentLink } from "../../../shared/components/secure-attachment-link";
+import { UserAuth } from "../../auth/store/store";
 import { useGetMembers } from "../hooks/useGetmembers";
 import { useGetProject } from "../hooks/useGetProject";
 import {
+	useAddSubtaskComment,
 	useCreateSubtask,
 	useDeleteSubtask,
 	useGetSubtasks,
 	useUpdateSubtaskStatus,
-	useAddSubtaskComment,
 } from "../hooks/useSubtasks";
 import {
+	useAddComment,
 	useAssignUserStoryToMember,
 	useUpdateUserStory,
-	useAddComment,
 } from "../hooks/useUserStories";
-import { type ISubtask, type IUserStory, UserStoryStatus } from "../types/types";
+import {
+	type ISubtask,
+	type IUserStory,
+	UserStoryStatus,
+} from "../types/types";
 import CommentSection from "./comment-section";
 import DeleteConfirmationModal from "./delete-confirmation-modal";
 
@@ -49,7 +52,9 @@ export default function UserStoryDetailModal({
 	story,
 }: UserStoryDetailModalProps) {
 	const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
-	const [newSubtaskEstimatedHours, setNewSubtaskEstimatedHours] = useState<number | "">("");
+	const [newSubtaskEstimatedHours, setNewSubtaskEstimatedHours] = useState<
+		number | ""
+	>("");
 	const [isEditingDescription, setIsEditingDescription] = useState(false);
 	const [editedDescription, setEditedDescription] = useState(story.description);
 	const [isAssignDropdownOpen, setIsAssignDropdownOpen] = useState(false);
@@ -57,7 +62,9 @@ export default function UserStoryDetailModal({
 
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [subtaskToDelete, setSubtaskToDelete] = useState<string | null>(null);
-	const [expandedComments, setExpandedComments] = useState<Record<string, boolean>>({});
+	const [expandedComments, setExpandedComments] = useState<
+		Record<string, boolean>
+	>({});
 
 	const user = UserAuth((state) => state.user);
 	const addSubtaskComment = useAddSubtaskComment(story.id);
@@ -68,9 +75,8 @@ export default function UserStoryDetailModal({
 	const { data: projectRes } = useGetProject(story?.projectId);
 	const project = projectRes?.data;
 
-	const { data: subtasksRes, isLoading: loadingSubtasks = true } = useGetSubtasks(
-		story.id,
-	);
+	const { data: subtasksRes, isLoading: loadingSubtasks = true } =
+		useGetSubtasks(story.id);
 	const { data: membersRes } = useGetMembers({
 		page: 1,
 		limit: 100,
@@ -95,7 +101,7 @@ export default function UserStoryDetailModal({
 	});
 
 	const projectMemberIds = (project?.members || []).map((pm: any) =>
-		typeof pm === "string" ? pm : (pm.id || pm._id),
+		typeof pm === "string" ? pm : pm.id || pm._id,
 	);
 
 	const developers = members.filter(
@@ -104,9 +110,7 @@ export default function UserStoryDetailModal({
 			projectMemberIds.includes(m._id || m.id),
 	);
 
-	const completedCount = subtasks.filter(
-		(s) => s.status === "Done",
-	).length;
+	const completedCount = subtasks.filter((s) => s.status === "Done").length;
 	const totalCount = subtasks.length;
 	const progressPercent =
 		totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
@@ -120,15 +124,18 @@ export default function UserStoryDetailModal({
 	const handleCreateSubtask = () => {
 		if (newSubtaskTitle.trim()) {
 			createSubtask.mutate(
-				{ 
+				{
 					title: newSubtaskTitle,
-					estimatedHours: newSubtaskEstimatedHours === "" ? undefined : Number(newSubtaskEstimatedHours)
+					estimatedHours:
+						newSubtaskEstimatedHours === ""
+							? undefined
+							: Number(newSubtaskEstimatedHours),
 				},
 				{
 					onSuccess: () => {
 						setNewSubtaskTitle("");
 						setNewSubtaskEstimatedHours("");
-					}
+					},
 				},
 			);
 		}
@@ -138,8 +145,6 @@ export default function UserStoryDetailModal({
 		const newStatus = subtask.status === "Done" ? "In pending" : "Done";
 		updateStatus.mutate({ subtaskId: subtask.id, status: newStatus });
 	};
-
-
 
 	const handleAssignMemberToStory = (memberId: string) => {
 		assignMember.mutate(
@@ -193,7 +198,7 @@ export default function UserStoryDetailModal({
 			});
 		}
 	};
-	
+
 	const handleMarkAsDone = () => {
 		updateStory.mutate({
 			projectId: story.projectId,
@@ -214,11 +219,11 @@ export default function UserStoryDetailModal({
 	};
 
 	const modalContent = (
-		<div 
+		<div
 			className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
 			onClick={onClose}
 		>
-			<div 
+			<div
 				className="bg-white rounded-[2.5rem] w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 flex flex-col"
 				onClick={(e) => e.stopPropagation()}
 			>
@@ -243,20 +248,23 @@ export default function UserStoryDetailModal({
 							<span className="text-gray-500 font-bold">
 								{completedCount}/{totalCount} subtasks completed
 							</span>
-							{isAdminOrLead && story.status === UserStoryStatus.IN_REVIEW && totalCount > 0 && completedCount === totalCount && (
-								<button
-									onClick={handleMarkAsDone}
-									disabled={updateStory.isPending}
-									className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg hover:bg-emerald-100 transition-all text-[10px] font-black uppercase tracking-wider disabled:opacity-50"
-								>
-									{updateStory.isPending ? (
-										<Loader2 size={14} className="animate-spin" />
-									) : (
-										<CheckCircle2 size={14} strokeWidth={3} />
-									)}
-									Mark as Done
-								</button>
-							)}
+							{isAdminOrLead &&
+								story.status === UserStoryStatus.IN_REVIEW &&
+								totalCount > 0 &&
+								completedCount === totalCount && (
+									<button
+										onClick={handleMarkAsDone}
+										disabled={updateStory.isPending}
+										className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg hover:bg-emerald-100 transition-all text-[10px] font-black uppercase tracking-wider disabled:opacity-50"
+									>
+										{updateStory.isPending ? (
+											<Loader2 size={14} className="animate-spin" />
+										) : (
+											<CheckCircle2 size={14} strokeWidth={3} />
+										)}
+										Mark as Done
+									</button>
+								)}
 							<span className="text-gray-300">•</span>
 							<span className="text-gray-500 font-bold">
 								Role:{" "}
@@ -354,14 +362,20 @@ export default function UserStoryDetailModal({
 							<h3 className="text-sm font-black text-gray-700 uppercase tracking-wider flex items-center gap-2">
 								Acceptance Criteria
 							</h3>
-							{story.acceptanceCriteria && story.acceptanceCriteria.length > 0 ? (
+							{story.acceptanceCriteria &&
+							story.acceptanceCriteria.length > 0 ? (
 								<ul className="space-y-2">
-									{story.acceptanceCriteria.map((criteria: string, index: number) => (
-										<li key={index} className="flex items-start gap-3 text-sm font-medium text-gray-600">
-											<div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-2 shrink-0" />
-											{criteria}
-										</li>
-									))}
+									{story.acceptanceCriteria.map(
+										(criteria: string, index: number) => (
+											<li
+												key={index}
+												className="flex items-start gap-3 text-sm font-medium text-gray-600"
+											>
+												<div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-2 shrink-0" />
+												{criteria}
+											</li>
+										),
+									)}
 								</ul>
 							) : (
 								<p className="text-sm text-gray-400 italic">
@@ -399,10 +413,17 @@ export default function UserStoryDetailModal({
 						</h3>
 
 						<div className="flex items-center gap-3">
-							{story.assignedTo && (Array.isArray(story.assignedTo) ? story.assignedTo.length > 0 : !!story.assignedTo) ? (
+							{story.assignedTo &&
+							(Array.isArray(story.assignedTo)
+								? story.assignedTo.length > 0
+								: !!story.assignedTo) ? (
 								(() => {
-									const assignedId = Array.isArray(story.assignedTo) ? story.assignedTo[0] : story.assignedTo;
-									const member = members.find((m: any) => m._id === assignedId || m.id === assignedId);
+									const assignedId = Array.isArray(story.assignedTo)
+										? story.assignedTo[0]
+										: story.assignedTo;
+									const member = members.find(
+										(m: any) => m._id === assignedId || m.id === assignedId,
+									);
 									return member ? (
 										<div
 											key={member._id}
@@ -431,15 +452,21 @@ export default function UserStoryDetailModal({
 									);
 								})()
 							) : (
-								<p className="text-xs text-gray-400 font-medium italic">Unassigned</p>
+								<p className="text-xs text-gray-400 font-medium italic">
+									Unassigned
+								</p>
 							)}
 
 							{(isAdmin || user?.role === "lead") && (
 								<div className="relative">
 									<button
-										onClick={() => setIsAssignDropdownOpen(!isAssignDropdownOpen)}
+										onClick={() =>
+											setIsAssignDropdownOpen(!isAssignDropdownOpen)
+										}
 										className="w-8 h-8 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50 transition-all"
-										title={story.assignedTo ? "Change Assignee" : "Assign Member"}
+										title={
+											story.assignedTo ? "Change Assignee" : "Assign Member"
+										}
 									>
 										{story.assignedTo ? (
 											<Edit3 size={14} strokeWidth={2.5} />
@@ -463,9 +490,10 @@ export default function UserStoryDetailModal({
 													<input
 														type="text"
 														value={assignSearchQuery}
-														onChange={(e) => setAssignSearchQuery(e.target.value)}
+														onChange={(e) =>
+															setAssignSearchQuery(e.target.value)
+														}
 														placeholder="Search members..."
-														autoFocus
 														className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-500 rounded-lg text-xs font-bold text-gray-900 placeholder:text-gray-400 outline-none transition-all"
 													/>
 												</div>
@@ -481,7 +509,9 @@ export default function UserStoryDetailModal({
 														.map((dev: any) => (
 															<button
 																key={dev._id}
-																onClick={() => handleAssignMemberToStory(dev._id)}
+																onClick={() =>
+																	handleAssignMemberToStory(dev._id)
+																}
 																className="w-full flex items-center gap-3 p-2 hover:bg-indigo-50 rounded-lg transition-colors group/option text-left"
 															>
 																<div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-500 group-hover/option:bg-indigo-100 group-hover/option:text-indigo-600 transition-colors">
@@ -520,11 +550,13 @@ export default function UserStoryDetailModal({
 											{/* Status Indicator */}
 											<div className="pt-1.5">
 												{isAdmin ? (
-													<div className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border ${
-														subtask.status === "Done"
-															? "bg-emerald-50 text-emerald-600 border-emerald-100"
-															: "bg-amber-50 text-amber-600 border-amber-100"
-													}`}>
+													<div
+														className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider border ${
+															subtask.status === "Done"
+																? "bg-emerald-50 text-emerald-600 border-emerald-100"
+																: "bg-amber-50 text-amber-600 border-amber-100"
+														}`}
+													>
 														{subtask.status === "Done" ? "DONE" : "TODO"}
 													</div>
 												) : (
@@ -535,7 +567,10 @@ export default function UserStoryDetailModal({
 															onChange={() => handleToggleSubtask(subtask)}
 															className="peer h-6 w-6 cursor-pointer appearance-none rounded-lg border-2 border-gray-200 transition-all checked:border-indigo-500 checked:bg-indigo-500 hover:border-indigo-300"
 														/>
-														<CheckCircle2 className="pointer-events-none absolute h-4 w-4 text-white opacity-0 transition-opacity peer-checked:opacity-100" strokeWidth={3} />
+														<CheckCircle2
+															className="pointer-events-none absolute h-4 w-4 text-white opacity-0 transition-opacity peer-checked:opacity-100"
+															strokeWidth={3}
+														/>
 													</div>
 												)}
 											</div>
@@ -543,12 +578,16 @@ export default function UserStoryDetailModal({
 											{/* Content Area */}
 											<div className="flex-1 min-w-0 space-y-3">
 												<div className="flex items-start justify-between gap-4">
-													<p className={`text-sm font-bold leading-relaxed ${
-														subtask.status === "Done" ? "text-gray-400 line-through" : "text-gray-900"
-													}`}>
+													<p
+														className={`text-sm font-bold leading-relaxed ${
+															subtask.status === "Done"
+																? "text-gray-400 line-through"
+																: "text-gray-900"
+														}`}
+													>
 														{subtask.title}
 													</p>
-													
+
 													{/* Metadata Badges */}
 													<div className="flex shrink-0 items-center gap-2">
 														{subtask.estimatedHours !== undefined && (
@@ -570,18 +609,29 @@ export default function UserStoryDetailModal({
 												<div className="flex items-center justify-between">
 													<div className="flex items-center gap-4">
 														<button
-															onClick={() => setExpandedComments(prev => ({ ...prev, [subtask.id]: !prev[subtask.id] }))}
+															onClick={() =>
+																setExpandedComments((prev) => ({
+																	...prev,
+																	[subtask.id]: !prev[subtask.id],
+																}))
+															}
 															className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider transition-colors ${
-																expandedComments[subtask.id] ? "text-indigo-600" : "text-gray-400 hover:text-indigo-600"
+																expandedComments[subtask.id]
+																	? "text-indigo-600"
+																	: "text-gray-400 hover:text-indigo-600"
 															}`}
 														>
 															<Edit3 size={12} strokeWidth={3} />
 															Comments ({subtask.comments?.length || 0})
 														</button>
-														
+
 														<div className="h-1 w-1 rounded-full bg-gray-200" />
-														
-														<AttachmentButton subtaskId={subtask.id} userStoryId={story.id} variant="icon" />
+
+														<AttachmentButton
+															subtaskId={subtask.id}
+															userStoryId={story.id}
+															variant="icon"
+														/>
 													</div>
 
 													<div className="flex items-center gap-2">
@@ -598,17 +648,20 @@ export default function UserStoryDetailModal({
 												</div>
 
 												{/* Attachments Section */}
-												{(subtask as any).attachments && (subtask as any).attachments.length > 0 && (
-													<div className="flex flex-wrap gap-2 pt-1">
-														{(subtask as any).attachments.map((att: any, idx: number) => (
-															<SecureAttachmentLink 
-																key={idx} 
-																fileUrl={att.fileUrl} 
-																fileName={att.fileName} 
-															/>
-														))}
-													</div>
-												)}
+												{(subtask as any).attachments &&
+													(subtask as any).attachments.length > 0 && (
+														<div className="flex flex-wrap gap-2 pt-1">
+															{(subtask as any).attachments.map(
+																(att: any, idx: number) => (
+																	<SecureAttachmentLink
+																		key={idx}
+																		fileUrl={att.fileUrl}
+																		fileName={att.fileName}
+																	/>
+																),
+															)}
+														</div>
+													)}
 											</div>
 										</div>
 
@@ -623,7 +676,7 @@ export default function UserStoryDetailModal({
 														onSubmit={(message, onSuccess) => {
 															addSubtaskComment.mutate(
 																{ subtaskId: subtask.id, message },
-																{ onSuccess }
+																{ onSuccess },
 															);
 														}}
 														isPending={addSubtaskComment.isPending}

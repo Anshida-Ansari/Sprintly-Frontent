@@ -16,12 +16,17 @@ export const meetingService = {
 	},
 
 	async getProjectMeetings(projectId: string): Promise<any> {
-		const res = await api.get(API_ENDPOINTS.ADMIN.MEETING.LIST_BY_PROJECT(projectId));
+		const res = await api.get(
+			API_ENDPOINTS.ADMIN.MEETING.LIST_BY_PROJECT(projectId),
+		);
 		return res.data;
 	},
 
 	async updateMeetingStatus(meetingId: string, status: string): Promise<any> {
-		const res = await api.patch(API_ENDPOINTS.ADMIN.MEETING.UPDATE_STATUS(meetingId), { status });
+		const res = await api.patch(
+			API_ENDPOINTS.ADMIN.MEETING.UPDATE_STATUS(meetingId),
+			{ status },
+		);
 		return res.data;
 	},
 

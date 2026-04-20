@@ -25,8 +25,9 @@ export default function Meetings() {
 	const projects = projectsRes?.data || [];
 
 	const handleActionClick = async (meeting: any) => {
-		if (meeting.status === "COMPLETED" || meeting.status === "CANCELLED") return;
-		
+		if (meeting.status === "COMPLETED" || meeting.status === "CANCELLED")
+			return;
+
 		if (meeting.status === "SCHEDULED") {
 			try {
 				await meetingService.updateMeetingStatus(meeting.roomId, "ONGOING");
@@ -152,21 +153,34 @@ export default function Meetings() {
 							</div>
 
 							<button
-								disabled={meeting.status === "COMPLETED" || meeting.status === "CANCELLED"}
+								disabled={
+									meeting.status === "COMPLETED" ||
+									meeting.status === "CANCELLED"
+								}
 								onClick={() => handleActionClick(meeting)}
 								className={`mt-8 w-full py-4 rounded-2xl font-black transition-all flex items-center justify-center gap-3 ${
-									meeting.status === "COMPLETED" || meeting.status === "CANCELLED"
+									meeting.status === "COMPLETED" ||
+									meeting.status === "CANCELLED"
 										? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
-										: meeting.status === "SCHEDULED" ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20" : "bg-gray-900 group-hover:bg-indigo-600 text-white"
+										: meeting.status === "SCHEDULED"
+											? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20"
+											: "bg-gray-900 group-hover:bg-indigo-600 text-white"
 								}`}
 							>
-								{meeting.status === "COMPLETED" ? "Meeting Ended" : meeting.status === "CANCELLED" ? "Meeting Cancelled" : meeting.status === "SCHEDULED" ? "Start Meeting" : "Join Meeting"}
-								{meeting.status !== "COMPLETED" && meeting.status !== "CANCELLED" && (
-									<ArrowUpRight
-										size={20}
-										className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
-									/>
-								)}
+								{meeting.status === "COMPLETED"
+									? "Meeting Ended"
+									: meeting.status === "CANCELLED"
+										? "Meeting Cancelled"
+										: meeting.status === "SCHEDULED"
+											? "Start Meeting"
+											: "Join Meeting"}
+								{meeting.status !== "COMPLETED" &&
+									meeting.status !== "CANCELLED" && (
+										<ArrowUpRight
+											size={20}
+											className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+										/>
+									)}
 							</button>
 						</div>
 					))
@@ -192,4 +206,3 @@ export default function Meetings() {
 		</div>
 	);
 }
-

@@ -1,4 +1,12 @@
-import { ArrowRight, Check, ChevronDown, Loader2, Users, Video, X } from "lucide-react";
+import {
+	ArrowRight,
+	Check,
+	ChevronDown,
+	Loader2,
+	Users,
+	Video,
+	X,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useGetProject } from "../hooks/useGetProject";
@@ -46,8 +54,6 @@ export default function ScheduleMeetingModal({
 	const projects = projectsRes?.data || [];
 	const projectMembers = projectRes?.data?.members || [];
 
-
-
 	const toggleParticipant = (userId: string) => {
 		setSelectedParticipants((prev) =>
 			prev.includes(userId)
@@ -77,7 +83,6 @@ export default function ScheduleMeetingModal({
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
 			<div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 border border-slate-100">
-
 				{/* Header */}
 				<div className="flex justify-between items-center px-8 py-6 border-b border-slate-100 bg-white/50 backdrop-blur-xl sticky top-0 z-10">
 					<div className="space-y-1">
@@ -107,8 +112,12 @@ export default function ScheduleMeetingModal({
 					className="px-8 py-6 space-y-5 max-h-[70vh] overflow-y-auto"
 				>
 					{/* Title Input */}
-					<div className={`group relative bg-slate-50 border-2 ${errors.title ? 'border-red-500' : 'border-transparent group-hover:border-slate-200'} rounded-2xl p-3 focus-within:bg-white focus-within:border-${errors.title ? 'red' : 'blue'}-600 focus-within:shadow-lg focus-within:shadow-blue-500/10 transition-all duration-300`}>
-						<p className={`text-[10px] font-black uppercase tracking-widest ${errors.title ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1 ml-1`}>
+					<div
+						className={`group relative bg-slate-50 border-2 ${errors.title ? "border-red-500" : "border-transparent group-hover:border-slate-200"} rounded-2xl p-3 focus-within:bg-white focus-within:border-${errors.title ? "red" : "blue"}-600 focus-within:shadow-lg focus-within:shadow-blue-500/10 transition-all duration-300`}
+					>
+						<p
+							className={`text-[10px] font-black uppercase tracking-widest ${errors.title ? "text-red-600" : "text-slate-400 group-focus-within:text-blue-600"} mb-1 ml-1`}
+						>
 							Meeting Title
 						</p>
 						<input
@@ -118,16 +127,21 @@ export default function ScheduleMeetingModal({
 						/>
 					</div>
 
-
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 						{/* Project Selection */}
-						<div className={`group relative bg-slate-50 border-2 ${errors.projectId ? 'border-red-500' : 'border-transparent group-hover:border-slate-200'} rounded-2xl p-3 focus-within:bg-white focus-within:border-${errors.projectId ? 'red' : 'blue'}-600 focus-within:shadow-lg focus-within:shadow-blue-500/10 transition-all duration-300`}>
-							<p className={`text-[10px] font-black uppercase tracking-widest ${errors.projectId ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1 ml-1`}>
+						<div
+							className={`group relative bg-slate-50 border-2 ${errors.projectId ? "border-red-500" : "border-transparent group-hover:border-slate-200"} rounded-2xl p-3 focus-within:bg-white focus-within:border-${errors.projectId ? "red" : "blue"}-600 focus-within:shadow-lg focus-within:shadow-blue-500/10 transition-all duration-300`}
+						>
+							<p
+								className={`text-[10px] font-black uppercase tracking-widest ${errors.projectId ? "text-red-600" : "text-slate-400 group-focus-within:text-blue-600"} mb-1 ml-1`}
+							>
 								Project Context
 							</p>
 							<div className="relative">
 								<select
-									{...register("projectId", { required: "Project is required" })}
+									{...register("projectId", {
+										required: "Project is required",
+									})}
 									className="w-full bg-transparent outline-none font-bold text-base text-slate-900 appearance-none cursor-pointer py-1 pr-8"
 								>
 									<option value="">Select Project...</option>
@@ -145,8 +159,12 @@ export default function ScheduleMeetingModal({
 
 						{/* Date Selection */}
 						<div className="space-y-1">
-							<div className={`group relative bg-slate-50 border-2 ${errors.date ? 'border-red-500' : 'border-transparent group-hover:border-slate-200'} rounded-2xl p-3 focus-within:bg-white focus-within:border-${errors.date ? 'red' : 'blue'}-600 focus-within:shadow-lg focus-within:shadow-blue-500/10 transition-all duration-300`}>
-								<p className={`text-[10px] font-black uppercase tracking-widest ${errors.date ? 'text-red-600' : 'text-slate-400 group-focus-within:text-blue-600'} mb-1 ml-1`}>
+							<div
+								className={`group relative bg-slate-50 border-2 ${errors.date ? "border-red-500" : "border-transparent group-hover:border-slate-200"} rounded-2xl p-3 focus-within:bg-white focus-within:border-${errors.date ? "red" : "blue"}-600 focus-within:shadow-lg focus-within:shadow-blue-500/10 transition-all duration-300`}
+							>
+								<p
+									className={`text-[10px] font-black uppercase tracking-widest ${errors.date ? "text-red-600" : "text-slate-400 group-focus-within:text-blue-600"} mb-1 ml-1`}
+								>
 									Date & Time
 								</p>
 								<input
@@ -157,7 +175,7 @@ export default function ScheduleMeetingModal({
 											const selectedDate = new Date(value);
 											const now = new Date();
 											return selectedDate > now || "Date must be in the future";
-										}
+										},
 									})}
 									min={new Date().toISOString().slice(0, 16)}
 									className="w-full bg-transparent outline-none font-bold text-base text-slate-900 placeholder:text-slate-300"
@@ -187,26 +205,35 @@ export default function ScheduleMeetingModal({
 										key={member.id}
 										type="button"
 										onClick={() => toggleParticipant(member.id)}
-										className={`group relative flex items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${selectedParticipants.includes(member.id)
-											? "border-blue-600 bg-blue-50/30 shadow-lg shadow-blue-100"
-											: "border-slate-100 hover:border-blue-200 bg-white"
-											}`}
+										className={`group relative flex items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${
+											selectedParticipants.includes(member.id)
+												? "border-blue-600 bg-blue-50/30 shadow-lg shadow-blue-100"
+												: "border-slate-100 hover:border-blue-200 bg-white"
+										}`}
 									>
 										<div
-											className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${selectedParticipants.includes(member.id)
-												? "bg-blue-600 text-white rotate-3"
-												: "bg-slate-100 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-600"
-												}`}
+											className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+												selectedParticipants.includes(member.id)
+													? "bg-blue-600 text-white rotate-3"
+													: "bg-slate-100 text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-600"
+											}`}
 										>
 											{selectedParticipants.includes(member.id) ? (
 												<Check size={20} strokeWidth={3} />
 											) : (
-												<span className="text-sm font-black">{member.name.charAt(0)}</span>
+												<span className="text-sm font-black">
+													{member.name.charAt(0)}
+												</span>
 											)}
 										</div>
 										<div className="flex flex-col items-start">
-											<span className={`font-bold text-sm transition-colors ${selectedParticipants.includes(member.id) ? "text-blue-900" : "text-slate-700"
-												}`}>
+											<span
+												className={`font-bold text-sm transition-colors ${
+													selectedParticipants.includes(member.id)
+														? "text-blue-900"
+														: "text-slate-700"
+												}`}
+											>
 												{member.name}
 											</span>
 											<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
@@ -222,7 +249,9 @@ export default function ScheduleMeetingModal({
 							) : (
 								<div className="col-span-2 py-12 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-center gap-2 bg-slate-50/50">
 									<Users size={32} className="text-slate-300 mb-2" />
-									<p className="text-slate-900 font-bold">No Members Available</p>
+									<p className="text-slate-900 font-bold">
+										No Members Available
+									</p>
 									<p className="text-slate-500 text-sm max-w-xs">
 										{selectedProjectId
 											? "This project hasn't been assigned any members yet."
@@ -255,7 +284,10 @@ export default function ScheduleMeetingModal({
 						) : (
 							<>
 								<span className="tracking-wide">CONFIRM SCHEDULE</span>
-								<ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+								<ArrowRight
+									size={20}
+									className="group-hover:translate-x-1 transition-transform"
+								/>
 							</>
 						)}
 					</button>

@@ -17,7 +17,9 @@ export const workLogService = {
 		Object.entries(filters).forEach(([key, value]) => {
 			if (value) queryParams.append(key, value as string);
 		});
-		const res = await api.get(`${API_ENDPOINTS.WORKLOG.MY_WORKLOGS}?${queryParams.toString()}`);
+		const res = await api.get(
+			`${API_ENDPOINTS.WORKLOG.MY_WORKLOGS}?${queryParams.toString()}`,
+		);
 		return res.data;
 	},
 
@@ -26,7 +28,9 @@ export const workLogService = {
 		Object.entries(filters).forEach(([key, value]) => {
 			if (value) queryParams.append(key, value as string);
 		});
-		const res = await api.get(`${API_ENDPOINTS.WORKLOG.ADMIN_WORKLOGS}?${queryParams.toString()}`);
+		const res = await api.get(
+			`${API_ENDPOINTS.WORKLOG.ADMIN_WORKLOGS}?${queryParams.toString()}`,
+		);
 		return res.data;
 	},
 };

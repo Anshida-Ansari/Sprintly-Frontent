@@ -180,11 +180,16 @@ export default function SprintPlanningPage() {
 												<span className="text-[10px] text-gray-400 font-medium">
 													{story.id.slice(-4).toUpperCase()}
 												</span>
-												{story.assignedTo && (Array.isArray(story.assignedTo) ? story.assignedTo.length > 0 : !!story.assignedTo) && (
-													<div className="w-4 h-4 rounded-full bg-indigo-100 flex items-center justify-center text-[8px] font-bold text-indigo-600">
-														{Array.isArray(story.assignedTo) ? story.assignedTo.length : 1}
-													</div>
-												)}
+												{story.assignedTo &&
+													(Array.isArray(story.assignedTo)
+														? story.assignedTo.length > 0
+														: !!story.assignedTo) && (
+														<div className="w-4 h-4 rounded-full bg-indigo-100 flex items-center justify-center text-[8px] font-bold text-indigo-600">
+															{Array.isArray(story.assignedTo)
+																? story.assignedTo.length
+																: 1}
+														</div>
+													)}
 											</div>
 										</div>
 									</div>
@@ -208,10 +213,11 @@ export default function SprintPlanningPage() {
 									key={sprint._id}
 									onDrop={(e) => onDrop(e, sprint._id)}
 									onDragOver={allowDrop}
-									className={`group rounded-2xl border transition-all ${isActive
-										? "bg-white border-indigo-200 shadow-md ring-1 ring-indigo-50"
-										: "bg-white border-gray-200/60 hover:border-gray-300"
-										}`}
+									className={`group rounded-2xl border transition-all ${
+										isActive
+											? "bg-white border-indigo-200 shadow-md ring-1 ring-indigo-50"
+											: "bg-white border-gray-200/60 hover:border-gray-300"
+									}`}
 								>
 									{/* Sprint Header */}
 									<div className="p-4 flex items-center justify-between border-b border-gray-50">
@@ -230,12 +236,13 @@ export default function SprintPlanningPage() {
 														{sprint.name}
 													</h3>
 													<span
-														className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${isActive
-															? "bg-indigo-50 text-indigo-600 border-indigo-100"
-															: isCompleted
-																? "bg-emerald-50 text-emerald-600 border-emerald-100"
-																: "bg-gray-100 text-gray-500 border-gray-200"
-															}`}
+														className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${
+															isActive
+																? "bg-indigo-50 text-indigo-600 border-indigo-100"
+																: isCompleted
+																	? "bg-emerald-50 text-emerald-600 border-emerald-100"
+																	: "bg-gray-100 text-gray-500 border-gray-200"
+														}`}
 													>
 														{sprint.status}
 													</span>
@@ -253,8 +260,13 @@ export default function SprintPlanningPage() {
 												</div>
 												{sprint.goal && (
 													<div className="mt-3 flex items-start gap-2 text-sm text-gray-500 bg-gray-50/80 p-2 rounded-lg border border-gray-100/50">
-														<Target size={14} className="mt-0.5 text-indigo-500 shrink-0" />
-														<span className="font-medium leading-snug">{sprint.goal}</span>
+														<Target
+															size={14}
+															className="mt-0.5 text-indigo-500 shrink-0"
+														/>
+														<span className="font-medium leading-snug">
+															{sprint.goal}
+														</span>
 													</div>
 												)}
 											</div>
@@ -314,21 +326,27 @@ export default function SprintPlanningPage() {
 														</div>
 														<div className="flex items-center gap-4">
 															<span
-																className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${story.status === UserStoryStatus.DONE
-																	? "bg-emerald-50 text-emerald-600"
-																	: story.status ===
-																		UserStoryStatus.IN_PROGRESS
-																		? "bg-blue-50 text-blue-600"
-																		: "bg-gray-100 text-gray-500"
-																	}`}
+																className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+																	story.status === UserStoryStatus.DONE
+																		? "bg-emerald-50 text-emerald-600"
+																		: story.status ===
+																				UserStoryStatus.IN_PROGRESS
+																			? "bg-blue-50 text-blue-600"
+																			: "bg-gray-100 text-gray-500"
+																}`}
 															>
 																{story.status}
 															</span>
-															{story.assignedTo && (Array.isArray(story.assignedTo) ? story.assignedTo.length > 0 : !!story.assignedTo) ? (
+															{story.assignedTo &&
+															(Array.isArray(story.assignedTo)
+																? story.assignedTo.length > 0
+																: !!story.assignedTo) ? (
 																<div className="flex -space-x-1">
 																	{/* Single/Multiple Assignee Avatar */}
 																	<div className="w-6 h-6 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-indigo-600">
-																		{Array.isArray(story.assignedTo) ? story.assignedTo.length : 1}
+																		{Array.isArray(story.assignedTo)
+																			? story.assignedTo.length
+																			: 1}
 																	</div>
 																</div>
 															) : (
@@ -353,7 +371,10 @@ export default function SprintPlanningPage() {
 								/* Add create sprint handler */
 							}}
 						>
-							<Plus size={18} className="group-hover:scale-110 transition-transform" />
+							<Plus
+								size={18}
+								className="group-hover:scale-110 transition-transform"
+							/>
 							<span>Create Sprint</span>
 						</button>
 					</div>

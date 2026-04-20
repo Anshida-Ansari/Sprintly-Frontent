@@ -8,23 +8,24 @@ interface SecureAttachmentLinkProps {
 	fileName: string;
 }
 
-export function SecureAttachmentLink({ fileUrl, fileName }: SecureAttachmentLinkProps) {
+export function SecureAttachmentLink({
+	fileUrl,
+	fileName,
+}: SecureAttachmentLinkProps) {
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleDownload = async (e: React.MouseEvent) => {
 		e.preventDefault();
-		
+
 		if (isLoading) return;
 		setIsLoading(true);
 
 		try {
-	
 			const response = await subtaskService.getDownloadUrl(fileUrl);
-			
+
 			if (response.success && response.data) {
-				
 				const signedUrl = response.data;
-				window.open(signedUrl, '_blank', 'noopener,noreferrer');
+				window.open(signedUrl, "_blank", "noopener,noreferrer");
 			} else {
 				throw new Error("Invalid response from server");
 			}
@@ -46,7 +47,10 @@ export function SecureAttachmentLink({ fileUrl, fileName }: SecureAttachmentLink
 			{isLoading ? (
 				<Loader2 size={12} className="shrink-0 animate-spin text-indigo-500" />
 			) : (
-				<Paperclip size={12} className="shrink-0 text-gray-400 group-hover:text-indigo-500 transition-colors" />
+				<Paperclip
+					size={12}
+					className="shrink-0 text-gray-400 group-hover:text-indigo-500 transition-colors"
+				/>
 			)}
 			<span className="truncate">{fileName}</span>
 		</button>

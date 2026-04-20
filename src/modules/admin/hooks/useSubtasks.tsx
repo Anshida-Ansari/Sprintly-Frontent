@@ -117,8 +117,13 @@ export const useAddSubtaskComment = (userStoryId: string) => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: ({ subtaskId, message }: { subtaskId: string; message: string }) =>
-			subtaskService.addSubtaskComment(subtaskId, { message }),
+		mutationFn: ({
+			subtaskId,
+			message,
+		}: {
+			subtaskId: string;
+			message: string;
+		}) => subtaskService.addSubtaskComment(subtaskId, { message }),
 		onSuccess: (res: any) => {
 			queryClient.invalidateQueries({ queryKey: ["subtasks", userStoryId] });
 			queryClient.invalidateQueries({ queryKey: ["active-sprint-stories"] });

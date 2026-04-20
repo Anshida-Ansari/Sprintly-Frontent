@@ -3,7 +3,6 @@ import {
 	ArrowUp,
 	Building2,
 	ChevronRight,
-
 	MoreVertical,
 	TrendingUp,
 	Users,
@@ -243,12 +242,13 @@ export default function SuperAdminDashboard() {
 									</div>
 									<div className="w-full bg-gray-100 rounded-full h-2.5">
 										<div
-											className={`h-2.5 rounded-full ${index === 0
+											className={`h-2.5 rounded-full ${
+												index === 0
 													? "bg-purple-500"
 													: index === 1
 														? "bg-blue-500"
 														: "bg-gray-400"
-												}`}
+											}`}
 											style={{ width: `${plan.percentage}%` }}
 										></div>
 									</div>
@@ -338,12 +338,13 @@ export default function SuperAdminDashboard() {
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap">
 											<span
-												className={`px-3 py-1 rounded-full text-xs font-medium ${company.plan === "Premium Plan"
+												className={`px-3 py-1 rounded-full text-xs font-medium ${
+													company.plan === "Premium Plan"
 														? "bg-purple-100 text-purple-700"
 														: company.plan === "Standard Plan"
 															? "bg-blue-100 text-blue-700"
 															: "bg-gray-100 text-gray-700"
-													}`}
+												}`}
 											>
 												{company.plan}
 											</span>
@@ -353,10 +354,11 @@ export default function SuperAdminDashboard() {
 										</td>
 										<td className="px-6 py-4 whitespace-nowrap">
 											<span
-												className={`px-3 py-1 rounded-full text-xs font-medium ${company.status === "registered"
+												className={`px-3 py-1 rounded-full text-xs font-medium ${
+													company.status === "registered"
 														? "bg-green-100 text-green-700"
 														: "bg-blue-100 text-blue-700"
-													}`}
+												}`}
 											>
 												{company.status}
 											</span>

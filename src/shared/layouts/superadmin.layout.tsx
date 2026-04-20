@@ -1,24 +1,28 @@
 import {
 	Activity,
+	BarChart3,
 	Building2,
+	ClipboardList,
 	CreditCard,
 	LayoutDashboard,
 	LogOut,
 	Settings,
-	BarChart3,
-	ClipboardList,
 } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
+import { NotificationBell } from "../components/notifications/NotificationBell";
 import { useLogout } from "../hooks/useLogout";
 import { useSocketNotifications } from "../hooks/useSocketNotifications";
-import { NotificationBell } from "../components/notifications/NotificationBell";
 
 const sidebarLinks = [
 	{ name: "Dashboard", path: "/superadmin/dashboard", icon: LayoutDashboard },
 	{ name: "Companies", path: "/superadmin/companies", icon: Building2 },
 	{ name: "Analytics", path: "/superadmin/analytics", icon: BarChart3 },
 	{ name: "Reports", path: "/superadmin/reports", icon: ClipboardList },
-	{ name: "Subscriptions", path: "/superadmin/subscriptions", icon: CreditCard },
+	{
+		name: "Subscriptions",
+		path: "/superadmin/subscriptions",
+		icon: CreditCard,
+	},
 	{ name: "Logs", path: "/superadmin/logs", icon: Activity },
 	{ name: "Settings", path: "/superadmin/settings", icon: Settings },
 ];
@@ -61,7 +65,7 @@ export default function SuperAdminLayout() {
 
 					<div className="flex items-center gap-4">
 						<NotificationBell />
-                        
+
 						<div className="h-8 w-px bg-gray-200 mx-2" />
 						<button
 							onClick={logout}

@@ -36,7 +36,10 @@ export const userStoryService = {
 		projectId: string,
 		payload: CreateUserStoryPayload,
 	): Promise<any> {
-		const res = await api.post(API_ENDPOINTS.ADMIN.USERSTORY.CREATE(projectId), payload);
+		const res = await api.post(
+			API_ENDPOINTS.ADMIN.USERSTORY.CREATE(projectId),
+			payload,
+		);
 		return res.data;
 	},
 
@@ -73,7 +76,7 @@ export const userStoryService = {
 			`${API_ENDPOINTS.ADMIN.USERSTORY.LIST(projectId)}?${query.toString()}`,
 		);
 
-		if (res.data && res.data.data) {
+		if (res.data?.data) {
 			res.data.data = res.data.data.map(mapUserStory);
 		}
 
@@ -85,17 +88,17 @@ export const userStoryService = {
 		userStoryId: string,
 		sprintId: string | null,
 	) {
-		const res = await api.post(API_ENDPOINTS.ADMIN.USERSTORY.ASSIGN_SPRINT(projectId), {
-			userStoryId,
-			sprintId,
-		});
+		const res = await api.post(
+			API_ENDPOINTS.ADMIN.USERSTORY.ASSIGN_SPRINT(projectId),
+			{
+				userStoryId,
+				sprintId,
+			},
+		);
 		return res.data;
 	},
 
-	async assignUserStoryToMember(
-		userStoryId: string,
-		developerId: string,
-	) {
+	async assignUserStoryToMember(userStoryId: string, developerId: string) {
 		const res = await api.patch(
 			API_ENDPOINTS.ADMIN.USERSTORY.ASSIGN_MEMBER(userStoryId),
 			{

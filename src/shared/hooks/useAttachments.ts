@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import axios from "axios";
+import { toast } from "sonner";
 import { subtaskService } from "../../modules/admin/services/subtask.service";
 
 export const useAttachments = (subtaskId: string, userStoryId?: string) => {
@@ -8,22 +8,19 @@ export const useAttachments = (subtaskId: string, userStoryId?: string) => {
 
 	return useMutation({
 		mutationFn: async (file: File) => {
-			
 			const { data } = await subtaskService.getUploadUrl({
 				fileName: file.name,
 				fileType: file.type,
 			});
-			
+
 			const { uploadUrl, fileUrl } = data;
 
-		
 			await axios.put(uploadUrl, file, {
 				headers: {
 					"Content-Type": file.type,
 				},
 			});
 
-			
 			const result = await subtaskService.addAttachment(subtaskId, {
 				fileUrl,
 				fileName: file.name,

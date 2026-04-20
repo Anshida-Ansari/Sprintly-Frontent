@@ -59,18 +59,27 @@ export default function ProjectCard({
 				<div className="mb-6 space-y-2">
 					<div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
 						<span>Progress</span>
-						<span className="text-indigo-600">{Math.round(project.analytics.progressPercentage)}%</span>
+						<span className="text-indigo-600">
+							{Math.round(project.analytics.progressPercentage)}%
+						</span>
 					</div>
 					<div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-						<div 
-							className="h-full bg-indigo-500 transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(99,102,241,0.4)]" 
+						<div
+							className="h-full bg-indigo-500 transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(99,102,241,0.4)]"
 							style={{ width: `${project.analytics.progressPercentage}%` }}
 						/>
 					</div>
 					<div className="flex justify-between items-center text-[10px] font-bold text-gray-500">
-						<span>{project.analytics.completedStories} / {project.analytics.totalStories} Stories</span>
+						<span>
+							{project.analytics.completedStories} /{" "}
+							{project.analytics.totalStories} Stories
+						</span>
 						{project.analytics.totalStories > 0 && (
-							<span>{project.analytics.totalStories - project.analytics.completedStories} Remaining</span>
+							<span>
+								{project.analytics.totalStories -
+									project.analytics.completedStories}{" "}
+								Remaining
+							</span>
 						)}
 					</div>
 				</div>

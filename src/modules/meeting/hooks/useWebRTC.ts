@@ -15,9 +15,15 @@ const configuration = {
 
 export function useWebRTC(roomId: string, userId: string, userName: string) {
 	const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-	const [remoteStreams, setRemoteStreams] = useState<Record<string, MediaStream>>({});
-	const [remoteUsers, setRemoteUsers] = useState<Record<string, { socketId: string; userName: string }>>({});
-	const [remoteCameraOff, setRemoteCameraOff] = useState<Record<string, boolean>>({});
+	const [remoteStreams, setRemoteStreams] = useState<
+		Record<string, MediaStream>
+	>({});
+	const [remoteUsers, setRemoteUsers] = useState<
+		Record<string, { socketId: string; userName: string }>
+	>({});
+	const [remoteCameraOff, setRemoteCameraOff] = useState<
+		Record<string, boolean>
+	>({});
 	const [isScreenSharing, setIsScreenSharing] = useState(false);
 	const [messages, setMessages] = useState<any[]>([]);
 	const [activeSpeaker] = useState<string | null>(null);
@@ -117,67 +123,69 @@ export function useWebRTC(roomId: string, userId: string, userName: string) {
 
 		socket.emit("join-room", roomId, userId, userName);
 
-		socket.on("user-joined", ({ socketId, userName: joinedName }: { socketId: string, userName?: string }) => {
-			console.log(`[Socket] user-joined: ${socketId} - ${joinedName}`);
-			if (joinedName) {
-				setRemoteUsers(prev => ({ ...prev, [socketId]: { socketId, userName: joinedName } }));
-			}
-		});
-
-		socket.on("existing-users", (users: { socketId: string, userName?: string }[]) => {
-			console.log(`[Socket] existing-users:`, users.map((u) => u.socketId));
-			const usersMap: Record<string, any> = {};
-			users.forEach(async (user) => {
-				if (user.userName) {
-					usersMap[user.socketId] = { socketId: user.socketId, userName: user.userName };
+		socket.on(
+			"user-joined",
+			({
+				socketId,
+				userName: joinedName,
+			}: {
+				socketId: string;
+				userName?: string;
+			}) => {
+				console.log(`[Socket] user-joined: ${socketId} - ${joinedName}`);
+				if (joinedName) {
+					setRemoteUsers((prev) => ({
+						...prev,
+						[socketId]: { socketId, userName: joinedName },
+					}));
 				}
-				const pc = createPeerConnection(user.socketId, localStream);
+			},
+		);
+
+		socket.on(
+			"existing-users",
+			(users: { socketId: string; userName?: string }[]) => {
+				console.log(
+					`[Socket] existing-users:`,
+					users.map((u) => u.socketId),
+				);
+				const usersMap: Record<string, any> = {};
+				users.forEach(async (user) => {
+					if (user.userName) {
+						usersMap[user.socketId] = {
+							socketId: user.socketId,
+							userName: user.userName,
+						};
+					}
+					const pc = createPeerConnection(user.socketId, localStream);
+					try {
+						const offer = await pc.createOffer();
+						await pc.setLocalDescription(offer);
+						socket.emit("offer", { roomId, to: user.socketId, offer });
+					} catch (err) {
+						console.error("[WebRTC] Error creating offer:", err);
+					}
+				});
+				if (Object.keys(usersMap).length > 0) {
+					setRemoteUsers((prev) => ({ ...prev, ...usersMap }));
+				}
+			},
+		);
+
+		socket.on(
+			"offer",
+			async ({
+				from,
+				offer,
+			}: {
+				from: string;
+				offer: RTCSessionDescriptionInit;
+			}) => {
+				console.log(`[Socket] offer from ${from}`);
+				const pc = createPeerConnection(from, localStream);
 				try {
-					const offer = await pc.createOffer();
-					await pc.setLocalDescription(offer);
-					socket.emit("offer", { roomId, to: user.socketId, offer });
-				} catch (err) {
-					console.error("[WebRTC] Error creating offer:", err);
-				}
-			});
-			if (Object.keys(usersMap).length > 0) {
-				setRemoteUsers(prev => ({ ...prev, ...usersMap }));
-			}
-		});
+					await pc.setRemoteDescription(new RTCSessionDescription(offer));
 
-		socket.on("offer", async ({ from, offer }: { from: string; offer: RTCSessionDescriptionInit }) => {
-			console.log(`[Socket] offer from ${from}`);
-			const pc = createPeerConnection(from, localStream);
-			try {
-				await pc.setRemoteDescription(new RTCSessionDescription(offer));
-				
-				// Process queued ICE candidates
-				if (candidateQueue.current[from]) {
-					candidateQueue.current[from].forEach(async (candidate) => {
-						try {
-							await pc.addIceCandidate(new RTCIceCandidate(candidate));
-						} catch (e) {
-							console.error("[WebRTC] Error adding queued ICE candidate:", e);
-						}
-					});
-					candidateQueue.current[from] = [];
-				}
-
-				const answer = await pc.createAnswer();
-				await pc.setLocalDescription(answer);
-				socket.emit("answer", { roomId, to: from, answer });
-			} catch (err) {
-				console.error("[WebRTC] Error handling offer:", err);
-			}
-		});
-
-		socket.on("answer", async ({ from, answer }: { from: string; answer: RTCSessionDescriptionInit }) => {
-			console.log(`[Socket] answer from ${from}`);
-			const pc = peers.current[from]?.connection;
-			if (pc) {
-				try {
-					await pc.setRemoteDescription(new RTCSessionDescription(answer));
-					
 					// Process queued ICE candidates
 					if (candidateQueue.current[from]) {
 						candidateQueue.current[from].forEach(async (candidate) => {
@@ -189,28 +197,78 @@ export function useWebRTC(roomId: string, userId: string, userName: string) {
 						});
 						candidateQueue.current[from] = [];
 					}
-				} catch (err) {
-					console.error("[WebRTC] Error setting remote description:", err);
-				}
-			}
-		});
 
-		socket.on("ice-candidate", async ({ from, candidate }: { from: string; candidate: RTCIceCandidateInit }) => {
-			const pc = peers.current[from]?.connection;
-			if (pc) {
-				if (pc.remoteDescription) {
-					try {
-						await pc.addIceCandidate(new RTCIceCandidate(candidate));
-					} catch (err) {
-						console.error("[WebRTC] Error adding ICE candidate:", err);
-					}
-				} else {
-					console.log(`[WebRTC] Queuing ICE candidate from ${from}`);
-					if (!candidateQueue.current[from]) candidateQueue.current[from] = [];
-					candidateQueue.current[from].push(candidate);
+					const answer = await pc.createAnswer();
+					await pc.setLocalDescription(answer);
+					socket.emit("answer", { roomId, to: from, answer });
+				} catch (err) {
+					console.error("[WebRTC] Error handling offer:", err);
 				}
-			}
-		});
+			},
+		);
+
+		socket.on(
+			"answer",
+			async ({
+				from,
+				answer,
+			}: {
+				from: string;
+				answer: RTCSessionDescriptionInit;
+			}) => {
+				console.log(`[Socket] answer from ${from}`);
+				const pc = peers.current[from]?.connection;
+				if (pc) {
+					try {
+						await pc.setRemoteDescription(new RTCSessionDescription(answer));
+
+						// Process queued ICE candidates
+						if (candidateQueue.current[from]) {
+							candidateQueue.current[from].forEach(async (candidate) => {
+								try {
+									await pc.addIceCandidate(new RTCIceCandidate(candidate));
+								} catch (e) {
+									console.error(
+										"[WebRTC] Error adding queued ICE candidate:",
+										e,
+									);
+								}
+							});
+							candidateQueue.current[from] = [];
+						}
+					} catch (err) {
+						console.error("[WebRTC] Error setting remote description:", err);
+					}
+				}
+			},
+		);
+
+		socket.on(
+			"ice-candidate",
+			async ({
+				from,
+				candidate,
+			}: {
+				from: string;
+				candidate: RTCIceCandidateInit;
+			}) => {
+				const pc = peers.current[from]?.connection;
+				if (pc) {
+					if (pc.remoteDescription) {
+						try {
+							await pc.addIceCandidate(new RTCIceCandidate(candidate));
+						} catch (err) {
+							console.error("[WebRTC] Error adding ICE candidate:", err);
+						}
+					} else {
+						console.log(`[WebRTC] Queuing ICE candidate from ${from}`);
+						if (!candidateQueue.current[from])
+							candidateQueue.current[from] = [];
+						candidateQueue.current[from].push(candidate);
+					}
+				}
+			},
+		);
 
 		socket.on("user-left", (socketId: string) => {
 			console.log(`[Socket] user-left: ${socketId}`);
@@ -234,9 +292,12 @@ export function useWebRTC(roomId: string, userId: string, userName: string) {
 			setMessages((prev) => [...prev, payload]);
 		});
 
-		socket.on("peer-camera-toggle", ({ from, isOn }: { from: string; isOn: boolean }) => {
-			setRemoteCameraOff((prev) => ({ ...prev, [from]: !isOn }));
-		});
+		socket.on(
+			"peer-camera-toggle",
+			({ from, isOn }: { from: string; isOn: boolean }) => {
+				setRemoteCameraOff((prev) => ({ ...prev, [from]: !isOn }));
+			},
+		);
 
 		socket.on("meeting-ended", () => {
 			setIsMeetingEnded(true);
@@ -264,7 +325,7 @@ export function useWebRTC(roomId: string, userId: string, userName: string) {
 			socket.disconnect();
 			socketRef.current = null;
 		};
-	}, [roomId, userId, localStream]); // eslint-disable-line react-hooks/exhaustive-deps
+	}, [roomId, userId, localStream, userName]);
 
 	const toggleScreenShare = async () => {
 		try {
@@ -324,7 +385,10 @@ export function useWebRTC(roomId: string, userId: string, userName: string) {
 
 	const endMeetingSocket = (meetingRoomId: string) => {
 		if (socketRef.current) {
-			socket.emit("end-meeting", { roomId: meetingRoomId, meetingId: meetingRoomId });
+			socket.emit("end-meeting", {
+				roomId: meetingRoomId,
+				meetingId: meetingRoomId,
+			});
 		}
 	};
 

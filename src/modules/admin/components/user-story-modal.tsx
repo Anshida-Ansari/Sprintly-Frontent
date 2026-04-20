@@ -1,14 +1,17 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, X } from "lucide-react";
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {
+	type UserStoryFormData,
+	userStorySchema,
+} from "../schemas/admin.schemas";
 import {
 	type IUserStory,
 	PriorityStatus,
 	UserStoryStatus,
 } from "../types/types";
-import { userStorySchema, type UserStoryFormData } from "../schemas/admin.schemas";
 
 interface UserStoryModalProps {
 	isOpen: boolean;
@@ -55,7 +58,7 @@ export default function UserStoryModal({
 				setValue("acceptanceCriteria", userStory.acceptanceCriteria || []);
 				setValue(
 					"acceptanceCriteriaText",
-					userStory.acceptanceCriteria?.join("\n") || ""
+					userStory.acceptanceCriteria?.join("\n") || "",
 				);
 			} else {
 				reset({
@@ -75,7 +78,9 @@ export default function UserStoryModal({
 
 	const handleFormSubmit = (data: UserStoryFormData) => {
 		const criteriaArray = data.acceptanceCriteriaText
-			? data.acceptanceCriteriaText.split("\n").filter((line: string) => line.trim() !== "")
+			? data.acceptanceCriteriaText
+					.split("\n")
+					.filter((line: string) => line.trim() !== "")
 			: [];
 
 		const payload = {
@@ -89,16 +94,15 @@ export default function UserStoryModal({
 	};
 
 	const modalContent = (
-		<div 
+		<div
 			className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
 			onClick={onClose}
 		>
 			{/* Modal Panel */}
-			<div 
+			<div
 				className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 border border-gray-100"
 				onClick={(e) => e.stopPropagation()}
 			>
-
 				{/* Header */}
 				<div className="px-6 py-4 flex justify-between items-center border-b border-gray-100 shrink-0">
 					<h2 className="text-lg font-semibold text-gray-900">
@@ -127,9 +131,9 @@ export default function UserStoryModal({
 							<input
 								{...register("title")}
 								placeholder="Issue title..."
-								autoFocus
-								className={`w-full px-3 py-2.5 bg-white border ${errors.title ? "border-red-500" : "border-gray-200"
-									} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium text-gray-900 placeholder:text-gray-400`}
+								className={`w-full px-3 py-2.5 bg-white border ${
+									errors.title ? "border-red-500" : "border-gray-200"
+								} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium text-gray-900 placeholder:text-gray-400`}
 							/>
 							{errors.title && (
 								<p className="text-red-500 text-xs mt-0.5">
@@ -146,8 +150,9 @@ export default function UserStoryModal({
 								{...register("description")}
 								rows={4}
 								placeholder="Add a description..."
-								className={`w-full px-3 py-2.5 bg-white border ${errors.description ? "border-red-500" : "border-gray-200"
-									} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm text-gray-900 placeholder:text-gray-400 resize-none leading-relaxed`}
+								className={`w-full px-3 py-2.5 bg-white border ${
+									errors.description ? "border-red-500" : "border-gray-200"
+								} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm text-gray-900 placeholder:text-gray-400 resize-none leading-relaxed`}
 							/>
 							{errors.description && (
 								<p className="text-red-500 text-xs mt-0.5">
@@ -184,10 +189,12 @@ export default function UserStoryModal({
 								</label>
 								<div className="relative">
 									<select
-										{...register("estimationPoints", { valueAsNumber: true })} className={`w-full px-3 py-2.5 bg-white border ${errors.estimationPoints
-											? "border-red-500"
-											: "border-gray-200"
-											} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium text-gray-900 appearance-none cursor-pointer`}
+										{...register("estimationPoints", { valueAsNumber: true })}
+										className={`w-full px-3 py-2.5 bg-white border ${
+											errors.estimationPoints
+												? "border-red-500"
+												: "border-gray-200"
+										} rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all outline-none text-sm font-medium text-gray-900 appearance-none cursor-pointer`}
 									>
 										{[
 											{ value: 1, label: "1 - Very Easy" },
@@ -239,7 +246,10 @@ export default function UserStoryModal({
 
 						<div className="space-y-1.5">
 							<label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-								Acceptance Criteria <span className="text-gray-400 font-normal lowercase">(one per line)</span>
+								Acceptance Criteria{" "}
+								<span className="text-gray-400 font-normal lowercase">
+									(one per line)
+								</span>
 							</label>
 							<textarea
 								{...register("acceptanceCriteriaText")}

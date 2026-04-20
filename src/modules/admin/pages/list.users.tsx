@@ -10,8 +10,8 @@ import {
 	User,
 } from "lucide-react";
 import { useState } from "react";
-import { Pagination } from "../../../shared/components/pagination";
 import ConfirmationModal from "../../../shared/components/ConfirmationModal";
+import { Pagination } from "../../../shared/components/pagination";
 import { useDebounce } from "../../../shared/hooks/useDebounce";
 import InviteMemberModal from "../components/invite.modal";
 import { useBlockUser } from "../hooks/useBlockUser";
@@ -55,7 +55,11 @@ export default function Members() {
 	const members = data?.data || [];
 	const totalPages = data?.totalPages || 1;
 
-	const handleInvite = (payload: { name: string; email: string; role: string }) => {
+	const handleInvite = (payload: {
+		name: string;
+		email: string;
+		role: string;
+	}) => {
 		inviteMember(payload, {
 			onSuccess: () => {
 				setIsModalOpen(false);
@@ -177,20 +181,22 @@ export default function Members() {
 								{/* Status */}
 								<div className="col-span-2 hidden md:block">
 									<span
-										className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight ${member.status === "active"
+										className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight ${
+											member.status === "active"
 												? "bg-emerald-50 text-emerald-600"
 												: member.status === "pending"
 													? "bg-amber-50 text-amber-600"
 													: "bg-rose-50 text-rose-600"
-											}`}
+										}`}
 									>
 										<span
-											className={`w-1.5 h-1.5 rounded-full ${member.status === "active"
+											className={`w-1.5 h-1.5 rounded-full ${
+												member.status === "active"
 													? "bg-emerald-500"
 													: member.status === "pending"
 														? "bg-amber-500"
 														: "bg-rose-500"
-												}`}
+											}`}
 										/>
 										{member.status === "active"
 											? "Active"
@@ -212,7 +218,9 @@ export default function Members() {
 
 								<div className="col-span-1 text-right flex justify-end gap-2">
 									{member.status === "pending" ? (
-										<span className="text-xs text-slate-400 italic pr-2">Awaiting setup</span>
+										<span className="text-xs text-slate-400 italic pr-2">
+											Awaiting setup
+										</span>
 									) : member.status === "active" ? (
 										<button
 											onClick={() =>

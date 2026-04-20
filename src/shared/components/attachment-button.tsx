@@ -1,5 +1,6 @@
 import { Loader2, Paperclip } from "lucide-react";
-import React, { useRef } from "react";
+import type React from "react";
+import { useRef } from "react";
 import { useAttachments } from "../hooks/useAttachments";
 
 interface AttachmentButtonProps {
@@ -8,20 +9,23 @@ interface AttachmentButtonProps {
 	variant?: "icon" | "full";
 }
 
-export function AttachmentButton({ subtaskId, userStoryId, variant = "icon" }: AttachmentButtonProps) {
+export function AttachmentButton({
+	subtaskId,
+	userStoryId,
+	variant = "icon",
+}: AttachmentButtonProps) {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const attachMutation = useAttachments(subtaskId, userStoryId);
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
-		
+
 		attachMutation.mutate(file);
-        
-       
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
+
+		if (fileInputRef.current) {
+			fileInputRef.current.value = "";
+		}
 	};
 
 	if (variant === "icon") {
@@ -32,7 +36,7 @@ export function AttachmentButton({ subtaskId, userStoryId, variant = "icon" }: A
 					ref={fileInputRef}
 					onChange={handleFileChange}
 					className="hidden"
-                    accept="image/*,.pdf,.doc,.docx"
+					accept="image/*,.pdf,.doc,.docx"
 				/>
 				<button
 					onClick={() => fileInputRef.current?.click()}
@@ -57,7 +61,7 @@ export function AttachmentButton({ subtaskId, userStoryId, variant = "icon" }: A
 				ref={fileInputRef}
 				onChange={handleFileChange}
 				className="hidden"
-                accept="image/*,.pdf,.doc,.docx"
+				accept="image/*,.pdf,.doc,.docx"
 			/>
 			<button
 				onClick={() => fileInputRef.current?.click()}

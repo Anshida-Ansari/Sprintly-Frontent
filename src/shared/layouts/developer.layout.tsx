@@ -1,6 +1,7 @@
 import {
 	Box,
 	CheckSquare,
+	Clock,
 	Kanban,
 	LayoutDashboard,
 	LogOut,
@@ -9,19 +10,17 @@ import {
 	UserCircle,
 	Video,
 	Zap,
-	Clock,
 } from "lucide-react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { DashboardHeader } from "../components/layout/DashboardHeader";
 import { useLogout } from "../hooks/useLogout";
 import { useSocketNotifications } from "../hooks/useSocketNotifications";
-import { DashboardHeader } from "../components/layout/DashboardHeader";
 
 const sidebarLinks = [
 	{ name: "Dashboard", path: "/developers/dashboard", icon: LayoutDashboard },
 	{ name: "Kanban Board", path: "/developers/kanban", icon: Kanban },
 	{ name: "My Tasks", path: "/developers/tasks", icon: CheckSquare },
 	{ name: "Projects", path: "/developers/projects", icon: Box },
-	{ name: "Sprints", path: "/developers/sprints", icon: Zap },
 	{ name: "Standups", path: "/developers/standups", icon: MessagesSquare },
 	{ name: "Meetings", path: "/developers/meetings", icon: Video },
 	{ name: "Profile", path: "/developers/profile", icon: UserCircle },
@@ -33,8 +32,6 @@ export default function DeveloperLayout() {
 	const location = useLocation();
 	useSocketNotifications();
 
-
-    
 	return (
 		<div className="flex min-h-screen bg-slate-50 text-gray-600 font-sans selection:bg-indigo-100">
 			{/* Sidebar */}
@@ -65,16 +62,23 @@ export default function DeveloperLayout() {
 								key={link.path}
 								to={link.path}
 								className={({ isActive }) =>
-									`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative ${isActive
-										? "bg-indigo-50 text-indigo-700 font-bold shadow-sm ring-1 ring-indigo-100"
-										: "hover:bg-gray-50 hover:text-gray-900 font-medium"
+									`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative ${
+										isActive
+											? "bg-indigo-50 text-indigo-700 font-bold shadow-sm ring-1 ring-indigo-100"
+											: "hover:bg-gray-50 hover:text-gray-900 font-medium"
 									}`
 								}
 							>
 								<Icon
 									size={20}
-									className={`transition-transform duration-300 group-hover:scale-110 ${({ isActive }: { isActive: boolean }) => isActive ? "text-indigo-600" : "text-gray-400 group-hover:text-gray-600"
-										}`}
+									className={`transition-transform duration-300 group-hover:scale-110 ${({
+										isActive,
+									}: {
+										isActive: boolean;
+									}) =>
+										isActive
+											? "text-indigo-600"
+											: "text-gray-400 group-hover:text-gray-600"}`}
 								/>
 								<span className="hidden lg:block text-sm tracking-tight">
 									{link.name}
@@ -106,11 +110,16 @@ export default function DeveloperLayout() {
 			{/* Main Stage */}
 			<main className="flex-1 overflow-y-auto relative">
 				<div className="p-8 lg:p-12 relative z-10 max-w-[1600px] mx-auto">
-                    <DashboardHeader title={location.pathname === "/developers/dashboard" ? "Developer Portal" : undefined} />
+					<DashboardHeader
+						title={
+							location.pathname === "/developers/dashboard"
+								? "Developer Portal"
+								: undefined
+						}
+					/>
 					<Outlet />
 				</div>
 			</main>
 		</div>
 	);
 }
-

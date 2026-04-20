@@ -7,7 +7,7 @@ import {
 	User,
 	Video,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMeetings } from "../../admin/hooks/useMeetings";
 import { useProjects } from "../../admin/hooks/useProjects";
@@ -18,7 +18,7 @@ export default function DeveloperMeetings() {
 	const { data: projectsRes } = useProjects({ page: 1, limit: 100 });
 	const { meetings, isLoading } = useMeetings(selectedProjectId);
 
-	const projects = projectsRes?.data || [];
+	const projects = useMemo(() => projectsRes?.data || [], [projectsRes?.data]);
 	useEffect(() => {
 		if (!selectedProjectId && projects.length > 0) {
 			setSelectedProjectId(projects[0].id);
@@ -145,19 +145,30 @@ export default function DeveloperMeetings() {
 							</div>
 
 							<button
-								disabled={meeting.status === "COMPLETED" || meeting.status === "CANCELLED" || meeting.status === "SCHEDULED"}
+								disabled={
+									meeting.status === "COMPLETED" ||
+									meeting.status === "CANCELLED" ||
+									meeting.status === "SCHEDULED"
+								}
 								onClick={() =>
 									(window.location.href = `/meeting/${meeting.roomId}`)
 								}
 								className={`mt-8 w-full py-4 rounded-2xl font-black transition-all flex items-center justify-center gap-3 ${
-									meeting.status === "COMPLETED" || meeting.status === "CANCELLED"
+									meeting.status === "COMPLETED" ||
+									meeting.status === "CANCELLED"
 										? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
 										: meeting.status === "SCHEDULED"
 											? "bg-indigo-50 text-indigo-400 cursor-not-allowed"
 											: "bg-gray-900 group-hover:bg-indigo-600 text-white"
 								}`}
 							>
-								{meeting.status === "COMPLETED" ? "Meeting Ended" : meeting.status === "CANCELLED" ? "Meeting Cancelled" : meeting.status === "SCHEDULED" ? "Waiting for Host" : "Join Meeting"}
+								{meeting.status === "COMPLETED"
+									? "Meeting Ended"
+									: meeting.status === "CANCELLED"
+										? "Meeting Cancelled"
+										: meeting.status === "SCHEDULED"
+											? "Waiting for Host"
+											: "Join Meeting"}
 								{meeting.status === "ONGOING" && (
 									<ArrowUpRight
 										size={20}

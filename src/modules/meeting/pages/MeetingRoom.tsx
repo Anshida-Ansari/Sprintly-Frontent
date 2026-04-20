@@ -13,8 +13,8 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { buildPath, ROUTES } from "../../../constants/routes";
-import { UserAuth } from "../../auth/store/store";
 import { meetingService } from "../../admin/services/meeting.service";
+import { UserAuth } from "../../auth/store/store";
 import { useWebRTC } from "../hooks/useWebRTC";
 
 const VideoPlayer = ({
@@ -37,7 +37,9 @@ const VideoPlayer = ({
 	return (
 		<div
 			className={`relative bg-gray-900 rounded-3xl overflow-hidden border border-gray-700/50 shadow-2xl transition-all duration-300 ${
-				isLocal ? "ring-2 ring-indigo-500 ring-offset-4 ring-offset-gray-900" : "hover:border-indigo-500/50"
+				isLocal
+					? "ring-2 ring-indigo-500 ring-offset-4 ring-offset-gray-900"
+					: "hover:border-indigo-500/50"
 			}`}
 		>
 			{stream ? (
@@ -59,7 +61,9 @@ const VideoPlayer = ({
 				<div
 					className={`w-2 h-2 rounded-full ${isLocal ? "bg-indigo-500" : "bg-emerald-500"}`}
 				/>
-				<span className="text-xs font-medium text-white/90 truncate max-w-[150px]">{label}</span>
+				<span className="text-xs font-medium text-white/90 truncate max-w-[150px]">
+					{label}
+				</span>
 			</div>
 		</div>
 	);
@@ -82,7 +86,11 @@ export default function MeetingRoom() {
 		isMeetingEnded,
 		endMeetingSocket,
 		emitCameraToggle,
-	} = useWebRTC(roomId || "default", user?.id || "anonymous", user?.name || "Anonymous");
+	} = useWebRTC(
+		roomId || "default",
+		user?.id || "anonymous",
+		user?.name || "Anonymous",
+	);
 
 	const [isMicOn, setIsMicOn] = useState(true);
 	const [isCameraOn, setIsCameraOn] = useState(true);
@@ -107,7 +115,9 @@ export default function MeetingRoom() {
 
 	const toggleMic = () => {
 		if (localStream) {
-			localStream.getAudioTracks().forEach((track) => (track.enabled = !isMicOn));
+			localStream
+				.getAudioTracks()
+				.forEach((track) => (track.enabled = !isMicOn));
 			setIsMicOn((prev) => !prev);
 		}
 	};
@@ -115,7 +125,9 @@ export default function MeetingRoom() {
 	const toggleCamera = () => {
 		if (localStream) {
 			const newState = !isCameraOn;
-			localStream.getVideoTracks().forEach((track) => (track.enabled = newState));
+			localStream
+				.getVideoTracks()
+				.forEach((track) => (track.enabled = newState));
 			setIsCameraOn(newState);
 			emitCameraToggle(newState); // tell peers
 		}
@@ -143,7 +155,10 @@ export default function MeetingRoom() {
 	};
 
 	const handleEndMeeting = async () => {
-		if (!window.confirm("Are you sure you want to end the meeting for everyone?")) return;
+		if (
+			!window.confirm("Are you sure you want to end the meeting for everyone?")
+		)
+			return;
 
 		// 1. Emit socket event to kick everyone
 		endMeetingSocket(roomId || "default");
@@ -210,7 +225,10 @@ export default function MeetingRoom() {
 				<div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-xl border border-white/5 text-[11px] font-bold text-white/50">
 					{remoteCount + 1} participants
 					<span className="text-white/20 mx-1">·</span>
-					Room: <span className="text-white/80 font-mono ml-1">{(roomId || "").slice(0, 8)}</span>
+					Room:{" "}
+					<span className="text-white/80 font-mono ml-1">
+						{(roomId || "").slice(0, 8)}
+					</span>
 				</div>
 			</div>
 
@@ -248,7 +266,9 @@ export default function MeetingRoom() {
 						{remoteCount === 0 && localStream && (
 							<div className="flex flex-col items-center justify-center bg-white/[0.03] rounded-3xl border border-white/5 border-dashed min-h-[200px]">
 								<Users size={28} className="text-white/20 mb-3" />
-								<p className="text-white/30 font-bold text-sm">Waiting for others to join...</p>
+								<p className="text-white/30 font-bold text-sm">
+									Waiting for others to join...
+								</p>
 							</div>
 						)}
 					</div>
@@ -276,7 +296,9 @@ export default function MeetingRoom() {
 							<>
 								<div className="flex-1 overflow-y-auto p-4 space-y-4">
 									{messages.length === 0 && (
-										<p className="text-white/20 text-sm text-center mt-8">No messages yet</p>
+										<p className="text-white/20 text-sm text-center mt-8">
+											No messages yet
+										</p>
 									)}
 									{messages.map((msg, i) => (
 										<div
@@ -306,7 +328,10 @@ export default function MeetingRoom() {
 										</div>
 									))}
 								</div>
-								<form onSubmit={handleSendMessage} className="p-3 border-t border-white/5">
+								<form
+									onSubmit={handleSendMessage}
+									className="p-3 border-t border-white/5"
+								>
 									<div className="relative">
 										<input
 											type="text"
@@ -332,18 +357,31 @@ export default function MeetingRoom() {
 										{user?.name?.charAt(0).toUpperCase()}
 									</div>
 									<div className="min-w-0">
-										<p className="text-sm font-bold truncate">{user?.name} (You)</p>
-										<p className="text-[10px] text-white/30 uppercase tracking-widest">{user?.role}</p>
+										<p className="text-sm font-bold truncate">
+											{user?.name} (You)
+										</p>
+										<p className="text-[10px] text-white/30 uppercase tracking-widest">
+											{user?.role}
+										</p>
 									</div>
 								</div>
 								{Object.keys(remoteStreams).map((socketId) => (
-									<div key={socketId} className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all">
+									<div
+										key={socketId}
+										className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl transition-all"
+									>
 										<div className="w-9 h-9 bg-white/5 rounded-lg flex items-center justify-center font-bold text-sm text-white/40 flex-shrink-0">
-											{(remoteUsers[socketId]?.userName || "P").charAt(0).toUpperCase()}
+											{(remoteUsers[socketId]?.userName || "P")
+												.charAt(0)
+												.toUpperCase()}
 										</div>
 										<div className="min-w-0">
-											<p className="text-sm font-bold truncate">{remoteUsers[socketId]?.userName || "Participant"}</p>
-											<p className="text-[10px] text-white/30 font-mono">{socketId.slice(0, 8)}</p>
+											<p className="text-sm font-bold truncate">
+												{remoteUsers[socketId]?.userName || "Participant"}
+											</p>
+											<p className="text-[10px] text-white/30 font-mono">
+												{socketId.slice(0, 8)}
+											</p>
 										</div>
 									</div>
 								))}
@@ -361,7 +399,9 @@ export default function MeetingRoom() {
 						onClick={toggleMic}
 						title={isMicOn ? "Mute" : "Unmute"}
 						className={`p-3.5 rounded-2xl transition-all ${
-							isMicOn ? "bg-white/5 hover:bg-white/10 text-white/80" : "bg-rose-500 text-white"
+							isMicOn
+								? "bg-white/5 hover:bg-white/10 text-white/80"
+								: "bg-rose-500 text-white"
 						}`}
 					>
 						{isMicOn ? <Mic size={20} /> : <MicOff size={20} />}
@@ -372,7 +412,9 @@ export default function MeetingRoom() {
 						onClick={toggleCamera}
 						title={isCameraOn ? "Turn off camera" : "Turn on camera"}
 						className={`p-3.5 rounded-2xl transition-all ${
-							isCameraOn ? "bg-white/5 hover:bg-white/10 text-white/80" : "bg-rose-500 text-white"
+							isCameraOn
+								? "bg-white/5 hover:bg-white/10 text-white/80"
+								: "bg-rose-500 text-white"
 						}`}
 					>
 						{isCameraOn ? <Camera size={20} /> : <CameraOff size={20} />}
@@ -385,7 +427,9 @@ export default function MeetingRoom() {
 						onClick={toggleScreenShare}
 						title="Share screen"
 						className={`p-3.5 rounded-2xl transition-all ${
-							isScreenSharing ? "bg-indigo-600 text-white" : "bg-white/5 hover:bg-white/10 text-white/50"
+							isScreenSharing
+								? "bg-indigo-600 text-white"
+								: "bg-white/5 hover:bg-white/10 text-white/50"
 						}`}
 					>
 						<Monitor size={20} />
@@ -399,7 +443,9 @@ export default function MeetingRoom() {
 						}}
 						title="Chat"
 						className={`p-3.5 rounded-2xl transition-all ${
-							showChat ? "bg-indigo-600 text-white" : "bg-white/5 hover:bg-white/10 text-white/50"
+							showChat
+								? "bg-indigo-600 text-white"
+								: "bg-white/5 hover:bg-white/10 text-white/50"
 						}`}
 					>
 						<MessageSquare size={20} />
@@ -413,7 +459,9 @@ export default function MeetingRoom() {
 						}}
 						title="Participants"
 						className={`p-3.5 rounded-2xl transition-all ${
-							showParticipants ? "bg-indigo-600 text-white" : "bg-white/5 hover:bg-white/10 text-white/50"
+							showParticipants
+								? "bg-indigo-600 text-white"
+								: "bg-white/5 hover:bg-white/10 text-white/50"
 						}`}
 					>
 						<Users size={20} />

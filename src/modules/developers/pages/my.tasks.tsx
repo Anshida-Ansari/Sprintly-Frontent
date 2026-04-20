@@ -5,24 +5,24 @@ import {
 	ChevronDown,
 	ChevronRight,
 	Clock,
-	Loader2,
-	Plus,
 	Flame,
-	RefreshCcw,
-	X,
-	TrendingUp,
-	TrendingDown,
 	KanbanSquare,
+	Loader2,
+	MessageSquare,
+	Plus,
+	RefreshCcw,
+	TrendingDown,
+	TrendingUp,
+	X,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { subtaskService } from "../../admin/services/subtask.service";
-import { userStoryService } from "../services/userstory.service";
+import CommentSection from "../../admin/components/comment-section";
 
 import { useGetMembers } from "../../admin/hooks/useGetmembers";
+import { subtaskService } from "../../admin/services/subtask.service";
 import { UserAuth } from "../../auth/store/store";
-import CommentSection from "../../admin/components/comment-section";
-import { MessageSquare } from "lucide-react";
+import { userStoryService } from "../services/userstory.service";
 
 export default function MyTasksPage() {
 	const queryClient = useQueryClient();
@@ -30,11 +30,16 @@ export default function MyTasksPage() {
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null);
 	const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
-	const [newSubtaskEstimatedHours, setNewSubtaskEstimatedHours] = useState<string>("");
+	const [newSubtaskEstimatedHours, setNewSubtaskEstimatedHours] =
+		useState<string>("");
 
 	// Track per-subtask actual hours input value (keyed by subtaskId)
-	const [actualHoursInputs, setActualHoursInputs] = useState<Record<string, string>>({});
-	const [expandedStoryComments, setExpandedStoryComments] = useState<Record<string, boolean>>({});
+	const [actualHoursInputs, setActualHoursInputs] = useState<
+		Record<string, string>
+	>({});
+	const [expandedStoryComments, setExpandedStoryComments] = useState<
+		Record<string, boolean>
+	>({});
 
 	const {
 		data: userStoriesRes,
@@ -56,8 +61,6 @@ export default function MyTasksPage() {
 		const id = m._id || m.id;
 		if (id && m.name) membersMap[id] = m.name;
 	});
-
-
 
 	const updateSubtaskTimeMutation = useMutation({
 		mutationFn: ({
@@ -84,11 +87,12 @@ export default function MyTasksPage() {
 			userStoryId: string;
 			title: string;
 			estimatedHours: number;
-		}) =>
-			subtaskService.createSubtask(userStoryId, { title, estimatedHours }),
+		}) => subtaskService.createSubtask(userStoryId, { title, estimatedHours }),
 		onSuccess: (_, variables) => {
 			queryClient.invalidateQueries({ queryKey: ["my-user-stories"] });
-			queryClient.invalidateQueries({ queryKey: ["subtasks", variables.userStoryId] });
+			queryClient.invalidateQueries({
+				queryKey: ["subtasks", variables.userStoryId],
+			});
 			toast.success("Subtask created");
 			setIsCreateModalOpen(false);
 			setNewSubtaskTitle("");
@@ -102,7 +106,7 @@ export default function MyTasksPage() {
 		const raw = actualHoursInputs[subtaskId];
 		if (raw === undefined || raw === "") return;
 		const val = Number(raw);
-		if (!isNaN(val) && val >= 0) {
+		if (!Number.isNaN(val) && val >= 0) {
 			updateSubtaskTimeMutation.mutate({
 				subtaskId,
 				payload: { actualHours: val },
@@ -125,8 +129,10 @@ export default function MyTasksPage() {
 	};
 
 	const toggleStoryExpand = (storyId: string) => {
-		setExpandedStories(prev =>
-			prev.includes(storyId) ? prev.filter(id => id !== storyId) : [...prev, storyId]
+		setExpandedStories((prev) =>
+			prev.includes(storyId)
+				? prev.filter((id) => id !== storyId)
+				: [...prev, storyId],
 		);
 	};
 
@@ -137,17 +143,23 @@ export default function MyTasksPage() {
 
 	const getPriorityStyle = (priority: string) => {
 		switch (priority) {
-			case "High": return "bg-rose-50 text-rose-700 border-rose-200";
-			case "Medium": return "bg-amber-50 text-amber-700 border-amber-200";
-			default: return "bg-emerald-50 text-emerald-700 border-emerald-200";
+			case "High":
+				return "bg-rose-50 text-rose-700 border-rose-200";
+			case "Medium":
+				return "bg-amber-50 text-amber-700 border-amber-200";
+			default:
+				return "bg-emerald-50 text-emerald-700 border-emerald-200";
 		}
 	};
 
 	const getPriorityIcon = (priority: string) => {
 		switch (priority) {
-			case "High": return <Flame size={12} />;
-			case "Medium": return <AlertCircle size={12} />;
-			default: return <CheckCircle2 size={12} />;
+			case "High":
+				return <Flame size={12} />;
+			case "Medium":
+				return <AlertCircle size={12} />;
+			default:
+				return <CheckCircle2 size={12} />;
 		}
 	};
 
@@ -189,24 +201,35 @@ export default function MyTasksPage() {
 				<div className="space-y-4">
 					{stories.map((story: any) => {
 						const subtasks = story.subtasks || [];
-						const completedCount = subtasks.filter((s: any) => s.status === "Done").length;
+						const completedCount = subtasks.filter(
+							(s: any) => s.status === "Done",
+						).length;
 						const totalCount = subtasks.length;
-						const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+						const progress =
+							totalCount > 0
+								? Math.round((completedCount / totalCount) * 100)
+								: 0;
 						const isExpanded = expandedStories.includes(story.id);
 						const isReview = story.status === "In review";
 
 						return (
 							<div
 								key={story.id}
-								className={`bg-white rounded-2xl border transition-all duration-300 overflow-hidden ${isReview ? 'border-amber-200 shadow-amber-100 ring-1 ring-amber-100' : 'border-gray-100 hover:border-indigo-200 hover:shadow-md'}`}
+								className={`bg-white rounded-2xl border transition-all duration-300 overflow-hidden ${isReview ? "border-amber-200 shadow-amber-100 ring-1 ring-amber-100" : "border-gray-100 hover:border-indigo-200 hover:shadow-md"}`}
 							>
 								{/* Header / Accordion Trigger */}
 								<div
 									onClick={() => toggleStoryExpand(story.id)}
-									className={`p-6 cursor-pointer flex items-center gap-4 ${isReview ? 'bg-amber-50/30' : ''}`}
+									className={`p-6 cursor-pointer flex items-center gap-4 ${isReview ? "bg-amber-50/30" : ""}`}
 								>
-									<div className={`p-1 rounded-lg transition-colors ${isExpanded ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400'}`}>
-										{isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+									<div
+										className={`p-1 rounded-lg transition-colors ${isExpanded ? "bg-indigo-50 text-indigo-600" : "text-gray-400"}`}
+									>
+										{isExpanded ? (
+											<ChevronDown size={20} />
+										) : (
+											<ChevronRight size={20} />
+										)}
 									</div>
 
 									<div className="flex-1 min-w-0">
@@ -214,7 +237,9 @@ export default function MyTasksPage() {
 											<h3 className="font-bold text-gray-900 truncate">
 												{story.title}
 											</h3>
-											<div className={`flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getPriorityStyle(story.priority)}`}>
+											<div
+												className={`flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getPriorityStyle(story.priority)}`}
+											>
 												{getPriorityIcon(story.priority)}
 												<span>{story.priority}</span>
 											</div>
@@ -248,15 +273,17 @@ export default function MyTasksPage() {
 									<button
 										onClick={(e) => {
 											e.stopPropagation();
-											setExpandedStoryComments(prev => ({
+											setExpandedStoryComments((prev) => ({
 												...prev,
-												[story.id]: !prev[story.id]
+												[story.id]: !prev[story.id],
 											}));
 										}}
 										className="ml-2 p-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-colors font-bold text-xs flex items-center gap-2"
 									>
 										<MessageSquare size={16} />
-										<span className="hidden sm:inline">Comments ({story.comments?.length || 0})</span>
+										<span className="hidden sm:inline">
+											Comments ({story.comments?.length || 0})
+										</span>
 									</button>
 									<button
 										onClick={(e) => {
@@ -284,15 +311,24 @@ export default function MyTasksPage() {
 														// We need a way to pass the storyId to the mutation
 														// Since useAddStoryComment returns a mutation object
 														// we can use it directly if we handle the ID correctly
-														userStoryService.addComment(story.id, { message })
+														userStoryService
+															.addComment(story.id, { message })
 															.then(() => {
 																onSuccess();
-																queryClient.invalidateQueries({ queryKey: ["my-user-stories"] });
-																queryClient.invalidateQueries({ queryKey: ["user-stories"] });
-																queryClient.invalidateQueries({ queryKey: ["subtasks", story.id] });
+																queryClient.invalidateQueries({
+																	queryKey: ["my-user-stories"],
+																});
+																queryClient.invalidateQueries({
+																	queryKey: ["user-stories"],
+																});
+																queryClient.invalidateQueries({
+																	queryKey: ["subtasks", story.id],
+																});
 																toast.success("Comment added");
 															})
-															.catch(() => toast.error("Failed to add comment"));
+															.catch(() =>
+																toast.error("Failed to add comment"),
+															);
 													}}
 													isPending={false} // Managed locally for now to avoid hook-in-loop
 													isError={false}
@@ -303,7 +339,9 @@ export default function MyTasksPage() {
 
 										<div className="flex items-center gap-1.5 text-[10px] text-gray-400 font-medium mb-2">
 											<KanbanSquare size={11} />
-											<span>Move subtasks in the Kanban board to update their status</span>
+											<span>
+												Move subtasks in the Kanban board to update their status
+											</span>
 										</div>
 										{/* Story Details: Points & Acceptance Criteria */}
 										<div className="bg-white border border-gray-100 rounded-2xl p-4 mb-4">
@@ -311,7 +349,9 @@ export default function MyTasksPage() {
 												{/* Story Points */}
 												{story.estimationPoints && (
 													<div className="flex items-center gap-2">
-														<span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Story Points</span>
+														<span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+															Story Points
+														</span>
 														<span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-black">
 															{story.estimationPoints}
 														</span>
@@ -319,35 +359,53 @@ export default function MyTasksPage() {
 												)}
 
 												{/* Acceptance Criteria */}
-												{story.acceptanceCriteria && story.acceptanceCriteria.length > 0 && (
-													<div className="flex-1 min-w-0">
-														<p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Acceptance Criteria</p>
-														<ul className="space-y-1">
-															{story.acceptanceCriteria.map((criterion: string, i: number) => (
-																<li key={i} className="flex items-start gap-2 text-xs text-gray-600">
-																	<CheckCircle2 size={12} className="text-emerald-500 mt-0.5 flex-shrink-0" />
-																	<span>{criterion}</span>
-																</li>
-															))}
-														</ul>
-													</div>
-												)}
+												{story.acceptanceCriteria &&
+													story.acceptanceCriteria.length > 0 && (
+														<div className="flex-1 min-w-0">
+															<p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+																Acceptance Criteria
+															</p>
+															<ul className="space-y-1">
+																{story.acceptanceCriteria.map(
+																	(criterion: string, i: number) => (
+																		<li
+																			key={i}
+																			className="flex items-start gap-2 text-xs text-gray-600"
+																		>
+																			<CheckCircle2
+																				size={12}
+																				className="text-emerald-500 mt-0.5 flex-shrink-0"
+																			/>
+																			<span>{criterion}</span>
+																		</li>
+																	),
+																)}
+															</ul>
+														</div>
+													)}
 											</div>
 										</div>
 
 										{subtasks.length > 0 ? (
 											subtasks.map((subtask: any) => {
 												const isDone = subtask.status === "Done";
-												const estH = subtask.estimatedHours as number | undefined;
+												const estH = subtask.estimatedHours as
+													| number
+													| undefined;
 												const actH = subtask.actualHours as number | undefined;
 												// For actual hours: prefer local input state, then server value
 												const localActual = actualHoursInputs[subtask.id];
 												const displayActual = actH;
 												const rawVariance =
-													isDone && estH !== undefined && displayActual !== undefined
+													isDone &&
+													estH !== undefined &&
+													displayActual !== undefined
 														? displayActual - estH
 														: null;
-												const variance = rawVariance !== null ? parseFloat(rawVariance.toFixed(2)) : null;
+												const variance =
+													rawVariance !== null
+														? parseFloat(rawVariance.toFixed(2))
+														: null;
 
 												return (
 													<div
@@ -356,16 +414,34 @@ export default function MyTasksPage() {
 													>
 														{/* Main row — status is read-only, controlled via Kanban */}
 														<div className="flex items-center gap-3 p-3">
-															<div className={`
+															<div
+																className={`
                                                                 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0
-                                                                ${subtask.status === 'Done' ? 'bg-emerald-500 border-emerald-500' :
-																	subtask.status === 'In progress' ? 'border-indigo-400 border-dashed' : 'border-gray-300'}
-                                                            `}>
-																{subtask.status === 'Done' && <CheckCircle2 size={12} className="text-white" />}
-																{subtask.status === 'In progress' && <div className="w-2 h-2 bg-indigo-400 rounded-full" />}
+                                                                ${
+																																	subtask.status ===
+																																	"Done"
+																																		? "bg-emerald-500 border-emerald-500"
+																																		: subtask.status ===
+																																				"In progress"
+																																			? "border-indigo-400 border-dashed"
+																																			: "border-gray-300"
+																																}
+                                                            `}
+															>
+																{subtask.status === "Done" && (
+																	<CheckCircle2
+																		size={12}
+																		className="text-white"
+																	/>
+																)}
+																{subtask.status === "In progress" && (
+																	<div className="w-2 h-2 bg-indigo-400 rounded-full" />
+																)}
 															</div>
 
-															<span className={`text-sm font-medium transition-colors flex-1 min-w-0 ${subtask.status === 'Done' ? 'text-gray-400 line-through' : 'text-gray-700'}`}>
+															<span
+																className={`text-sm font-medium transition-colors flex-1 min-w-0 ${subtask.status === "Done" ? "text-gray-400 line-through" : "text-gray-700"}`}
+															>
 																{subtask.title}
 															</span>
 
@@ -380,21 +456,38 @@ export default function MyTasksPage() {
 
 																{/* Variance badge — only when done and both values known */}
 																{variance !== null && (
-																	<span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border ${variance <= 0
-																		? "bg-emerald-50 text-emerald-700 border-emerald-200"
-																		: "bg-rose-50 text-rose-700 border-rose-200"
-																		}`}>
-																		{variance <= 0 ? <TrendingDown size={10} /> : <TrendingUp size={10} />}
-																		{variance > 0 ? "+" : ""}{variance}h
+																	<span
+																		className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border ${
+																			variance <= 0
+																				? "bg-emerald-50 text-emerald-700 border-emerald-200"
+																				: "bg-rose-50 text-rose-700 border-rose-200"
+																		}`}
+																	>
+																		{variance <= 0 ? (
+																			<TrendingDown size={10} />
+																		) : (
+																			<TrendingUp size={10} />
+																		)}
+																		{variance > 0 ? "+" : ""}
+																		{variance}h
 																	</span>
 																)}
 															</div>
 
-															<span className={`
+															<span
+																className={`
                                                                 text-[10px] font-bold uppercase px-2 py-0.5 rounded border ml-2 flex-shrink-0
-                                                                ${subtask.status === 'Done' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-																	subtask.status === 'In progress' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' : 'bg-gray-100 text-gray-500 border-gray-200'}
-                                                            `}>
+                                                                ${
+																																	subtask.status ===
+																																	"Done"
+																																		? "bg-emerald-50 text-emerald-600 border-emerald-100"
+																																		: subtask.status ===
+																																				"In progress"
+																																			? "bg-indigo-50 text-indigo-600 border-indigo-100"
+																																			: "bg-gray-100 text-gray-500 border-gray-200"
+																																}
+                                                            `}
+															>
 																{subtask.status}
 															</span>
 														</div>
@@ -402,8 +495,13 @@ export default function MyTasksPage() {
 														{/* Actual Hours row — only when status is Done */}
 														{isDone && (
 															<div className="px-3 pb-3 flex items-center gap-3 border-t border-gray-50 pt-2">
-																<Clock size={12} className="text-gray-400 flex-shrink-0" />
-																<span className="text-xs font-bold text-gray-500 flex-shrink-0">Actual Hours</span>
+																<Clock
+																	size={12}
+																	className="text-gray-400 flex-shrink-0"
+																/>
+																<span className="text-xs font-bold text-gray-500 flex-shrink-0">
+																	Actual Hours
+																</span>
 																<input
 																	type="number"
 																	min="0"
@@ -416,15 +514,17 @@ export default function MyTasksPage() {
 																				? String(parseFloat(actH.toFixed(2)))
 																				: ""
 																	}
-																	onClick={e => e.stopPropagation()}
-																	onChange={e =>
-																		setActualHoursInputs(prev => ({
+																	onClick={(e) => e.stopPropagation()}
+																	onChange={(e) =>
+																		setActualHoursInputs((prev) => ({
 																			...prev,
 																			[subtask.id]: e.target.value,
 																		}))
 																	}
-																	onBlur={() => handleActualHoursBlur(subtask.id)}
-																	onKeyDown={e => {
+																	onBlur={() =>
+																		handleActualHoursBlur(subtask.id)
+																	}
+																	onKeyDown={(e) => {
 																		if (e.key === "Enter") {
 																			(e.target as HTMLInputElement).blur();
 																		}
@@ -437,7 +537,10 @@ export default function MyTasksPage() {
 																	</span>
 																)}
 																{updateSubtaskTimeMutation.isPending && (
-																	<Loader2 size={12} className="animate-spin text-indigo-400" />
+																	<Loader2
+																		size={12}
+																		className="animate-spin text-indigo-400"
+																	/>
 																)}
 															</div>
 														)}
@@ -462,7 +565,9 @@ export default function MyTasksPage() {
 				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
 					<div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl animate-in zoom-in-95">
 						<div className="flex justify-between items-center mb-6">
-							<h3 className="text-xl font-bold text-gray-900">Create Subtask</h3>
+							<h3 className="text-xl font-bold text-gray-900">
+								Create Subtask
+							</h3>
 							<button
 								onClick={() => {
 									setIsCreateModalOpen(false);
@@ -486,9 +591,10 @@ export default function MyTasksPage() {
 									value={newSubtaskTitle}
 									onChange={(e) => setNewSubtaskTitle(e.target.value)}
 									placeholder="What needs to be done?"
-									autoFocus
 									className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-colors font-medium"
-									onKeyDown={(e) => e.key === "Enter" && isCreateValid && handleCreate()}
+									onKeyDown={(e) =>
+										e.key === "Enter" && isCreateValid && handleCreate()
+									}
 								/>
 							</div>
 
@@ -498,16 +604,23 @@ export default function MyTasksPage() {
 									Estimated Hours <span className="text-rose-500">*</span>
 								</label>
 								<div className="relative">
-									<Clock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+									<Clock
+										size={16}
+										className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+									/>
 									<input
 										type="number"
 										min="0.5"
 										step="0.5"
 										value={newSubtaskEstimatedHours}
-										onChange={(e) => setNewSubtaskEstimatedHours(e.target.value)}
+										onChange={(e) =>
+											setNewSubtaskEstimatedHours(e.target.value)
+										}
 										placeholder="e.g. 4"
 										className="w-full pl-9 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-colors font-medium"
-										onKeyDown={(e) => e.key === "Enter" && isCreateValid && handleCreate()}
+										onKeyDown={(e) =>
+											e.key === "Enter" && isCreateValid && handleCreate()
+										}
 									/>
 								</div>
 								<p className="text-xs text-gray-400 mt-1">
@@ -531,7 +644,11 @@ export default function MyTasksPage() {
 									disabled={!isCreateValid || createSubtaskMutation.isPending}
 									className="flex-1 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 								>
-									{createSubtaskMutation.isPending ? <Loader2 size={18} className="animate-spin mx-auto" /> : "Create Subtask"}
+									{createSubtaskMutation.isPending ? (
+										<Loader2 size={18} className="animate-spin mx-auto" />
+									) : (
+										"Create Subtask"
+									)}
 								</button>
 							</div>
 						</div>

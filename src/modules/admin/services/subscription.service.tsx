@@ -1,16 +1,24 @@
 import api from "../../../lib/axios.user";
 
 export const subscriptionService = {
-	async createStripeSession(priceId: string): Promise<{ success: boolean; url: string; sessionId: string }> {
+	async createStripeSession(
+		priceId: string,
+	): Promise<{ success: boolean; url: string; sessionId: string }> {
 		const res = await api.post("admin/create-stripe-session", { priceId });
 		return res.data;
 	},
-	async verifyStripeSession(sessionId: string): Promise<{ success: boolean; message: string; currentPlan: string }> {
+	async verifyStripeSession(
+		sessionId: string,
+	): Promise<{ success: boolean; message: string; currentPlan: string }> {
 		const res = await api.post("admin/verify-stripe-session", { sessionId });
 		return res.data;
 	},
 
-	async upgradePlanSimulated(): Promise<{ success: boolean; message: string; currentPlan: string }> {
+	async upgradePlanSimulated(): Promise<{
+		success: boolean;
+		message: string;
+		currentPlan: string;
+	}> {
 		const res = await api.post("admin/upgrade-plan");
 		return res.data;
 	},

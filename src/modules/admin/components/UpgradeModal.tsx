@@ -1,5 +1,8 @@
-import { Check,  Shield, Zap, X, Sparkles } from "lucide-react";
-import { useCreateStripeSession, useUpgradeSubscription } from "../hooks/useSubscription";
+import { Check, Shield, Sparkles, X, Zap } from "lucide-react";
+import {
+	useCreateStripeSession,
+	useUpgradeSubscription,
+} from "../hooks/useSubscription";
 
 interface UpgradeModalProps {
 	isOpen: boolean;
@@ -7,8 +10,10 @@ interface UpgradeModalProps {
 }
 
 export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
-	const { mutate: upgradeSimulated, isPending: isUpgradingSimulated } = useUpgradeSubscription();
-	const { mutate: createStripeSession, isPending: isCreatingSession } = useCreateStripeSession();
+	const { mutate: upgradeSimulated, isPending: isUpgradingSimulated } =
+		useUpgradeSubscription();
+	const { mutate: createStripeSession, isPending: isCreatingSession } =
+		useCreateStripeSession();
 
 	if (!isOpen) return null;
 
@@ -59,8 +64,11 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
 
 	return (
 		<div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-			<div className="absolute inset-0 bg-gray-900/70 backdrop-blur-sm" onClick={onClose} />
-			
+			<div
+				className="absolute inset-0 bg-gray-900/70 backdrop-blur-sm"
+				onClick={onClose}
+			/>
+
 			<div className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl overflow-hidden">
 				{/* Header gradient */}
 				<div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-7 text-white relative overflow-hidden">
@@ -76,10 +84,13 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
 						<div className="p-2 bg-white/20 rounded-xl">
 							<Sparkles size={22} className="text-yellow-300" />
 						</div>
-						<h2 className="text-2xl font-black tracking-tight">Unlock Your Full Potential</h2>
+						<h2 className="text-2xl font-black tracking-tight">
+							Unlock Your Full Potential
+						</h2>
 					</div>
 					<p className="text-indigo-100 text-sm">
-						You've reached the free plan limit. Upgrade to Pro for unlimited projects.
+						You've reached the free plan limit. Upgrade to Pro for unlimited
+						projects.
 					</p>
 				</div>
 
@@ -91,16 +102,24 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
 							className={`rounded-2xl border-2 ${plan.borderColor} ${plan.bgColor} p-5 flex flex-col relative overflow-hidden`}
 						>
 							{/* Badge */}
-							<span className={`absolute top-4 right-4 text-xs font-bold px-2.5 py-1 rounded-full ${plan.badgeColor}`}>
+							<span
+								className={`absolute top-4 right-4 text-xs font-bold px-2.5 py-1 rounded-full ${plan.badgeColor}`}
+							>
 								{plan.badge}
 							</span>
 
 							{/* Plan name & price */}
 							<div className="mb-5">
-								<p className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-1">{plan.name}</p>
+								<p className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-1">
+									{plan.name}
+								</p>
 								<div className="flex items-baseline gap-1">
-									<span className="text-3xl font-black text-gray-900">{plan.price}</span>
-									<span className="text-sm text-gray-400 font-medium">{plan.period}</span>
+									<span className="text-3xl font-black text-gray-900">
+										{plan.price}
+									</span>
+									<span className="text-sm text-gray-400 font-medium">
+										{plan.period}
+									</span>
 								</div>
 							</div>
 
@@ -110,14 +129,23 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
 									<li key={idx} className="flex items-center gap-2.5 text-sm">
 										{f.included ? (
 											<div className="w-4 h-4 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-												<Check size={10} className="text-indigo-600 stroke-[3]" />
+												<Check
+													size={10}
+													className="text-indigo-600 stroke-[3]"
+												/>
 											</div>
 										) : (
 											<div className="w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
 												<X size={10} className="text-gray-400 stroke-[3]" />
 											</div>
 										)}
-										<span className={f.included ? "text-gray-700" : "text-gray-400 line-through"}>
+										<span
+											className={
+												f.included
+													? "text-gray-700"
+													: "text-gray-400 line-through"
+											}
+										>
 											{f.text}
 										</span>
 									</li>
@@ -136,7 +164,10 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
 									) : (
 										<>
 											Upgrade Now
-											<Zap size={15} className="fill-white group-hover:scale-110 transition-transform" />
+											<Zap
+												size={15}
+												className="fill-white group-hover:scale-110 transition-transform"
+											/>
 										</>
 									)}
 								</button>
@@ -156,7 +187,9 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
 						disabled={isUpgradingSimulated || isCreatingSession}
 						className="text-xs text-gray-400 hover:text-indigo-600 transition-colors font-medium"
 					>
-						{isUpgradingSimulated ? "Upgrading..." : "Simulate Upgrade (Dev Only)"}
+						{isUpgradingSimulated
+							? "Upgrading..."
+							: "Simulate Upgrade (Dev Only)"}
 					</button>
 					<p className="text-xs text-gray-400 flex items-center gap-1">
 						<Shield size={12} />

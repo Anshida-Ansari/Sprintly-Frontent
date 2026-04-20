@@ -28,7 +28,12 @@ export interface SetPasswordResponse {
 }
 
 // Member Types
-export type MemberRole = "superadmin" | "admin" | "lead" | "developers" | "developer";
+export type MemberRole =
+	| "superadmin"
+	| "admin"
+	| "lead"
+	| "developers"
+	| "developer";
 export type MemberStatus = "active" | "block" | "pending";
 
 export interface IMember {
@@ -104,7 +109,6 @@ export interface CreateProjectResponse {
 	message: string;
 	data: any;
 }
-
 
 export const UserStoryStatus = {
 	IN_REVIEW: "In review",
@@ -182,7 +186,6 @@ export interface GetUserStoriesResponse {
 	limit: number;
 }
 
-
 export type SprintStatus = "PLANNED" | "ACTIVE" | "COMPLETED";
 
 export interface ISprint {
@@ -222,7 +225,6 @@ export interface GetSprintsResponse {
 	limit: number;
 	totalPages: number;
 }
-
 
 export type SubtaskStatus = "In pending" | "In progress" | "Done";
 

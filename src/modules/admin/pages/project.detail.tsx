@@ -1,4 +1,5 @@
 import {
+	BarChart3,
 	Calendar,
 	CheckCircle2,
 	Clock,
@@ -6,12 +7,11 @@ import {
 	GitBranch,
 	Layout,
 	MoreHorizontal,
+	PieChart,
 	PlayCircle,
 	Plus,
 	ScrollText,
 	Users,
-	BarChart3,
-	PieChart
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -19,10 +19,10 @@ import { UserAuth } from "../../auth/store/store";
 import { StandupChat } from "../../standup/components/standup.chat";
 import AddMemberModal from "../components/add.member.modal";
 import EditProjectModal from "../components/edit.project.modal";
+import { ProjectLevelAnalytics } from "../components/project.level.analytics";
+import { ProjectLevelReports } from "../components/project.level.reports";
 import SprintList from "../components/sprint.list";
 import UserStoryList from "../components/user-story-list";
-import { ProjectLevelReports } from "../components/project.level.reports";
-import { ProjectLevelAnalytics } from "../components/project.level.analytics";
 import { useEditProject } from "../hooks/useEditProject";
 import { useGetProject } from "../hooks/useGetProject";
 import type { EditProjectPayload, IMember } from "../types/types";
@@ -31,7 +31,9 @@ interface ProjectDetailProps {
 	isReadOnly?: boolean;
 }
 
-export default function ProjectDetail({ isReadOnly = false }: ProjectDetailProps) {
+export default function ProjectDetail({
+	isReadOnly = false,
+}: ProjectDetailProps) {
 	const { projectId } = useParams<{ projectId: string }>();
 	const navigate = useNavigate();
 	const { data: projectResponse, isLoading } = useGetProject(projectId || "");
@@ -58,7 +60,9 @@ export default function ProjectDetail({ isReadOnly = false }: ProjectDetailProps
 			<div className="flex flex-col items-center justify-center h-full min-h-[400px] gap-4">
 				<p className="text-gray-500 font-medium">Project not found.</p>
 				<button
-					onClick={() => navigate(isReadOnly ? "/developers/dashboard" : "/admin/projects")}
+					onClick={() =>
+						navigate(isReadOnly ? "/developers/dashboard" : "/admin/projects")
+					}
 					className="px-4 py-2 text-indigo-600 font-bold hover:bg-indigo-50 rounded-lg transition"
 				>
 					Back to Dashboard
@@ -112,16 +116,16 @@ export default function ProjectDetail({ isReadOnly = false }: ProjectDetailProps
 		},
 		...(project.endDate
 			? [
-				{
-					id: "3",
-					type: "deadline",
-					title: `Target Deadline`,
-					date: project.endDate,
-					isFuture: new Date(project.endDate) > new Date(),
-					icon: <Calendar size={16} />,
-					color: "bg-white text-rose-600 ring-1 ring-rose-100",
-				},
-			]
+					{
+						id: "3",
+						type: "deadline",
+						title: `Target Deadline`,
+						date: project.endDate,
+						isFuture: new Date(project.endDate) > new Date(),
+						icon: <Calendar size={16} />,
+						color: "bg-white text-rose-600 ring-1 ring-rose-100",
+					},
+				]
 			: []),
 	].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -134,7 +138,11 @@ export default function ProjectDetail({ isReadOnly = false }: ProjectDetailProps
 					<div className="flex items-center justify-between">
 						<nav className="flex items-center gap-2 text-sm text-gray-500 font-medium">
 							<span
-								onClick={() => navigate(isReadOnly ? "/developers/dashboard" : "/admin/projects")}
+								onClick={() =>
+									navigate(
+										isReadOnly ? "/developers/dashboard" : "/admin/projects",
+									)
+								}
 								className="hover:text-gray-900 cursor-pointer transition-colors"
 							>
 								{isReadOnly ? "Dashboard" : "Projects"}
@@ -163,10 +171,11 @@ export default function ProjectDetail({ isReadOnly = false }: ProjectDetailProps
 								<h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-3">
 									{project.name}
 									<span
-										className={`px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset ${statusColors[
-											project.status as keyof typeof statusColors
-										] || "bg-gray-100 text-gray-600 ring-gray-200"
-											}`}
+										className={`px-2.5 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset ${
+											statusColors[
+												project.status as keyof typeof statusColors
+											] || "bg-gray-100 text-gray-600 ring-gray-200"
+										}`}
 									>
 										{project.status}
 									</span>
@@ -178,24 +187,25 @@ export default function ProjectDetail({ isReadOnly = false }: ProjectDetailProps
 						</div>
 
 						{/* Actions - Hide for ReadOnly */}
-						{!isReadOnly && (user?.role === "admin" || user?.role === "lead") && (
-							<div className="flex items-center gap-3">
-								<button
-									onClick={() => setIsEditModalOpen(true)}
-									className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition shadow-sm flex items-center gap-2"
-								>
-									<Edit size={16} />
-									Edit Project
-								</button>
-								<button
-									className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition shadow-sm flex items-center gap-2"
-									onClick={() => setActiveTab('sprints')} // Quick action
-								>
-									<PlayCircle size={16} />
-									Active Sprint
-								</button>
-							</div>
-						)}
+						{!isReadOnly &&
+							(user?.role === "admin" || user?.role === "lead") && (
+								<div className="flex items-center gap-3">
+									<button
+										onClick={() => setIsEditModalOpen(true)}
+										className="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition shadow-sm flex items-center gap-2"
+									>
+										<Edit size={16} />
+										Edit Project
+									</button>
+									<button
+										className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition shadow-sm flex items-center gap-2"
+										onClick={() => setActiveTab("sprints")} // Quick action
+									>
+										<PlayCircle size={16} />
+										Active Sprint
+									</button>
+								</div>
+							)}
 					</div>
 
 					{/* Tabs */}
@@ -211,10 +221,11 @@ export default function ProjectDetail({ isReadOnly = false }: ProjectDetailProps
 							<button
 								key={tab.id}
 								onClick={() => setActiveTab(tab.id as any)}
-								className={`flex items-center gap-2 pb-3 text-sm font-medium transition-all relative whitespace-nowrap ${activeTab === tab.id
-									? "text-indigo-600 border-b-2 border-indigo-600"
-									: "text-gray-500 hover:text-gray-800 border-b-2 border-transparent hover:border-gray-200"
-									}`}
+								className={`flex items-center gap-2 pb-3 text-sm font-medium transition-all relative whitespace-nowrap ${
+									activeTab === tab.id
+										? "text-indigo-600 border-b-2 border-indigo-600"
+										: "text-gray-500 hover:text-gray-800 border-b-2 border-transparent hover:border-gray-200"
+								}`}
 							>
 								<tab.icon size={16} />
 								{tab.label}
@@ -250,8 +261,15 @@ export default function ProjectDetail({ isReadOnly = false }: ProjectDetailProps
 											<GitBranch size={16} className="text-gray-600" />
 										</div>
 										<div>
-											<p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Repository</p>
-											<a href={project.gitRepoUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-indigo-600 hover:underline break-all">
+											<p className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+												Repository
+											</p>
+											<a
+												href={project.gitRepoUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="text-sm font-medium text-indigo-600 hover:underline break-all"
+											>
 												{project.gitRepoUrl}
 											</a>
 										</div>
@@ -303,15 +321,16 @@ export default function ProjectDetail({ isReadOnly = false }: ProjectDetailProps
 										</span>
 									</h3>
 									{/* Hide Add Member for ReadOnly */}
-									{!isReadOnly && (user?.role === "admin" || user?.role === "lead") && (
-										<button
-											onClick={() => setIsAddMemberModalOpen(true)}
-											className="text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-md transition-colors"
-											title="Add Member"
-										>
-											<Plus size={16} />
-										</button>
-									)}
+									{!isReadOnly &&
+										(user?.role === "admin" || user?.role === "lead") && (
+											<button
+												onClick={() => setIsAddMemberModalOpen(true)}
+												className="text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-md transition-colors"
+												title="Add Member"
+											>
+												<Plus size={16} />
+											</button>
+										)}
 								</div>
 
 								<div className="p-2 overflow-y-auto">
@@ -351,7 +370,12 @@ export default function ProjectDetail({ isReadOnly = false }: ProjectDetailProps
 
 				{activeTab === "stories" && (
 					<div className="animate-in slide-in-from-right-4 duration-500">
-						<UserStoryList projectId={project.id} members={project.members} showHeader={false} isReadOnly={isReadOnly} />
+						<UserStoryList
+							projectId={project.id}
+							members={project.members}
+							showHeader={false}
+							isReadOnly={isReadOnly}
+						/>
 					</div>
 				)}
 

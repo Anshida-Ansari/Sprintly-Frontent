@@ -9,7 +9,7 @@ export function useUpgradeSubscription() {
 			if (res.success) {
 				toast.success(res.message || "Successfully upgraded to Pro!");
 				// Reload the page to reflect the new state, or invalidate queries if we had a user query
-				window.location.reload(); 
+				window.location.reload();
 			}
 		},
 		onError: (err: any) => {
@@ -20,21 +20,25 @@ export function useUpgradeSubscription() {
 
 export function useCreateStripeSession() {
 	return useMutation({
-		mutationFn: (priceId: string) => subscriptionService.createStripeSession(priceId),
+		mutationFn: (priceId: string) =>
+			subscriptionService.createStripeSession(priceId),
 		onSuccess: (res) => {
 			if (res.success && res.url) {
 				window.location.href = res.url;
 			}
 		},
 		onError: (err: any) => {
-			toast.error(err.response?.data?.message || "Failed to initialize checkout");
+			toast.error(
+				err.response?.data?.message || "Failed to initialize checkout",
+			);
 		},
 	});
 }
 
 export function useVerifyStripeSession() {
 	return useMutation({
-		mutationFn: (sessionId: string) => subscriptionService.verifyStripeSession(sessionId),
+		mutationFn: (sessionId: string) =>
+			subscriptionService.verifyStripeSession(sessionId),
 		onSuccess: (res) => {
 			if (res.success) {
 				toast.success(res.message);
@@ -54,4 +58,3 @@ export function useSubscriptionStatus() {
 		refetchInterval: 60000, // Refetch every minute
 	});
 }
-
