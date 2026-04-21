@@ -239,6 +239,7 @@ export interface ISubtask {
 	estimatedHours?: number;
 	actualHours?: number;
 	comments?: IComment[];
+	attachments?: { fileUrl: string; fileName: string }[];
 	createdAt: string;
 	updatedAt?: string;
 }

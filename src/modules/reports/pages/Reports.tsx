@@ -19,7 +19,7 @@ import {
 	useUserStoryReports,
 } from "../hooks/useReports";
 
-import { IProject } from "../../admin/types/types";
+import type { IProject } from "../../admin/types/types";
 
 type ReportTab =
 	| "projects"
@@ -487,7 +487,7 @@ export default function Reports() {
 			{/* Main Table */}
 			<PaginatedTable
 				title={currentConfig.title}
-				columns={currentConfig.columns}
+				columns={currentConfig.columns as any}
 				data={data?.data || []}
 				total={data?.total || 0}
 				page={page}

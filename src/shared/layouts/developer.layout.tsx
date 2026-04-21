@@ -9,7 +9,6 @@ import {
 	Terminal,
 	UserCircle,
 	Video,
-	Zap,
 } from "lucide-react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { DashboardHeader } from "../components/layout/DashboardHeader";
