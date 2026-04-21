@@ -1,6 +1,7 @@
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { matchPath, useLocation } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
 import { aiService } from "../service/ai.service";
 
 interface Message {
@@ -367,7 +368,9 @@ export const AiChatbot: React.FC = () => {
 											border: "1px solid #eaeaf0",
 										}}
 									>
-										{msg.text}
+										<ReactMarkdown>
+											{msg.text}
+										</ReactMarkdown>
 									</div>
 								</div>
 							),
