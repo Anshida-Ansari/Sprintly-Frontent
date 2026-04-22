@@ -108,9 +108,9 @@ export default function SuperAdminAnalytics() {
 
 			{/* Stats Grid */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-				{stats.map((stat, index) => (
+				{stats.map((stat) => (
 					<div
-						key={index}
+						key={stat.label}
 						className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all"
 					>
 						<div className="flex items-center justify-between mb-4">
@@ -332,7 +332,11 @@ export default function SuperAdminAnalytics() {
 											fill: "#10b981",
 										},
 									].map((entry, index) => (
-										<Cell key={`cell-${index}`} fill={entry.fill} />
+										<Cell
+											// biome-ignore lint/suspicious/noArrayIndexKey: Recharts Cell map
+											key={`cell-${index}`}
+											fill={entry.fill}
+										/>
 									))}
 								</Bar>
 							</BarChart>
@@ -350,7 +354,7 @@ export default function SuperAdminAnalytics() {
 					<div className="space-y-6">
 						{topData.map((company: any, idx: number) => (
 							<div
-								key={idx}
+								key={company.companyId || company.companyName}
 								className="flex items-center justify-between group"
 							>
 								<div className="flex items-center gap-4">
@@ -398,6 +402,7 @@ export default function SuperAdminAnalytics() {
 								>
 									{metData.planDistribution.map((_: any, index: number) => (
 										<Cell
+											// biome-ignore lint/suspicious/noArrayIndexKey: Recharts Cell map
 											key={`cell-${index}`}
 											fill={COLORS[index % COLORS.length]}
 											strokeWidth={0}
@@ -416,7 +421,7 @@ export default function SuperAdminAnalytics() {
 					</div>
 					<div className="flex justify-center gap-8 mt-4">
 						{metData.planDistribution.map((plan: any, idx: number) => (
-							<div key={idx} className="flex items-center gap-2">
+							<div key={plan.name || idx} className="flex items-center gap-2">
 								<div
 									className="h-2.5 w-2.5 rounded-full"
 									style={{ backgroundColor: COLORS[idx % COLORS.length] }}

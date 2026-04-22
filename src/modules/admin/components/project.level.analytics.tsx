@@ -46,7 +46,7 @@ export function ProjectLevelAnalytics({
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse">
 				{[1, 2, 3, 4].map((i) => (
 					<div
-						key={i}
+						key={`pulse-${i}`}
 						className="h-32 bg-gray-100 rounded-2xl border border-gray-100"
 					></div>
 				))}
@@ -207,9 +207,9 @@ export function ProjectLevelAnalytics({
 									dataKey="count"
 									nameKey="_id"
 								>
-									{taskDistribution.map((index: number) => (
+									{taskDistribution.map((_item: any, index: number) => (
 										<Cell
-											key={`cell-${index}`}
+											key={`cell-${_item._id || index}`}
 											fill={COLORS[index % COLORS.length]}
 											stroke="none"
 										/>

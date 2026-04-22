@@ -48,7 +48,9 @@ export function useWebRTC(roomId: string, userId: string, userName: string) {
 					setLocalStream(stream);
 					localStreamRef.current = stream;
 				} else {
-					stream.getTracks().forEach((track) => track.stop());
+					stream.getTracks().forEach((track) => {
+						track.stop();
+					});
 				}
 			} catch (err) {
 				console.error("Error accessing media devices:", err);
@@ -60,11 +62,15 @@ export function useWebRTC(roomId: string, userId: string, userName: string) {
 		return () => {
 			isMounted = false;
 			if (localStreamRef.current) {
-				localStreamRef.current.getTracks().forEach((track) => track.stop());
+				for (const track of localStreamRef.current.getTracks()) {
+					track.stop();
+				}
 				localStreamRef.current = null;
 			}
 			if (screenStreamRef.current) {
-				screenStreamRef.current.getTracks().forEach((track) => track.stop());
+				for (const track of screenStreamRef.current.getTracks()) {
+					track.stop();
+				}
 				screenStreamRef.current = null;
 			}
 		};
@@ -319,7 +325,9 @@ export function useWebRTC(roomId: string, userId: string, userName: string) {
 			socket.off("meeting-ended");
 			socket.off("kicked");
 
-			Object.values(peers.current).forEach((p) => p.connection.close());
+			Object.values(peers.current).forEach((p) => {
+				p.connection.close();
+			});
 			peers.current = {};
 
 			socket.disconnect();
@@ -358,7 +366,9 @@ export function useWebRTC(roomId: string, userId: string, userName: string) {
 
 	const stopScreenShare = () => {
 		if (screenStreamRef.current) {
-			screenStreamRef.current.getTracks().forEach((track) => track.stop());
+			for (const track of screenStreamRef.current.getTracks()) {
+				track.stop();
+			}
 			screenStreamRef.current = null;
 		}
 		if (localStreamRef.current) {

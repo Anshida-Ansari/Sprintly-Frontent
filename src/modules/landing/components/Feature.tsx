@@ -53,9 +53,9 @@ export default function Features() {
 							title: "Automation",
 							desc: "Automate workflows, notifications, and repetitive tasks to save time",
 						},
-					].map((feature, idx) => (
+					].map((feature) => (
 						<div
-							key={idx}
+							key={feature.title}
 							className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition border border-gray-100"
 						>
 							<feature.icon className="w-10 h-10 text-indigo-600 mb-4" />

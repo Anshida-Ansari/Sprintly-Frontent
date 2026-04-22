@@ -207,7 +207,7 @@ function SprintOverview({
 					<div className="h-4 w-32 bg-gray-100 rounded-full animate-pulse" />
 					{[1, 2, 3, 4].map((i) => (
 						<div
-							key={i}
+							key={`skeleton-${i}`}
 							className="h-20 bg-gray-50 rounded-2xl animate-pulse"
 						/>
 					))}
@@ -341,9 +341,9 @@ function SprintOverview({
 
 										<div className="flex -space-x-1.5">
 											{story.assignedTo?.length > 0 ? (
-												story.assignedTo.map((userId: string, idx: number) => (
+												story.assignedTo.map((userId: string) => (
 													<div
-														key={idx}
+														key={userId}
 														className="w-7 h-7 rounded-xl bg-gray-100 border-2 border-white text-[10px] font-black text-gray-500 flex items-center justify-center shadow-sm group-hover:border-indigo-50 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-all"
 													>
 														{userId.substring(0, 1).toUpperCase()}

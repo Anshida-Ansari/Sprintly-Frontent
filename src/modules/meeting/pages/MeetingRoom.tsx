@@ -115,9 +115,9 @@ export default function MeetingRoom() {
 
 	const toggleMic = () => {
 		if (localStream) {
-			localStream
-				.getAudioTracks()
-				.forEach((track) => (track.enabled = !isMicOn));
+			localStream.getAudioTracks().forEach((track) => {
+				track.enabled = !isMicOn;
+			});
 			setIsMicOn((prev) => !prev);
 		}
 	};
@@ -125,9 +125,9 @@ export default function MeetingRoom() {
 	const toggleCamera = () => {
 		if (localStream) {
 			const newState = !isCameraOn;
-			localStream
-				.getVideoTracks()
-				.forEach((track) => (track.enabled = newState));
+			localStream.getVideoTracks().forEach((track) => {
+				track.enabled = newState;
+			});
 			setIsCameraOn(newState);
 			emitCameraToggle(newState); // tell peers
 		}
@@ -149,7 +149,9 @@ export default function MeetingRoom() {
 
 	const handleLeave = () => {
 		if (localStream) {
-			localStream.getTracks().forEach((track) => track.stop());
+			for (const track of localStream.getTracks()) {
+				track.stop();
+			}
 		}
 		navigate(getDashboardPath());
 	};
@@ -300,9 +302,9 @@ export default function MeetingRoom() {
 											No messages yet
 										</p>
 									)}
-									{messages.map((msg, i) => (
+									{messages.map((msg) => (
 										<div
-											key={i}
+											key={`${msg.timestamp}-${msg.senderId}`}
 											className={`flex flex-col ${msg.senderId === "me" ? "items-end" : "items-start"}`}
 										>
 											<div className="flex items-center gap-2 mb-1 px-0.5">

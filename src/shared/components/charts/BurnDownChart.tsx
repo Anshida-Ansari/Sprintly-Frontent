@@ -32,9 +32,9 @@ const CustomTooltip = ({ active, payload, label, unit }: any) => {
 					{label}
 				</p>
 				<div className="space-y-2">
-					{payload.map((entry: any, index: number) => (
+					{payload.map((entry: any) => (
 						<div
-							key={index}
+							key={entry.name}
 							className="flex items-center justify-between gap-8"
 						>
 							<span className="text-xs font-bold text-gray-500 uppercase tracking-tight flex items-center gap-1.5">

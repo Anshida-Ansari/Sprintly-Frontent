@@ -130,9 +130,9 @@ export function ProjectLevelReports({ projectId }: ProjectLevelReportsProps) {
 					key: "assignedUsers",
 					render: (item: any) => (
 						<div className="flex flex-wrap gap-1">
-							{item.assignedUsers?.map((name: string, i: number) => (
+							{item.assignedUsers?.map((name: string) => (
 								<span
-									key={i}
+									key={name}
 									className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded text-[10px] font-bold"
 								>
 									{name}

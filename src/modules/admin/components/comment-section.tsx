@@ -93,11 +93,11 @@ export default function CommentSection({
 						No comments yet. Be the first to comment!
 					</p>
 				) : (
-					comments.map((comment, index) => {
+					comments.map((comment, _index) => {
 						const name = resolveName(comment);
 						return (
 							<div
-								key={`${comment.userId}-${index}`}
+								key={`${comment.userId}-${comment.createdAt}`}
 								className="flex items-start gap-3 p-3 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-100 transition-all"
 							>
 								{/* Avatar */}

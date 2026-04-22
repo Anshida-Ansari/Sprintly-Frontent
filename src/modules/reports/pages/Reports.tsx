@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { PaginatedTable } from "../../../shared/components/PaginatedTable";
 import { useProjects } from "../../admin/hooks/useProjects";
+import type { IProject } from "../../admin/types/types";
 import {
 	useProjectReports,
 	useSprintReports,
@@ -18,8 +19,6 @@ import {
 	useUserPerformanceReports,
 	useUserStoryReports,
 } from "../hooks/useReports";
-
-import type { IProject } from "../../admin/types/types";
 
 type ReportTab =
 	| "projects"
@@ -244,9 +243,9 @@ export default function Reports() {
 					key: "assignedUsers",
 					render: (item: StoryReport) => (
 						<div className="flex flex-wrap gap-1">
-							{item.assignedUsers?.map((name: string, i: number) => (
+							{item.assignedUsers?.map((name: string) => (
 								<span
-									key={i}
+									key={name}
 									className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded text-[10px] font-bold"
 								>
 									{name}

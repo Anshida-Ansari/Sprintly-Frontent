@@ -188,6 +188,7 @@ const OtpPage = () => {
 						stroke="currentColor"
 						viewBox="0 0 24 24"
 					>
+						<title>Security Lock Icon</title>
 						<path
 							strokeLinecap="round"
 							strokeLinejoin="round"

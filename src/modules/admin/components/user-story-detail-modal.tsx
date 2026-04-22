@@ -365,17 +365,15 @@ export default function UserStoryDetailModal({
 							{story.acceptanceCriteria &&
 							story.acceptanceCriteria.length > 0 ? (
 								<ul className="space-y-2">
-									{story.acceptanceCriteria.map(
-										(criteria: string, index: number) => (
-											<li
-												key={index}
-												className="flex items-start gap-3 text-sm font-medium text-gray-600"
-											>
-												<div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-2 shrink-0" />
-												{criteria}
-											</li>
-										),
-									)}
+									{story.acceptanceCriteria.map((criteria: string) => (
+										<li
+											key={criteria}
+											className="flex items-start gap-3 text-sm font-medium text-gray-600"
+										>
+											<div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-2 shrink-0" />
+											{criteria}
+										</li>
+									))}
 								</ul>
 							) : (
 								<p className="text-sm text-gray-400 italic">
@@ -651,15 +649,13 @@ export default function UserStoryDetailModal({
 												{(subtask as any).attachments &&
 													(subtask as any).attachments.length > 0 && (
 														<div className="flex flex-wrap gap-2 pt-1">
-															{(subtask as any).attachments.map(
-																(att: any, idx: number) => (
-																	<SecureAttachmentLink
-																		key={idx}
-																		fileUrl={att.fileUrl}
-																		fileName={att.fileName}
-																	/>
-																),
-															)}
+															{(subtask as any).attachments.map((att: any) => (
+																<SecureAttachmentLink
+																	key={att.fileUrl}
+																	fileUrl={att.fileUrl}
+																	fileName={att.fileName}
+																/>
+															))}
 														</div>
 													)}
 											</div>

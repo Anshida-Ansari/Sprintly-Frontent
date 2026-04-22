@@ -32,7 +32,10 @@ export function Table<T>({ columns, data, actions }: TableProps<T>) {
 			</thead>
 			<tbody>
 				{data.map((row, idx) => (
-					<tr key={idx} className="border-t border-gray-200">
+					<tr
+						key={(row as any).id || (row as any)._id || idx}
+						className="border-t border-gray-200"
+					>
 						{columns.map((col) => (
 							<td key={col.key as string} className="px-4 py-2">
 								{col.render ? col.render(row) : (row as any)[col.key]}

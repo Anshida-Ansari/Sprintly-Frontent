@@ -150,9 +150,7 @@ export default function DeveloperMeetings() {
 									meeting.status === "CANCELLED" ||
 									meeting.status === "SCHEDULED"
 								}
-								onClick={() =>
-									(window.location.href = `/meeting/${meeting.roomId}`)
-								}
+								onClick={() => navigate(`/meeting/${meeting.roomId}`)}
 								className={`mt-8 w-full py-4 rounded-2xl font-black transition-all flex items-center justify-center gap-3 ${
 									meeting.status === "COMPLETED" ||
 									meeting.status === "CANCELLED"

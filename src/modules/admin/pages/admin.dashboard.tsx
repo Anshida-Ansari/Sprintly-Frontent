@@ -30,6 +30,7 @@ import { buildPath, ROUTES } from "../../../constants/routes";
 import { UserAuth } from "../../auth/store/store";
 import InviteMemberBtn from "../components/invite.member.btn";
 import InviteMemberModal from "../components/invite.modal";
+import UpgradeModal from "../components/UpgradeModal";
 import { useDashboardStats } from "../hooks/useDashboardStats";
 import { useInviteMember } from "../hooks/useInviteMember";
 
@@ -37,6 +38,7 @@ export default function AdminDashboard() {
 	const navigate = useNavigate();
 	const user = UserAuth((state) => state.user);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 	const { mutate: inviteMember, isPending } = useInviteMember();
 	const { data: statsRes } = useDashboardStats();
 	const handleInvite = (data: {
@@ -166,9 +168,9 @@ export default function AdminDashboard() {
 
 			{/* 3. Stats Grid */}
 			<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-				{stats.map((stat, index) => (
+				{stats.map((stat) => (
 					<div
-						key={index}
+						key={stat.label}
 						className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:translate-y-[-4px] transition-all duration-300"
 					>
 						<div
@@ -187,7 +189,7 @@ export default function AdminDashboard() {
 			{/* Subscription Status Banner */}
 			{(() => {
 				const plan = dashboardStats?.companyPlan ?? "free";
-				const isPro = plan.toLowerCase() === "pro";
+				const isPro = plan.toLowerCase().includes("pro");
 				const limit = dashboardStats?.projectLimit ?? 2;
 				const used = dashboardStats?.activeProjects ?? 0;
 				const usagePct =
@@ -294,7 +296,7 @@ export default function AdminDashboard() {
 						{/* Right: CTA */}
 						{!isPro && (
 							<button
-								onClick={() => navigate(buildPath.admin(ROUTES.ADMIN.SETTINGS))}
+								onClick={() => setIsUpgradeModalOpen(true)}
 								className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl transition-all shadow-sm whitespace-nowrap"
 							>
 								<Zap size={15} fill="currentColor" /> Upgrade to Pro
@@ -328,8 +330,8 @@ export default function AdminDashboard() {
 											paddingAngle={5}
 											dataKey="value"
 										>
-											{storyData.map((entry, index) => (
-												<Cell key={`cell-${index}`} fill={entry.color} />
+											{storyData.map((entry) => (
+												<Cell key={`cell-${entry.name}`} fill={entry.color} />
 											))}
 										</Pie>
 										<Tooltip
@@ -657,6 +659,12 @@ export default function AdminDashboard() {
 				onClose={() => setIsModalOpen(false)}
 				onSubmit={handleInvite}
 				isLoading={isPending}
+			/>
+
+			<UpgradeModal
+				isOpen={isUpgradeModalOpen}
+				onClose={() => setIsUpgradeModalOpen(false)}
+				currentPlanName={dashboardStats?.companyPlan}
 			/>
 		</div>
 	);

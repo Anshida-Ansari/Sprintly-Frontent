@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
-import { matchPath, useLocation } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import { matchPath, useLocation } from "react-router-dom";
 import { aiService } from "../service/ai.service";
 
 interface Message {
@@ -36,6 +36,7 @@ const BotAvatar = () => (
 		}}
 	>
 		<svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+			<title>Bot Avatar</title>
 			<path
 				d="M12 2a2 2 0 0 1 2 2v1h2a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3h2V4a2 2 0 0 1 2-2zm-1 8a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm4 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm-4 3h4v1H11v-1z"
 				fill="white"
@@ -203,6 +204,7 @@ export const AiChatbot: React.FC = () => {
 			>
 				{open ? (
 					<svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+						<title>Close Chat</title>
 						<path
 							d="M18 6 6 18M6 6l12 12"
 							stroke="white"
@@ -212,6 +214,7 @@ export const AiChatbot: React.FC = () => {
 					</svg>
 				) : (
 					<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+						<title>Open Chat</title>
 						<path
 							d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
 							stroke="white"
@@ -269,6 +272,7 @@ export const AiChatbot: React.FC = () => {
 							}}
 						>
 							<svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+								<title>Sprintly Assistant</title>
 								<path
 									d="M12 2a2 2 0 0 1 2 2v1h2a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3h2V4a2 2 0 0 1 2-2zm-1 8a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm4 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm-4 3h4v1H11v-1z"
 									fill="white"
@@ -368,9 +372,7 @@ export const AiChatbot: React.FC = () => {
 											border: "1px solid #eaeaf0",
 										}}
 									>
-										<ReactMarkdown>
-											{msg.text}
-										</ReactMarkdown>
+										<ReactMarkdown>{msg.text}</ReactMarkdown>
 									</div>
 								</div>
 							),
@@ -488,6 +490,7 @@ export const AiChatbot: React.FC = () => {
 								}}
 							>
 								<svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+									<title>Send Message</title>
 									<path
 										d="M22 2 11 13M22 2 15 22l-4-9-9-4 20-7z"
 										stroke="white"

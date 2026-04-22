@@ -168,6 +168,7 @@ export default function KanbanBoard() {
 									fill="none"
 									xmlns="http://www.w3.org/2000/svg"
 								>
+									<title>Select Icon</title>
 									<path
 										d="M2.5 4.5L6 8L9.5 4.5"
 										stroke="currentColor"
@@ -202,6 +203,7 @@ export default function KanbanBoard() {
 									fill="none"
 									xmlns="http://www.w3.org/2000/svg"
 								>
+									<title>Select Icon</title>
 									<path
 										d="M2.5 4.5L6 8L9.5 4.5"
 										stroke="currentColor"
@@ -422,20 +424,18 @@ function Swimlane({
 										Acceptance Criteria
 									</p>
 									<ul className="space-y-1">
-										{story.acceptanceCriteria.map(
-											(c: string, i: number) => (
-												<li
-													key={i}
-													className="flex items-start gap-1.5 text-xs text-gray-500"
-												>
-													<CheckCircle2
-														size={11}
-														className="text-emerald-500 mt-0.5 flex-shrink-0"
-													/>
-													<span>{c}</span>
-												</li>
-											),
-										)}
+										{story.acceptanceCriteria.map((c: string) => (
+											<li
+												key={c}
+												className="flex items-start gap-1.5 text-xs text-gray-500"
+											>
+												<CheckCircle2
+													size={11}
+													className="text-emerald-500 mt-0.5 flex-shrink-0"
+												/>
+												<span>{c}</span>
+											</li>
+										))}
 									</ul>
 								</div>
 							)}
@@ -638,21 +638,20 @@ function SubtaskCard({
 						</div>
 
 						{/* Attachments rendering */}
-						{task.attachments &&
-							task.attachments.length > 0 && (
-								<div
-									className="flex flex-wrap gap-1.5 overflow-x-auto pb-1 hide-scrollbar"
-									onClick={(e) => e.stopPropagation()}
-								>
-									{task.attachments.map((att: any, idx: number) => (
-										<SecureAttachmentLink
-											key={idx}
-											fileUrl={att.fileUrl}
-											fileName={att.fileName}
-										/>
-									))}
-								</div>
-							)}
+						{task.attachments && task.attachments.length > 0 && (
+							<div
+								className="flex flex-wrap gap-1.5 overflow-x-auto pb-1 hide-scrollbar"
+								onClick={(e) => e.stopPropagation()}
+							>
+								{task.attachments.map((att: any) => (
+									<SecureAttachmentLink
+										key={att.fileUrl}
+										fileUrl={att.fileUrl}
+										fileName={att.fileName}
+									/>
+								))}
+							</div>
+						)}
 					</div>
 					{task.assignedTo && (
 						<div
@@ -814,9 +813,9 @@ function SubtaskModal({
 						{(task as any).attachments &&
 						(task as any).attachments.length > 0 ? (
 							<div className="flex flex-wrap gap-2">
-								{(task as any).attachments.map((att: any, idx: number) => (
+								{(task as any).attachments.map((att: any) => (
 									<SecureAttachmentLink
-										key={idx}
+										key={att.fileUrl}
 										fileUrl={att.fileUrl}
 										fileName={att.fileName}
 									/>

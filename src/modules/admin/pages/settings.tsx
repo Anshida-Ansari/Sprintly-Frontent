@@ -10,6 +10,7 @@ import {
 	Zap,
 } from "lucide-react";
 import { useState } from "react";
+import UpgradeModal from "../components/UpgradeModal";
 import { useDisconnectGitHub } from "../hooks/useDisconnectGitHub";
 import { useGitHubStatus } from "../hooks/useGitHubStatus";
 import { useSubscriptionStatus } from "../hooks/useSubscription";
@@ -20,6 +21,7 @@ export default function Settings() {
 	const { data: subscription } = useSubscriptionStatus();
 	const disconnectMutation = useDisconnectGitHub();
 	const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
+	const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
 	const handleConnectGitHub = async () => {
 		try {
@@ -204,7 +206,7 @@ export default function Settings() {
 									<div className="flex items-center justify-between mb-6">
 										<div className="flex items-center gap-3">
 											<div
-												className={`p-2 rounded-xl ${subscription?.data?.currentPlan === "PRO" ? "bg-indigo-100 text-indigo-600" : "bg-gray-100 text-gray-600"}`}
+												className={`p-2 rounded-xl ${subscription?.data?.currentPlan?.toLowerCase().includes("pro") ? "bg-indigo-100 text-indigo-600" : "bg-gray-100 text-gray-600"}`}
 											>
 												<CreditCard size={20} />
 											</div>
@@ -217,7 +219,9 @@ export default function Settings() {
 												</h3>
 											</div>
 										</div>
-										{subscription?.data?.currentPlan === "PRO" ? (
+										{subscription?.data?.currentPlan
+											?.toLowerCase()
+											.includes("pro") ? (
 											<span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-black rounded-full uppercase tracking-tight">
 												Active
 											</span>
@@ -249,7 +253,9 @@ export default function Settings() {
 											</div>
 										</div>
 
-										{subscription?.data?.currentPlan === "FREE" && (
+										{!subscription?.data?.currentPlan
+											?.toLowerCase()
+											.includes("pro") && (
 											<div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
 												<p className="text-xs text-indigo-700 font-medium leading-relaxed">
 													You're currently limited to 2 projects. Upgrade to Pro
@@ -272,19 +278,28 @@ export default function Settings() {
 										{[
 											{
 												text: "Unlimited Projects",
-												active: subscription?.data?.currentPlan === "PRO",
+												active: subscription?.data?.currentPlan
+													?.toLowerCase()
+													.includes("pro"),
 											},
 											{
 												text: "Priority Support",
-												active: subscription?.data?.currentPlan === "PRO",
+												active: subscription?.data?.currentPlan
+													?.toLowerCase()
+													.includes("pro"),
 											},
 											{
 												text: "Advanced Analytics",
-												active: subscription?.data?.currentPlan === "PRO",
+												active: subscription?.data?.currentPlan
+													?.toLowerCase()
+													.includes("pro"),
 											},
 											{ text: "Basic Project Management", active: true },
-										].map((benefit, i) => (
-											<li key={i} className="flex items-center gap-2 text-sm">
+										].map((benefit) => (
+											<li
+												key={benefit.text}
+												className="flex items-center gap-2 text-sm"
+											>
 												<div
 													className={`w-1.5 h-1.5 rounded-full ${benefit.active ? "bg-indigo-600" : "bg-gray-300"}`}
 												/>
@@ -302,7 +317,9 @@ export default function Settings() {
 									</ul>
 
 									<div className="mt-6 pt-6 border-t border-gray-100 flex-1 flex flex-col justify-end">
-										{subscription?.data?.currentPlan === "PRO" ? (
+										{subscription?.data?.currentPlan
+											?.toLowerCase()
+											.includes("pro") ? (
 											<div className="space-y-4">
 												<div className="flex items-center justify-between text-sm">
 													<span className="text-gray-500 font-medium">
@@ -333,7 +350,10 @@ export default function Settings() {
 												)}
 											</div>
 										) : (
-											<button className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-indigo-50 text-indigo-600 rounded-xl transition-all group">
+											<button
+												onClick={() => setIsUpgradeModalOpen(true)}
+												className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-indigo-50 text-indigo-600 rounded-xl transition-all group"
+											>
 												<span className="text-sm font-bold">
 													Compare all plans
 												</span>
@@ -400,6 +420,12 @@ export default function Settings() {
 					</div>
 				</div>
 			)}
+
+			<UpgradeModal
+				isOpen={isUpgradeModalOpen}
+				onClose={() => setIsUpgradeModalOpen(false)}
+				currentPlanName={subscription?.data?.currentPlan}
+			/>
 		</div>
 	);
 }

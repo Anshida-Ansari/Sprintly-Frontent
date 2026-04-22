@@ -125,10 +125,10 @@ export default function SuperAdminDashboard() {
 			<div className="px-8 pb-8">
 				{/* Stats Grid */}
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-					{stats.map((stat, index) => {
+					{stats.map((stat) => {
 						return (
 							<div
-								key={index}
+								key={stat.label}
 								className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
 							>
 								<div className="flex items-start justify-between mb-4">
@@ -204,8 +204,8 @@ export default function SuperAdminDashboard() {
 							</button>
 						</div>
 						<div className="space-y-4">
-							{subscriptionData.map((item, index) => (
-								<div key={index} className="flex items-center gap-4">
+							{subscriptionData.map((item) => (
+								<div key={item.month} className="flex items-center gap-4">
 									<span className="text-sm font-medium text-gray-600 w-8">
 										{item.month}
 									</span>
@@ -231,7 +231,7 @@ export default function SuperAdminDashboard() {
 						</h2>
 						<div className="space-y-5">
 							{planDistribution.map((plan, index) => (
-								<div key={index}>
+								<div key={plan.name}>
 									<div className="flex items-center justify-between mb-2">
 										<span className="text-sm font-medium text-gray-700">
 											{plan.name}
@@ -316,9 +316,9 @@ export default function SuperAdminDashboard() {
 								</tr>
 							</thead>
 							<tbody className="bg-white divide-y divide-gray-200">
-								{recentCompanies.map((company, index) => (
+								{recentCompanies.map((company) => (
 									<tr
-										key={index}
+										key={company.name}
 										className="hover:bg-gray-50 transition-colors"
 									>
 										<td className="px-6 py-4">

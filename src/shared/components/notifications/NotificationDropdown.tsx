@@ -116,9 +116,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
 				)}
 			</div>
 
-			<style
-				dangerouslySetInnerHTML={{
-					__html: `
+			<style>{`
         .custom-scrollbar-light::-webkit-scrollbar {
           width: 5px;
         }
@@ -132,9 +130,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
         .custom-scrollbar-light::-webkit-scrollbar-thumb:hover {
           background: #d1d5db;
         }
-      `,
-				}}
-			/>
+      `}</style>
 		</div>
 	);
 };

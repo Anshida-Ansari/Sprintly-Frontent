@@ -39,6 +39,9 @@ const SuperAdminSettings = lazy(
 const SuperAdminSubscriptions = lazy(
 	() => import("../modules/superadmin/pages/superadmin.subscriptions"),
 );
+const SuperAdminSubscriptionPlans = lazy(
+	() => import("../modules/superadmin/pages/superadmin.subscription-plans"),
+);
 const SuperAdminAnalytics = lazy(
 	() => import("../modules/superadmin/pages/superadmin.analytics"),
 );
@@ -167,6 +170,10 @@ export const router = createBrowserRouter([
 					{
 						path: ROUTES.SUPERADMIN.SUBSCRIPTIONS,
 						element: <SuperAdminSubscriptions />,
+					},
+					{
+						path: ROUTES.SUPERADMIN.SUBSCRIPTION_PLANS,
+						element: <SuperAdminSubscriptionPlans />,
 					},
 					{
 						path: ROUTES.SUPERADMIN.ANALYTICS,

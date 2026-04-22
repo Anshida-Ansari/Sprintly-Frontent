@@ -28,6 +28,7 @@ export const API_ENDPOINTS = {
 		EXPIRING_REPORTS: "/superadmin/reports/expiring-soon",
 		TRIAL_REPORTS: "/superadmin/reports/trials",
 		PLATFORM_ANALYTICS: "/superadmin/analytics/platform",
+		SUBSCRIPTION_PLANS: "/superadmin/subscription-plans",
 	},
 
 	ADMIN: {
@@ -90,6 +91,7 @@ export const API_ENDPOINTS = {
 			USER_BURNDOWN: (sprintId: string) =>
 				`/projects/burndown/user/${sprintId}`,
 		},
+		ACTIVE_PLANS: "/admin/subscription-plans/active",
 	},
 
 	GITHUB: {

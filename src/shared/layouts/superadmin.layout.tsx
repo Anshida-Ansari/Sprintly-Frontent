@@ -23,6 +23,11 @@ const sidebarLinks = [
 		path: "/superadmin/subscriptions",
 		icon: CreditCard,
 	},
+	{
+		name: "Plans",
+		path: "/superadmin/subscription-plans",
+		icon: CreditCard,
+	},
 	{ name: "Logs", path: "/superadmin/logs", icon: Activity },
 	{ name: "Settings", path: "/superadmin/settings", icon: Settings },
 ];

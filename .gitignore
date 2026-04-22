@@ -22,3 +22,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+eslint_frontend_v*.json
+frontend_lint_errors.txt

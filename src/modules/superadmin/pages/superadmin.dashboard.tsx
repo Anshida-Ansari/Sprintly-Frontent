@@ -178,9 +178,9 @@ export default function SuperAdminDashboard() {
 
 			{/* KPI Grid - 6 cards */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-				{kpiCards.map((card, i) => (
+				{kpiCards.map((card) => (
 					<div
-						key={i}
+						key={card.label}
 						className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all"
 					>
 						<div className="flex items-start justify-between mb-4">
@@ -490,7 +490,7 @@ export default function SuperAdminDashboard() {
 					</div>
 					<div className="divide-y divide-gray-50 flex-1">
 						{recentCompanies.length > 0 ? (
-							recentCompanies.slice(0, 5).map((company: any, i: number) => {
+							recentCompanies.slice(0, 5).map((company: any) => {
 								const statusColors: any = {
 									approved: "bg-emerald-50 text-emerald-700",
 									rejected: "bg-rose-50 text-rose-700",
@@ -498,7 +498,7 @@ export default function SuperAdminDashboard() {
 								};
 								return (
 									<div
-										key={i}
+										key={company._id}
 										className="px-6 py-3.5 flex items-center justify-between hover:bg-gray-50/60 cursor-pointer transition-colors"
 										onClick={() =>
 											navigate(`/superadmin/companies/${company._id}`)

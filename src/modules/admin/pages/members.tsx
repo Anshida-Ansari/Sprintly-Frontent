@@ -134,9 +134,9 @@ export default function AdminInviteMemberPage() {
 						</div>
 						<ul className="space-y-2">
 							{["Unlimited Projects", "Sprint Access", "Task Assignment"].map(
-								(text, i) => (
+								(text) => (
 									<li
-										key={i}
+										key={text}
 										className="text-emerald-700/70 text-xs font-bold flex items-center gap-2"
 									>
 										<div className="w-1 h-1 bg-emerald-400 rounded-full" />

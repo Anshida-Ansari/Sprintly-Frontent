@@ -199,9 +199,9 @@ export function TaskCard({
 								{/* Render Attachment Links using Secure Links */}
 								{subtask.attachments && subtask.attachments.length > 0 && (
 									<div className="flex flex-wrap gap-1.5 mt-2 overflow-x-auto pb-1 hide-scrollbar">
-										{subtask.attachments.map((att, idx) => (
+										{subtask.attachments.map((att) => (
 											<SecureAttachmentLink
-												key={idx}
+												key={att.fileUrl}
 												fileUrl={att.fileUrl}
 												fileName={att.fileName}
 											/>

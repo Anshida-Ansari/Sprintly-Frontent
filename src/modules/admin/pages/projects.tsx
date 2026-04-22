@@ -62,7 +62,8 @@ export default function Projects({ isReadOnly = false }: ProjectsProps) {
 	};
 
 	const handleOpenCreateModal = () => {
-		if (isLimitReached) {
+		const isPro = currentPlan.toLowerCase().includes("pro");
+		if (isLimitReached && !isPro) {
 			setIsUpgradeModalOpen(true);
 		} else {
 			setIsModalOpen(true);
@@ -146,31 +147,33 @@ export default function Projects({ isReadOnly = false }: ProjectsProps) {
 			)}
 
 			{/* Subscription Limit Warning */}
-			{!isReadOnly && isLimitReached && currentPlan === "FREE" && (
-				<div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-4 flex items-center justify-between shadow-sm animate-in slide-in-from-top duration-500">
-					<div className="flex items-center gap-4">
-						<div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm">
-							<AlertCircle className="text-amber-500" size={24} />
+			{!isReadOnly &&
+				isLimitReached &&
+				!currentPlan.toLowerCase().includes("pro") && (
+					<div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-4 flex items-center justify-between shadow-sm animate-in slide-in-from-top duration-500">
+						<div className="flex items-center gap-4">
+							<div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm">
+								<AlertCircle className="text-amber-500" size={24} />
+							</div>
+							<div>
+								<h4 className="font-black text-gray-900 tracking-tight">
+									You’ve reached your free limit
+								</h4>
+								<p className="text-gray-500 text-sm font-medium">
+									Upgrade to Pro to create unlimited projects and unlock
+									advanced features.
+								</p>
+							</div>
 						</div>
-						<div>
-							<h4 className="font-black text-gray-900 tracking-tight">
-								You’ve reached your free limit
-							</h4>
-							<p className="text-gray-500 text-sm font-medium">
-								Upgrade to Pro to create unlimited projects and unlock advanced
-								features.
-							</p>
-						</div>
+						<button
+							onClick={() => setIsUpgradeModalOpen(true)}
+							className="px-6 py-2.5 bg-gray-900 text-white rounded-2xl font-bold hover:bg-gray-800 transition shadow-lg shadow-gray-200 flex items-center gap-2 text-sm"
+						>
+							<Zap size={16} className="fill-white" />
+							Upgrade Now
+						</button>
 					</div>
-					<button
-						onClick={() => setIsUpgradeModalOpen(true)}
-						className="px-6 py-2.5 bg-gray-900 text-white rounded-2xl font-bold hover:bg-gray-800 transition shadow-lg shadow-gray-200 flex items-center gap-2 text-sm"
-					>
-						<Zap size={16} className="fill-white" />
-						Upgrade Now
-					</button>
-				</div>
-			)}
+				)}
 
 			{/* Header */}
 			<div className="flex flex-col md:flex-row md:items-center justify-between gap-4 flex-shrink-0">
@@ -275,6 +278,7 @@ export default function Projects({ isReadOnly = false }: ProjectsProps) {
 			<UpgradeModal
 				isOpen={isUpgradeModalOpen}
 				onClose={() => setIsUpgradeModalOpen(false)}
+				currentPlanName={currentPlan}
 			/>
 		</div>
 	);

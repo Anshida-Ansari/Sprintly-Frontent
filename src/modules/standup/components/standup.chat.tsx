@@ -156,9 +156,10 @@ export const StandupChat = ({
 								</div>
 
 								<div className="grid grid-cols-7 gap-1 mb-2">
-									{["S", "M", "T", "W", "T", "F", "S"].map((d) => (
+									{["S", "M", "T", "W", "T", "F", "S"].map((d, idx) => (
 										<div
-											key={d}
+											// biome-ignore lint/suspicious/noArrayIndexKey: static list
+											key={`day-header-${d}-${idx}`}
 											className="text-center text-[9px] font-black text-gray-400 py-1"
 										>
 											{d}
@@ -167,7 +168,7 @@ export const StandupChat = ({
 								</div>
 
 								<div className="grid grid-cols-7 gap-1">
-									{calendarDays.map((day, idx) => {
+									{calendarDays.map((day) => {
 										const isSelected = isSameDay(day, new Date(selectedDate));
 										const isCurrentMonth = isSameMonth(day, currentMonth);
 										const isToday = isSameDay(day, new Date());
@@ -175,7 +176,7 @@ export const StandupChat = ({
 
 										return (
 											<button
-												key={idx}
+												key={day.toISOString()}
 												disabled={isDisabled}
 												onClick={(e) => {
 													e.stopPropagation();

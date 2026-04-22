@@ -20,22 +20,22 @@ export default function Footer() {
 						<h4 className="text-white font-semibold mb-4">Product</h4>
 						<ul className="space-y-2 text-sm">
 							<li>
-								<a href="#" className="hover:text-white transition">
+								<a href="#!" className="hover:text-white transition">
 									Features
 								</a>
 							</li>
 							<li>
-								<a href="#" className="hover:text-white transition">
+								<a href="#!" className="hover:text-white transition">
 									Pricing
 								</a>
 							</li>
 							<li>
-								<a href="#" className="hover:text-white transition">
+								<a href="#!" className="hover:text-white transition">
 									Integrations
 								</a>
 							</li>
 							<li>
-								<a href="#" className="hover:text-white transition">
+								<a href="#!" className="hover:text-white transition">
 									API Docs
 								</a>
 							</li>
@@ -46,22 +46,22 @@ export default function Footer() {
 						<h4 className="text-white font-semibold mb-4">Company</h4>
 						<ul className="space-y-2 text-sm">
 							<li>
-								<a href="#" className="hover:text-white transition">
+								<a href="#!" className="hover:text-white transition">
 									About Us
 								</a>
 							</li>
 							<li>
-								<a href="#" className="hover:text-white transition">
+								<a href="#!" className="hover:text-white transition">
 									Blog
 								</a>
 							</li>
 							<li>
-								<a href="#" className="hover:text-white transition">
+								<a href="#!" className="hover:text-white transition">
 									Careers
 								</a>
 							</li>
 							<li>
-								<a href="#" className="hover:text-white transition">
+								<a href="#!" className="hover:text-white transition">
 									Contact
 								</a>
 							</li>
@@ -80,17 +80,17 @@ export default function Footer() {
 								</a>
 							</li>
 							<li>
-								<a href="#" className="hover:text-white transition">
+								<a href="#!" className="hover:text-white transition">
 									Twitter
 								</a>
 							</li>
 							<li>
-								<a href="#" className="hover:text-white transition">
+								<a href="#!" className="hover:text-white transition">
 									GitHub
 								</a>
 							</li>
 							<li>
-								<a href="#" className="hover:text-white transition">
+								<a href="#!" className="hover:text-white transition">
 									LinkedIn
 								</a>
 							</li>
@@ -101,13 +101,13 @@ export default function Footer() {
 				<div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm">
 					<p>© 2025 Sprintly. All rights reserved.</p>
 					<div className="flex gap-6 mt-4 md:mt-0">
-						<a href="#" className="hover:text-white transition">
+						<a href="#!" className="hover:text-white transition">
 							Privacy Policy
 						</a>
-						<a href="#" className="hover:text-white transition">
+						<a href="#!" className="hover:text-white transition">
 							Terms of Service
 						</a>
-						<a href="#" className="hover:text-white transition">
+						<a href="#!" className="hover:text-white transition">
 							Security
 						</a>
 					</div>

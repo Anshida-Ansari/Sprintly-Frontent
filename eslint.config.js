@@ -2,7 +2,6 @@ import js from "@eslint/js";
 import { defineConfig, globalIgnores } from "eslint/config";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
-import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
@@ -19,10 +18,10 @@ export default defineConfig([
 			"@typescript-eslint/no-explicit-any": "warn",
 			"@typescript-eslint/no-unused-vars": [
 				"warn",
-				{ 
+				{
 					argsIgnorePattern: "^_",
 					varsIgnorePattern: "^_",
-					caughtErrorsIgnorePattern: "^_"
+					caughtErrorsIgnorePattern: "^_",
 				},
 			],
 			"react-refresh/only-export-components": [

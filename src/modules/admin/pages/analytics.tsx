@@ -167,7 +167,7 @@ export default function Analytics() {
 								>
 									{taskDistribution.map((_item: any, index: number) => (
 										<Cell
-											key={`cell-${index}`}
+											key={`cell-${_item._id}`}
 											fill={COLORS[index % COLORS.length]}
 										/>
 									))}

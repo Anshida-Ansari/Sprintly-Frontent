@@ -1,0 +1,822 @@
+node.exe : src\modules\admin\components\comment-section.tsx:96:29 lint/correctness/noUnusedFunctionParameters  FIXABLE 
+ ??????????
+At C:\Program Files\nodejs\npx.ps1:29 char:3
++   & $NODE_EXE $NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (src\modules\adm...BLE  ??????????:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+  ! This parameter is unused.
+  
+    94 ? 					</p>
+    95 ? 				) : (
+  > 96 ? 					comments.map((comment, index) => {
+       ? 					                       ^^^^^
+    97 ? 						const name = resolveName(comment);
+    98 ? 						return (
+  
+  i Unused parameters might be the result of an incomplete refactoring.
+  
+  i Unsafe fix: If this is intentional, prepend index with an underscore.
+  
+     94  94 ?   					</p>
+     95  95 ?   				) : (
+     96     ? - ? ? ? ? ? comments.map((comment,?index)?=>?{
+         96 ? + ? ? ? ? ? comments.map((comment,?_index)?=>?{
+     97  97 ?   						const name = resolveName(comment);
+     98  98 ?   						return (
+  
+
+src\modules\superadmin\pages\superadmin.subscription-plans.tsx:42:12 lint/correctness/noUnusedVariables  FIXABLE  
+??????????
+
+  ! This variable error is unused.
+  
+    40 ? 			}
+    41 ? 			setIsModalOpen(false);
+  > 42 ? 		} catch (error) {
+       ? 		         ^^^^^
+    43 ? 			toast.error("Failed to save plan");
+    44 ? 		}
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend error with an underscore.
+  
+     40  40 ?   			}
+     41  41 ?   			setIsModalOpen(false);
+     42     ? - ? ? }?catch?(error)?{
+         42 ? + ? ? }?catch?(_error)?{
+     43  43 ?   			toast.error("Failed to save plan");
+     44  44 ?   		}
+  
+
+src\shared\components\PaginatedTable.tsx:105:10 suppressions/unused ????????????????????????????????
+
+  ! Suppression comment has no effect. Remove the suppression or make sure you are suppressing the correct rule.
+  
+    103 ? 							data.map((item, rowIdx) => (
+    104 ? 								<tr
+  > 105 ? 									// biome-ignore lint/suspicious/noArrayIndexKey: rowIdx is used as a fallback for generic data
+        ? 									^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    106 ? 									key={(item as any)._id || (item as any).id || rowIdx}
+    107 ? 									className="hover:bg-gray-50/50 transition-colors group"
+  
+
+src\shared\components\Table.tsx:35:6 suppressions/unused ???????????????????????????????????????????
+
+  ! Suppression comment has no effect. Remove the suppression or make sure you are suppressing the correct rule.
+  
+    33 ? 			<tbody>
+    34 ? 				{data.map((row, idx) => (
+  > 35 ? 					// biome-ignore lint/suspicious/noArrayIndexKey: idx is used as a fallback for generic data
+       ? 					^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    36 ? 					<tr
+    37 ? 						key={(row as any).id || (row as any)._id || idx}
+  
+
+eslint_frontend_errors.json internalError/io  INTERNAL  ????????????????????????????????????????????
+
+  ? stream did not contain valid UTF-8
+  
+  ! This diagnostic was derived from an internal Biome error. Potential bug, please report it if necessary.
+  
+
+eslint_frontend_errors_v3.json internalError/io  INTERNAL  ?????????????????????????????????????????
+
+  ? stream did not contain valid UTF-8
+  
+  ! This diagnostic was derived from an internal Biome error. Potential bug, please report it if necessary.
+  
+
+eslint_frontend_warnings.json internalError/io  INTERNAL  ??????????????????????????????????????????
+
+  ? stream did not contain valid UTF-8
+  
+  ! This diagnostic was derived from an internal Biome error. Potential bug, please report it if necessary.
+  
+
+eslint_report.json internalError/io  INTERNAL  ?????????????????????????????????????????????????????
+
+  ? stream did not contain valid UTF-8
+  
+  ! This diagnostic was derived from an internal Biome error. Potential bug, please report it if necessary.
+  
+
+eslint_report_after_fix.json internalError/io  INTERNAL  ???????????????????????????????????????????
+
+  ? stream did not contain valid UTF-8
+  
+  ! This diagnostic was derived from an internal Biome error. Potential bug, please report it if necessary.
+  
+
+src\modules\admin\pages\settings.tsx:299:21 lint/suspicious/noArrayIndexKey ????????????????????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    297 ? 											{ text: "Basic Project Management", active: true },
+    298 ? 										].map((benefit, i) => (
+  > 299 ? 											<li key={i} className="flex items-center gap-2 text-sm">
+        ? 											         ^
+    300 ? 												<div
+    301 ? 													className={`w-1.5 h-1.5 rounded-full ${benefit.active ? "bg-indigo-600" : "bg-gray-300"}`}
+  
+  i This is the source of the key value.
+  
+    296 ? 											},
+    297 ? 											{ text: "Basic Project Management", active: true },
+  > 298 ? 										].map((benefit, i) => (
+        ? 										                ^
+    299 ? 											<li key={i} className="flex items-center gap-2 text-sm">
+    300 ? 												<div
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\auth\pages\otp.tsx:185:6 lint/a11y/noSvgWithoutTitle ???????????????????????????????????
+
+  ? Alternative text title element cannot be empty
+  
+    183 ? 				{/* Security Note */}
+    184 ? 				<div className="mt-8 flex items-start gap-2 text-xs text-gray-500">
+  > 185 ? 					<svg
+        ? 					^^^^
+  > 186 ? 						className="w-4 h-4 mt-0.5 flex-shrink-0"
+  > 187 ? 						fill="none"
+  > 188 ? 						stroke="currentColor"
+  > 189 ? 						viewBox="0 0 24 24"
+  > 190 ? 					>
+        ? 					^
+    191 ? 						<path
+    192 ? 							strokeLinecap="round"
+  
+  i For accessibility purposes, SVGs should have an alternative text, provided via title element. If the svg element 
+has role="img", you should add the aria-label or aria-labelledby attribute.
+  
+
+src\modules\developers\components\task.card.tsx:204:18 lint/suspicious/noArrayIndexKey ?????????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    202 ? 										{subtask.attachments.map((att, idx) => (
+    203 ? 											<SecureAttachmentLink
+  > 204 ? 												key={idx}
+        ? 												     ^^^
+    205 ? 												fileUrl={att.fileUrl}
+    206 ? 												fileName={att.fileName}
+  
+  i This is the source of the key value.
+  
+    200 ? 								{subtask.attachments && subtask.attachments.length > 0 && (
+    201 ? 									<div className="flex flex-wrap gap-1.5 mt-2 overflow-x-auto pb-1 hide-scrollbar">
+  > 202 ? 										{subtask.attachments.map((att, idx) => (
+        ? 										                               ^^^
+    203 ? 											<SecureAttachmentLink
+    204 ? 												key={idx}
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\developers\pages\kanban-board.tsx:164:9 lint/a11y/noSvgWithoutTitle ????????????????????
+
+  ? Alternative text title element cannot be empty
+  
+    162 ? 							</select>
+    163 ? 							<div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+  > 164 ? 								<svg
+        ? 								^^^^
+  > 165 ? 									width="12"
+         ...
+  > 169 ? 									xmlns="http://www.w3.org/2000/svg"
+  > 170 ? 								>
+        ? 								^
+    171 ? 									<path
+    172 ? 										d="M2.5 4.5L6 8L9.5 4.5"
+  
+  i For accessibility purposes, SVGs should have an alternative text, provided via title element. If the svg element 
+has role="img", you should add the aria-label or aria-labelledby attribute.
+  
+
+src\modules\developers\pages\kanban-board.tsx:198:9 lint/a11y/noSvgWithoutTitle ????????????????????
+
+  ? Alternative text title element cannot be empty
+  
+    196 ? 							</select>
+    197 ? 							<div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+  > 198 ? 								<svg
+        ? 								^^^^
+  > 199 ? 									width="12"
+         ...
+  > 203 ? 									xmlns="http://www.w3.org/2000/svg"
+  > 204 ? 								>
+        ? 								^
+    205 ? 									<path
+    206 ? 										d="M2.5 4.5L6 8L9.5 4.5"
+  
+  i For accessibility purposes, SVGs should have an alternative text, provided via title element. If the svg element 
+has role="img", you should add the aria-label or aria-labelledby attribute.
+  
+
+src\modules\developers\pages\kanban-board.tsx:816:16 lint/suspicious/noArrayIndexKey ???????????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    814 ? 								{(task as any).attachments.map((att: any, idx: number) => (
+    815 ? 									<SecureAttachmentLink
+  > 816 ? 										key={idx}
+        ? 										     ^^^
+    817 ? 										fileUrl={att.fileUrl}
+    818 ? 										fileName={att.fileName}
+  
+  i This is the source of the key value.
+  
+    812 ? 						(task as any).attachments.length > 0 ? (
+    813 ? 							<div className="flex flex-wrap gap-2">
+  > 814 ? 								{(task as any).attachments.map((att: any, idx: number) => (
+        ? 								                                          ^^^
+    815 ? 									<SecureAttachmentLink
+    816 ? 										key={idx}
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\developers\pages\my.tasks.tsx:372:25 lint/suspicious/noArrayIndexKey ???????????????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    370 ? 																	(criterion: string, i: number) => (
+    371 ? 																		<li
+  > 372 ? 																			key={i}
+        ? 																			     ^
+    373 ? 																			className="flex items-start gap-2 text-xs text-gray-600"
+    374 ? 																		>
+  
+  i This is the source of the key value.
+  
+    368 ? 															<ul className="space-y-1">
+    369 ? 																{story.acceptanceCriteria.map(
+  > 370 ? 																	(criterion: string, i: number) => (
+        ? 																	                    ^
+    371 ? 																		<li
+    372 ? 																			key={i}
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\meeting\hooks\useWebRTC.ts:67:41 lint/suspicious/useIterableCallbackReturn ?????????????
+
+  ? This callback passed to forEach() iterable method should not return a value.
+  
+    65 ? 			}
+    66 ? 			if (screenStreamRef.current) {
+  > 67 ? 				screenStreamRef.current.getTracks().forEach((track) => track.stop());
+       ? 				                                    ^^^^^^^
+    68 ? 				screenStreamRef.current = null;
+    69 ? 			}
+  
+  i Either remove this return or remove the returned value.
+  
+    65 ? 			}
+    66 ? 			if (screenStreamRef.current) {
+  > 67 ? 				screenStreamRef.current.getTracks().forEach((track) => track.stop());
+       ? 				                                                       ^^^^^^^^^^^^
+    68 ? 				screenStreamRef.current = null;
+    69 ? 			}
+  
+
+src\modules\meeting\hooks\useWebRTC.ts:51:25 lint/suspicious/useIterableCallbackReturn ?????????????
+
+  ? This callback passed to forEach() iterable method should not return a value.
+  
+    49 ? 					localStreamRef.current = stream;
+    50 ? 				} else {
+  > 51 ? 					stream.getTracks().forEach((track) => track.stop());
+       ? 					                   ^^^^^^^
+    52 ? 				}
+    53 ? 			} catch (err) {
+  
+  i Either remove this return or remove the returned value.
+  
+    49 ? 					localStreamRef.current = stream;
+    50 ? 				} else {
+  > 51 ? 					stream.getTracks().forEach((track) => track.stop());
+       ? 					                                      ^^^^^^^^^^^^
+    52 ? 				}
+    53 ? 			} catch (err) {
+  
+
+src\modules\meeting\hooks\useWebRTC.ts:63:40 lint/suspicious/useIterableCallbackReturn ?????????????
+
+  ? This callback passed to forEach() iterable method should not return a value.
+  
+    61 ? 			isMounted = false;
+    62 ? 			if (localStreamRef.current) {
+  > 63 ? 				localStreamRef.current.getTracks().forEach((track) => track.stop());
+       ? 				                                   ^^^^^^^
+    64 ? 				localStreamRef.current = null;
+    65 ? 			}
+  
+  i Either remove this return or remove the returned value.
+  
+    61 ? 			isMounted = false;
+    62 ? 			if (localStreamRef.current) {
+  > 63 ? 				localStreamRef.current.getTracks().forEach((track) => track.stop());
+       ? 				                                                      ^^^^^^^^^^^^
+    64 ? 				localStreamRef.current = null;
+    65 ? 			}
+  
+
+src\modules\meeting\hooks\useWebRTC.ts:322:33 lint/suspicious/useIterableCallbackReturn ????????????
+
+  ? This callback passed to forEach() iterable method should not return a value.
+  
+    320 ? 			socket.off("kicked");
+    321 ? 
+  > 322 ? 			Object.values(peers.current).forEach((p) => p.connection.close());
+        ? 			                             ^^^^^^^
+    323 ? 			peers.current = {};
+    324 ? 
+  
+  i Either remove this return or remove the returned value.
+  
+    320 ? 			socket.off("kicked");
+    321 ? 
+  > 322 ? 			Object.values(peers.current).forEach((p) => p.connection.close());
+        ? 			                                            ^^^^^^^^^^^^^^^^^^^^
+    323 ? 			peers.current = {};
+    324 ? 
+  
+
+src\modules\meeting\hooks\useWebRTC.ts:361:40 lint/suspicious/useIterableCallbackReturn ????????????
+
+  ? This callback passed to forEach() iterable method should not return a value.
+  
+    359 ? 	const stopScreenShare = () => {
+    360 ? 		if (screenStreamRef.current) {
+  > 361 ? 			screenStreamRef.current.getTracks().forEach((track) => track.stop());
+        ? 			                                    ^^^^^^^
+    362 ? 			screenStreamRef.current = null;
+    363 ? 		}
+  
+  i Either remove this return or remove the returned value.
+  
+    359 ? 	const stopScreenShare = () => {
+    360 ? 		if (screenStreamRef.current) {
+  > 361 ? 			screenStreamRef.current.getTracks().forEach((track) => track.stop());
+        ? 			                                                       ^^^^^^^^^^^^
+    362 ? 			screenStreamRef.current = null;
+    363 ? 		}
+  
+
+src\modules\meeting\pages\MeetingRoom.tsx:120:6 lint/suspicious/useIterableCallbackReturn ??????????
+
+  ? This callback passed to forEach() iterable method should not return a value.
+  
+    118 ? 			localStream
+    119 ? 				.getAudioTracks()
+  > 120 ? 				.forEach((track) => (track.enabled = !isMicOn));
+        ? 				 ^^^^^^^
+    121 ? 			setIsMicOn((prev) => !prev);
+    122 ? 		}
+  
+  i Either remove this return or remove the returned value.
+  
+    118 ? 			localStream
+    119 ? 				.getAudioTracks()
+  > 120 ? 				.forEach((track) => (track.enabled = !isMicOn));
+        ? 				                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    121 ? 			setIsMicOn((prev) => !prev);
+    122 ? 		}
+  
+
+src\modules\meeting\pages\MeetingRoom.tsx:120:26 lint/suspicious/noAssignInExpressions ?????????????
+
+  ? The assignment should not be in an expression.
+  
+    118 ? 			localStream
+    119 ? 				.getAudioTracks()
+  > 120 ? 				.forEach((track) => (track.enabled = !isMicOn));
+        ? 				                     ^^^^^^^^^^^^^^^^^^^^^^^^
+    121 ? 			setIsMicOn((prev) => !prev);
+    122 ? 		}
+  
+  i The use of assignments in expressions is confusing.
+    Expressions are often considered as side-effect free.
+  
+
+src\modules\meeting\pages\MeetingRoom.tsx:130:6 lint/suspicious/useIterableCallbackReturn ??????????
+
+  ? This callback passed to forEach() iterable method should not return a value.
+  
+    128 ? 			localStream
+    129 ? 				.getVideoTracks()
+  > 130 ? 				.forEach((track) => (track.enabled = newState));
+        ? 				 ^^^^^^^
+    131 ? 			setIsCameraOn(newState);
+    132 ? 			emitCameraToggle(newState); // tell peers
+  
+  i Either remove this return or remove the returned value.
+  
+    128 ? 			localStream
+    129 ? 				.getVideoTracks()
+  > 130 ? 				.forEach((track) => (track.enabled = newState));
+        ? 				                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    131 ? 			setIsCameraOn(newState);
+    132 ? 			emitCameraToggle(newState); // tell peers
+  
+
+src\modules\meeting\pages\MeetingRoom.tsx:130:26 lint/suspicious/noAssignInExpressions ?????????????
+
+  ? The assignment should not be in an expression.
+  
+    128 ? 			localStream
+    129 ? 				.getVideoTracks()
+  > 130 ? 				.forEach((track) => (track.enabled = newState));
+        ? 				                     ^^^^^^^^^^^^^^^^^^^^^^^^
+    131 ? 			setIsCameraOn(newState);
+    132 ? 			emitCameraToggle(newState); // tell peers
+  
+  i The use of assignments in expressions is confusing.
+    Expressions are often considered as side-effect free.
+  
+
+src\modules\meeting\pages\MeetingRoom.tsx:152:28 lint/suspicious/useIterableCallbackReturn ??????????
+
+  ? This callback passed to forEach() iterable method should not return a value.
+  
+    150 ? 	const handleLeave = () => {
+    151 ? 		if (localStream) {
+  > 152 ? 			localStream.getTracks().forEach((track) => track.stop());
+        ? 			                        ^^^^^^^
+    153 ? 		}
+    154 ? 		navigate(getDashboardPath());
+  
+  i Either remove this return or remove the returned value.
+  
+    150 ? 	const handleLeave = () => {
+    151 ? 		if (localStream) {
+  > 152 ? 			localStream.getTracks().forEach((track) => track.stop());
+        ? 			                                           ^^^^^^^^^^^^
+    153 ? 		}
+    154 ? 		navigate(getDashboardPath());
+  
+
+src\modules\meeting\pages\MeetingRoom.tsx:305:17 lint/suspicious/noArrayIndexKey ???????????????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    303 ? 									{messages.map((msg, i) => (
+    304 ? 										<div
+  > 305 ? 											key={i}
+        ? 											     ^
+    306 ? 											className={`flex flex-col ${msg.senderId === "me" ? "items-end" : "items-start"}`}
+    307 ? 										>
+  
+  i This is the source of the key value.
+  
+    301 ? 										</p>
+    302 ? 									)}
+  > 303 ? 									{messages.map((msg, i) => (
+        ? 									                    ^
+    304 ? 										<div
+    305 ? 											key={i}
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\meeting\pages\developer.meetings.tsx:154:11 lint/suspicious/noAssignInExpressions ??????????
+
+  ? The assignment should not be in an expression.
+  
+    152 ? 								}
+    153 ? 								onClick={() =>
+  > 154 ? 									(window.location.href = `/meeting/${meeting.roomId}`)
+        ? 									 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    155 ? 								}
+    156 ? 								className={`mt-8 w-full py-4 rounded-2xl font-black transition-all flex items-center justify-center 
+gap-3 ${
+  
+  i The use of assignments in expressions is confusing.
+    Expressions are often considered as side-effect free.
+  
+
+src\modules\reports\pages\Reports.tsx:248:15 lint/suspicious/noArrayIndexKey ???????????????????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    246 ? 							{item.assignedUsers?.map((name: string, i: number) => (
+    247 ? 								<span
+  > 248 ? 									key={i}
+        ? 									     ^
+    249 ? 									className="px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded text-[10px] font-bold"
+    250 ? 								>
+  
+  i This is the source of the key value.
+  
+    244 ? 					render: (item: StoryReport) => (
+    245 ? 						<div className="flex flex-wrap gap-1">
+  > 246 ? 							{item.assignedUsers?.map((name: string, i: number) => (
+        ? 							                                        ^
+    247 ? 								<span
+    248 ? 									key={i}
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\standup\components\standup.chat.tsx:161:36 lint/suspicious/noArrayIndexKey ?????????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    159 ? 									{["S", "M", "T", "W", "T", "F", "S"].map((d, idx) => (
+    160 ? 										<div
+  > 161 ? 											key={`day-header-${d}-${idx}`}
+        ? 											                        ^^^
+    162 ? 											className="text-center text-[9px] font-black text-gray-400 py-1"
+    163 ? 										>
+  
+  i This is the source of the key value.
+  
+    158 ? 								<div className="grid grid-cols-7 gap-1 mb-2">
+  > 159 ? 									{["S", "M", "T", "W", "T", "F", "S"].map((d, idx) => (
+        ? 									                                             ^^^
+    160 ? 										<div
+    161 ? 											key={`day-header-${d}-${idx}`}
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\superadmin\pages\page.tsx:131:14 lint/suspicious/noArrayIndexKey ???????????????????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    129 ? 						return (
+    130 ? 							<div
+  > 131 ? 								key={index}
+        ? 								     ^^^^^
+    132 ? 								className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md 
+transition-shadow"
+    133 ? 							>
+  
+  i This is the source of the key value.
+  
+    126 ? 				{/* Stats Grid */}
+    127 ? 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  > 128 ? 					{stats.map((stat, index) => {
+        ? 					                  ^^^^^
+    129 ? 						return (
+    130 ? 							<div
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\superadmin\pages\page.tsx:208:19 lint/suspicious/noArrayIndexKey ???????????????????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    206 ? 						<div className="space-y-4">
+    207 ? 							{subscriptionData.map((item, index) => (
+  > 208 ? 								<div key={index} className="flex items-center gap-4">
+        ? 								          ^^^^^
+    209 ? 									<span className="text-sm font-medium text-gray-600 w-8">
+    210 ? 										{item.month}
+  
+  i This is the source of the key value.
+  
+    205 ? 						</div>
+    206 ? 						<div className="space-y-4">
+  > 207 ? 							{subscriptionData.map((item, index) => (
+        ? 							                             ^^^^^
+    208 ? 								<div key={index} className="flex items-center gap-4">
+    209 ? 									<span className="text-sm font-medium text-gray-600 w-8">
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\superadmin\pages\page.tsx:234:19 lint/suspicious/noArrayIndexKey ???????????????????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    232 ? 						<div className="space-y-5">
+    233 ? 							{planDistribution.map((plan, index) => (
+  > 234 ? 								<div key={index}>
+        ? 								          ^^^^^
+    235 ? 									<div className="flex items-center justify-between mb-2">
+    236 ? 										<span className="text-sm font-medium text-gray-700">
+  
+  i This is the source of the key value.
+  
+    231 ? 						</h2>
+    232 ? 						<div className="space-y-5">
+  > 233 ? 							{planDistribution.map((plan, index) => (
+        ? 							                             ^^^^^
+    234 ? 								<div key={index}>
+    235 ? 									<div className="flex items-center justify-between mb-2">
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\superadmin\pages\page.tsx:321:16 lint/suspicious/noArrayIndexKey ???????????????????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    319 ? 								{recentCompanies.map((company, index) => (
+    320 ? 									<tr
+  > 321 ? 										key={index}
+        ? 										     ^^^^^
+    322 ? 										className="hover:bg-gray-50 transition-colors"
+    323 ? 									>
+  
+  i This is the source of the key value.
+  
+    317 ? 							</thead>
+    318 ? 							<tbody className="bg-white divide-y divide-gray-200">
+  > 319 ? 								{recentCompanies.map((company, index) => (
+        ? 								                               ^^^^^
+    320 ? 									<tr
+    321 ? 										key={index}
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\superadmin\pages\superadmin.analytics.tsx:113:12 lint/suspicious/noArrayIndexKey ??????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    111 ? 				{stats.map((stat, index) => (
+    112 ? 					<div
+  > 113 ? 						key={index}
+        ? 						     ^^^^^
+    114 ? 						className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all"
+    115 ? 					>
+  
+  i This is the source of the key value.
+  
+    109 ? 			{/* Stats Grid */}
+    110 ? 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+  > 111 ? 				{stats.map((stat, index) => (
+        ? 				                  ^^^^^
+    112 ? 					<div
+    113 ? 						key={index}
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\superadmin\pages\superadmin.analytics.tsx:335:30 lint/suspicious/noArrayIndexKey ??????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    333 ? 										},
+    334 ? 									].map((entry, index) => (
+  > 335 ? 										<Cell key={`cell-${index}`} fill={entry.fill} />
+        ? 										                   ^^^^^
+    336 ? 									))}
+    337 ? 								</Bar>
+  
+  i This is the source of the key value.
+  
+    332 ? 											fill: "#10b981",
+    333 ? 										},
+  > 334 ? 									].map((entry, index) => (
+        ? 									              ^^^^^
+    335 ? 										<Cell key={`cell-${index}`} fill={entry.fill} />
+    336 ? 									))}
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+Checked 204 files in 1745ms. No fixes applied.
+Found 31 errors.
+Found 4 warnings.
+  
+
+src\modules\superadmin\pages\superadmin.analytics.tsx:353:14 lint/suspicious/noArrayIndexKey ??????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    351 ? 						{topData.map((company: any, idx: number) => (
+    352 ? 							<div
+  > 353 ? 								key={idx}
+        ? 								     ^^^
+    354 ? 								className="flex items-center justify-between group"
+    355 ? 							>
+  
+  i This is the source of the key value.
+  
+    349 ? 					</h3>
+    350 ? 					<div className="space-y-6">
+  > 351 ? 						{topData.map((company: any, idx: number) => (
+        ? 						                            ^^^
+    352 ? 							<div
+    353 ? 								key={idx}
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\superadmin\pages\superadmin.analytics.tsx:401:25 lint/suspicious/noArrayIndexKey ??????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    399 ? 									{metData.planDistribution.map((_: any, index: number) => (
+    400 ? 										<Cell
+  > 401 ? 											key={`cell-${index}`}
+        ? 											             ^^^^^
+    402 ? 											fill={COLORS[index % COLORS.length]}
+    403 ? 											strokeWidth={0}
+  
+  i This is the source of the key value.
+  
+    397 ? 									dataKey="value"
+    398 ? 								>
+  > 399 ? 									{metData.planDistribution.map((_: any, index: number) => (
+        ? 									                                       ^^^^^
+    400 ? 										<Cell
+    401 ? 											key={`cell-${index}`}
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\superadmin\pages\superadmin.analytics.tsx:419:18 lint/suspicious/noArrayIndexKey ??????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    417 ? 					<div className="flex justify-center gap-8 mt-4">
+    418 ? 						{metData.planDistribution.map((plan: any, idx: number) => (
+  > 419 ? 							<div key={idx} className="flex items-center gap-2">
+        ? 							          ^^^
+    420 ? 								<div
+    421 ? 									className="h-2.5 w-2.5 rounded-full"
+  
+  i This is the source of the key value.
+  
+    416 ? 					</div>
+    417 ? 					<div className="flex justify-center gap-8 mt-4">
+  > 418 ? 						{metData.planDistribution.map((plan: any, idx: number) => (
+        ? 						                                          ^^^
+    419 ? 							<div key={idx} className="flex items-center gap-2">
+    420 ? 								<div
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+src\modules\superadmin\pages\superadmin.subscriptions.tsx:69:12 lint/suspicious/noArrayIndexKey ??????????
+
+  ? Avoid using the index of an array as key property in an element.
+  
+    67 ? 				{stats.map((stat, index) => (
+    68 ? 					<div
+  > 69 ? 						key={index}
+       ? 						     ^^^^^
+    70 ? 						className="group relative bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md 
+transition-all"
+    71 ? 					>
+  
+  i This is the source of the key value.
+  
+    65 ? 			{/* Stats Grid */}
+    66 ? 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+  > 67 ? 				{stats.map((stat, index) => (
+       ? 				                  ^^^^^
+    68 ? 					<div
+    69 ? 						key={index}
+  
+  i The order of the items may change, and this also affects performances and component state.
+  
+  i Check the React documentation. 
+  
+
+check ??????????????????????????????????????????????????????????????????????????????????????????????
+
+  ? Some errors were emitted while running checks.
+  
+

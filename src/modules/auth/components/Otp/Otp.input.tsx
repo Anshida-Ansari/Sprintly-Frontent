@@ -82,7 +82,8 @@ const OtpInput = forwardRef<OtpInputRef, OtpInputProps>(
 			<div onPaste={handlePaste} className="flex justify-center gap-3">
 				{otp.map((digit, index) => (
 					<input
-						key={index}
+						// biome-ignore lint/suspicious/noArrayIndexKey: OTP inputs are static and never reordered
+						key={`otp-${index}`}
 						ref={(el) => {
 							inputRefs.current[index] = el;
 						}}

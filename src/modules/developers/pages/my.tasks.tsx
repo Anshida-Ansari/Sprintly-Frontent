@@ -367,9 +367,9 @@ export default function MyTasksPage() {
 															</p>
 															<ul className="space-y-1">
 																{story.acceptanceCriteria.map(
-																	(criterion: string, i: number) => (
+																	(criterion: string) => (
 																		<li
-																			key={i}
+																			key={criterion}
 																			className="flex items-start gap-2 text-xs text-gray-600"
 																		>
 																			<CheckCircle2
